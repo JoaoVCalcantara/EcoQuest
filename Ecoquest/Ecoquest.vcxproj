@@ -141,7 +141,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Ecoquest.cpp" />
+    <ClCompile Include="Ecoquest.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

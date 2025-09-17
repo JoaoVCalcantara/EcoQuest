@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Ecoquest.cpp">
+    <ClCompile Include="Ecoquest.c">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
   </ItemGroup>
