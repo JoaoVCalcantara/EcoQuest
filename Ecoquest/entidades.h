@@ -1,5 +1,6 @@
 #ifndef entidades_h
 #define entidades_h
+#include <stdbool.h>
 
 typedef struct {
 	float x;
@@ -9,9 +10,9 @@ typedef struct {
 
 }jogador;
 
-void iniciarentidade(jogador *p,float x,float y);
+void iniciarentidade(jogador *p, float width, float height);
 void desenharjogador(jogador *p);
-void limitarjogador(jogador* p, float width, float height);
+bool colisao(float cx, float cy, float r, float rx, float ry, float rw, float rh);
 
 
 

@@ -13,6 +13,17 @@
 #include <stdio.h>
 
 
+
+
+void limitarjogador(jogador* p, float width, float height) {
+
+	if (p->x < width) p->x = p->raio;
+	if (p->x > width - p->raio) p->x = width - p->raio;
+	if (p->y < p->raio) p->y = p->raio;
+	if (p->y > height - p->raio) p->y = height - p->raio;
+
+}
+
 void desenhar_quadrados(int width, int height) {
 	int margem = width * 0.125;   // tamanho proporcional (12.5% da tela)
 	int tamanho = width * 0.125;  // quadrados escalando com a largura
@@ -48,7 +59,6 @@ int main() {
 	al_install_keyboard();
 	al_init_primitives_addon();
 
-
 	ALLEGRO_DISPLAY* display = al_create_display(1280, 720);
 	ALLEGRO_TIMER* timer = al_create_timer(1.0 / 60.0); // <-- FPS
 	ALLEGRO_FONT* fonte = al_load_font("./font.ttf", 50, 0);
@@ -59,28 +69,33 @@ int main() {
 	const int width = al_get_display_width(display);
 	const int height = al_get_display_height(display);
 
+
+
 	ALLEGRO_EVENT_QUEUE* event_queue = al_create_event_queue();
 	al_register_event_source(event_queue, al_get_display_event_source(display));
 	al_register_event_source(event_queue, al_get_timer_event_source(timer));
 	al_register_event_source(event_queue, al_get_keyboard_event_source());
+	
+	ALLEGRO_USER_EVENT* custom_source;
+	al_init_user_event_source(&custom_source);
+	al_register_event_source(event_queue, &custom_source);
+	
+
 
 	al_start_timer(timer); // inicia o timer
 
 	//Variaveis
-		jogador *jogador;
+		jogador jogador;
 		iniciarentidade(&jogador,width,height);
 
 	float frame = 0.f;
 	int current_frame_y = 161;
 
-	float velocidade = 8.0f;
-	float x = width / 2.0f;
-	float y = height / 2.0f;
-	float raio = 50.0f;
+
 
 	bool rodando = true;
 	bool ativado = false;
-	bool desenhar = false;
+	bool desenhar = true;
 
 
 
@@ -98,26 +113,26 @@ int main() {
 
 			if (al_key_down(&estado, ALLEGRO_KEY_W)) {
 
-				jogador->y -= jogador->velocidade;
+				jogador.y -= jogador.velocidade;
 			}
 			if (al_key_down(&estado, ALLEGRO_KEY_S)) {
 
 
-				jogador->y += jogador->velocidade;
+				jogador.y += jogador.velocidade;
 			}
 			if (al_key_down(&estado, ALLEGRO_KEY_A)) {
 
-				jogador->x -= jogador->velocidade;
+				jogador.x -= jogador.velocidade;
 
 			}
 			if (al_key_down(&estado, ALLEGRO_KEY_D)) {
 
-				jogador->x += jogador->velocidade;
+				jogador.x += jogador.velocidade;
 
 			}
 
 			 //limitar posição do círculo
-			limitarjogador(&jogador, width, height);
+			//limitarjogador(&jogador, width, height);
 
 			desenhar = true;
 		}
@@ -127,13 +142,13 @@ int main() {
 
 				int margem = width * 0.125;
 				int tamanho = width * 0.125;
-				float q1 = circle_rect_collision(x, y, raio, 0, 0, tamanho, tamanho);
-				float q2 = circle_rect_collision(x, y, raio, width - tamanho, 0, width, tamanho);
-				float q3 = circle_rect_collision(x, y, raio, 0, height - tamanho, tamanho, height);
-				float q4 = circle_rect_collision(x, y, raio, width - tamanho, height - tamanho, width, height);
+				bool q1 = colisao(jogador.x, jogador.y, jogador.raio, 0, 0, tamanho, tamanho);
+			
 
-				if (q1 || q2 || q3 || q4) {
+				if (q1) {
 					ativado = true;
+
+				
 				}
 				else ativado = false;
 			}
@@ -155,12 +170,11 @@ int main() {
 			al_draw_bitmap(bg, 0, 0, 0);
 
 			desenhar_quadrados(width, height);
-			desenharjogador(&jogador,x,y);
-
+			desenharjogador(&jogador);
 			if (ativado) {
 
-				al_draw_bitmap_region(dragao, 191 * (int)frame, current_frame_y, 191, 161, 640, 360, 0);
 			}
+		
 
 			al_flip_display();
 		}
