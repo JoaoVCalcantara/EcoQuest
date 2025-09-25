@@ -4,13 +4,13 @@
 #include <stdbool.h>
 #include <math.h>
 
-void iniciarentidade(jogador *p,float width,float height) {
+void iniciarentidade(entidade *p,float width,float height) {
 	p->x = width/2.0f;
 	p->y = height/2.0f;
 	p->raio = 50.0f;
-	p->velocidade = 6.0f;
+	p->velocidade = 8.0f;
 }
-void desenharjogador(jogador* p) {
+void desenharjogador(entidade* p) {
 
 	al_draw_filled_circle(p->x, p->y, p->raio, al_map_rgb(0, 0, 0));
 }
@@ -23,4 +23,11 @@ bool colisao(float cx, float cy, float r,
 	float dx = cx - closestX;
 	float dy = cy - closestY;
 	return (dx * dx + dy * dy) <= (r * r);
+}
+
+void limitar_jogador(entidade* p, float width, float height) {
+	if (p->x < p->raio) p->x = p->raio;
+	if (p->x > width - p->raio) p->x = width - p->raio;
+	if (p->y < p->raio) p->y = p->raio;
+	if (p->y > height - p->raio) p->y = height - p->raio;
 }

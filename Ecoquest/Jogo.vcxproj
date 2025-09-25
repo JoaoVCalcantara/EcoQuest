@@ -19,6 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="allegro_init.c" />
+    <ClCompile Include="cenario.c" />
     <ClCompile Include="entidades.c" />
     <ClCompile Include="main.c" />
   </ItemGroup>
@@ -26,6 +28,8 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="allegro_init.h" />
+    <ClInclude Include="cenario.h" />
     <ClInclude Include="entidades.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
