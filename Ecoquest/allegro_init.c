@@ -97,6 +97,7 @@ int inicializar_allegro(AllegroContext* ctx) {
 
     ctx->width = al_get_display_width(ctx->display);
     ctx->height = al_get_display_height(ctx->display);
+    ctx->tamanho = ctx->width * 0.125f;
 
     return 1; // sucesso
 }

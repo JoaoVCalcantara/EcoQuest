@@ -1,6 +1,7 @@
 #include "entidades.h"
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_primitives.h>
+
 #include <stdbool.h>
 #include <math.h>
 
@@ -11,8 +12,8 @@ void iniciarentidade(entidade *p,float width,float height) {
 	p->velocidade = 8.0f;
 }
 void desenharjogador(entidade* p) {
-
 	al_draw_filled_circle(p->x, p->y, p->raio, al_map_rgb(0, 0, 0));
+
 }
 
 bool colisao(float cx, float cy, float r,

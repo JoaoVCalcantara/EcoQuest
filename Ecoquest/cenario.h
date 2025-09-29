@@ -4,14 +4,16 @@
 #include "allegro_init.h"
 
 typedef enum {
-	MENU,
+	
 	MUNDO,
 	ANIMAL,
-	FIM_DE_JOGO,
+	
 
 }CenasDoJogo;
 
-void desenhar_quadrados(int width, int height);
-void cenarios(CenasDoJogo *atual, entidade *jogador, AllegroContext *ctx);
+void quadrado(AllegroContext* ctx);
+
+void cenarios(CenasDoJogo atual, AllegroContext *ctx);
+
 
 #endif

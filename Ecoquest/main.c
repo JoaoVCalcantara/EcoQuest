@@ -12,13 +12,39 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+#define NUM_ENTRADAS 4
+#define NUM_SAIDAS 1
 
+// Declare portal positions globally or static inside main
+float entradaX[NUM_ENTRADAS];
+float entradaY[NUM_ENTRADAS];
+float saidaX;
+float saidaY;
+float comprimentoPorta;
+float alturaPorta;
+// Initialize portal positions (adjust these values as needed)
 
-
+void initPortas(int width, int height) {
+    float tamanho = width * 0.125f;  // same as in quadrado()
+     comprimentoPorta = tamanho;
+     alturaPorta = tamanho;
+    // Example entry positions in MUNDO scenario
+    entradaX[0] = 0.0f;
+    entradaY[0] = 0.0f;
+    entradaX[1] = width - tamanho;
+    entradaY[1] = 0.0f;
+    entradaX[2] = 0.0f;
+    entradaY[2] = height - tamanho;
+    entradaX[3] = width - tamanho;
+    entradaY[3] = height - tamanho;
+    // Example exit position in ANIMAL scenario
+    saidaX = width / 2.0f - tamanho / 2.0f;
+    saidaY = height / 2.0f - tamanho / 2.0f;
+}
 
 int main() {
 
-
+    
     AllegroContext ctx;
     if (!inicializar_allegro(&ctx)) {
         printf("Falha ao inicializar Allegro\n");
@@ -32,6 +58,9 @@ int main() {
 
     bool rodando = true;
     bool desenhar = true;
+
+    initPortas(ctx.width,ctx.height);
+
 
     while (rodando) {
         ALLEGRO_EVENT event;
@@ -53,23 +82,36 @@ int main() {
 
             desenhar = true;
 
-            bool square1 = colisao(jogador.x, jogador.y, jogador.raio, 0, 0, ctx.width, ctx.height);
+        } 
+            
 
-            if (al_key_down(&estado, ALLEGRO_KEY_E)){
-                if (square1) {
-                    atual = ANIMAL;
-                    jogador.x = jogador.raio;
-                    jogador.y = ctx.height; 
+        if (event.type == ALLEGRO_EVENT_KEY_DOWN && event.keyboard.keycode == ALLEGRO_KEY_E) {
+            if (atual == MUNDO) {
+                for (int i = 0; i < NUM_ENTRADAS; i++) {
+                    if (colisao(jogador.x, jogador.y, jogador.raio,
+                        entradaX[i], entradaY[i], comprimentoPorta, alturaPorta)) {
+                        atual = ANIMAL;
+                       
+                        break;
+                    }
                 }
             }
-        } 
+            else if (atual == ANIMAL) {
+                if (colisao(jogador.x, jogador.y, jogador.raio,
+                    saidaX, saidaY, comprimentoPorta, alturaPorta)) {
+                    atual = MUNDO;
+                    
+                }
+            }
+        }
+
+        printf("saidaX %f e saidaY %f\n",saidaX,saidaY);
 
         if (desenhar && al_is_event_queue_empty(ctx.event_queue)) {
             desenhar = false;
 
-            desenhar_quadrados(ctx.height, ctx.height);
-            cenarios(atual, &jogador, &ctx);
-           
+            cenarios(atual,&ctx);
+            desenharjogador(&jogador);
             al_flip_display();
         }
     }

@@ -18,6 +18,7 @@ typedef struct {
     ALLEGRO_EVENT_QUEUE* event_queue;
     int width;
     int height;
+    float tamanho;
 } AllegroContext;
 
 int inicializar_allegro(AllegroContext* ctx);
