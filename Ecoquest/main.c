@@ -105,7 +105,6 @@ int main() {
             }
         }
 
-        printf("saidaX %f e saidaY %f\n",saidaX,saidaY);
 
         if (desenhar && al_is_event_queue_empty(ctx.event_queue)) {
             desenhar = false;
