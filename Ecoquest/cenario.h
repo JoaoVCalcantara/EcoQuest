@@ -6,14 +6,16 @@
 typedef enum {
 	
 	MUNDO,
-	ANIMAL,
-	
+	CAVERNA_1,
+	CAVERNA_2,
+	CAVERNA_3,
+	CAVERNA_4,
 
 }CenasDoJogo;
 
 void quadrado(AllegroContext* ctx);
 
-void cenarios(CenasDoJogo atual, AllegroContext *ctx);
+void cenarios(CenasDoJogo atual, AllegroContext *ctx, entidade jogador);
 
 
 #endif

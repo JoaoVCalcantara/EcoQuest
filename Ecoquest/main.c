@@ -90,13 +90,26 @@ int main() {
                 for (int i = 0; i < NUM_ENTRADAS; i++) {
                     if (colisao(jogador.x, jogador.y, jogador.raio,
                         entradaX[i], entradaY[i], comprimentoPorta, alturaPorta)) {
-                        atual = ANIMAL;
+                        switch (i) {
+                        case 0:
+                            atual = CAVERNA_1;
+                            break;
+                        case 1:
+                            atual = CAVERNA_2;
+                            break;
+                        case 2:
+                            atual = CAVERNA_3;
+                            break;
+                        case 3: 
+                            atual = CAVERNA_4;
+                            break;
+                        }
                        
                         break;
                     }
                 }
             }
-            else if (atual == ANIMAL) {
+            else if (atual != MUNDO) {
                 if (colisao(jogador.x, jogador.y, jogador.raio,
                     saidaX, saidaY, comprimentoPorta, alturaPorta)) {
                     atual = MUNDO;
@@ -109,7 +122,7 @@ int main() {
         if (desenhar && al_is_event_queue_empty(ctx.event_queue)) {
             desenhar = false;
 
-            cenarios(atual,&ctx);
+            cenarios(atual,&ctx,jogador);
             desenharjogador(&jogador);
             al_flip_display();
         }
