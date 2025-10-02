@@ -7,114 +7,58 @@
 #include "entidades.h"
 #include "allegro_init.h"
 #include "cenario.h"
+#include "cavernas.h"
 
 #include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
+        int main() {
+            AllegroContext ctx;
+            if (!inicializar_allegro(&ctx)) {
+                printf("Falha ao inicializar Allegro\n");
+                return -1;
+            }
 
-#define NUM_ENTRADAS 4
-#define NUM_SAIDAS 1
+            entidade jogador;
+            iniciarentidade(&jogador, ctx.width, ctx.height);
 
-// Declare portal positions globally or static inside main
-float entradaX[NUM_ENTRADAS];
-float entradaY[NUM_ENTRADAS];
-float saidaX;
-float saidaY;
-float comprimentoPorta;
-float alturaPorta;
-// Initialize portal positions (adjust these values as needed)
+            CenasDoJogo atual = MUNDO;
 
-void initPortas(int width, int height) {
-    float tamanho = width * 0.125f;  // same as in quadrado()
-     comprimentoPorta = tamanho;
-     alturaPorta = tamanho;
-    // Example entry positions in MUNDO scenario
-    entradaX[0] = 0.0f;
-    entradaY[0] = 0.0f;
-    entradaX[1] = width - tamanho;
-    entradaY[1] = 0.0f;
-    entradaX[2] = 0.0f;
-    entradaY[2] = height - tamanho;
-    entradaX[3] = width - tamanho;
-    entradaY[3] = height - tamanho;
-    // Example exit position in ANIMAL scenario
-    saidaX = width / 2.0f - tamanho / 2.0f;
-    saidaY = height / 2.0f - tamanho / 2.0f;
-}
+            bool rodando = true;
+            bool desenhar = true;
 
-int main() {
+            initPortas(ctx.width, ctx.height);
 
-    
-    AllegroContext ctx;
-    if (!inicializar_allegro(&ctx)) {
-        printf("Falha ao inicializar Allegro\n");
-        return -1;
-    }
+            while (rodando) {
+                ALLEGRO_EVENT event;
+                al_wait_for_event(ctx.event_queue, &event);
 
-    entidade jogador;
-    iniciarentidade(&jogador, ctx.width, ctx.height);
+                if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
+                    rodando = false;
+                }
+                else if (event.type == ALLEGRO_EVENT_TIMER) {
+                    ALLEGRO_KEYBOARD_STATE estado;
+                    al_get_keyboard_state(&estado);
 
-    CenasDoJogo atual = MUNDO;
+                    processar_teclado(&estado, &jogador, ctx.width, ctx.height);
 
-    bool rodando = true;
-    bool desenhar = true;
+                    desenhar = true;
 
-    initPortas(ctx.width,ctx.height);
+                }
 
+                if (event.type == ALLEGRO_EVENT_KEY_DOWN && event.keyboard.keycode == ALLEGRO_KEY_E) {
+                    checarEntrada(&jogador,&atual);
+                }
 
-    while (rodando) {
-        ALLEGRO_EVENT event;
-        al_wait_for_event(ctx.event_queue, &event);
+                if (desenhar && al_is_event_queue_empty(ctx.event_queue)) {
+                    desenhar = false;
 
-        if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
-            rodando = false;
-        }
-        else if (event.type == ALLEGRO_EVENT_TIMER) {
-            ALLEGRO_KEYBOARD_STATE estado;
-            al_get_keyboard_state(&estado);
-
-            if (al_key_down(&estado, ALLEGRO_KEY_W)) jogador.y -= jogador.velocidade;
-            if (al_key_down(&estado, ALLEGRO_KEY_S)) jogador.y += jogador.velocidade;
-            if (al_key_down(&estado, ALLEGRO_KEY_A)) jogador.x -= jogador.velocidade;
-            if (al_key_down(&estado, ALLEGRO_KEY_D)) jogador.x += jogador.velocidade;
-
-            limitar_jogador(&jogador, ctx.width, ctx.height);
-
-            desenhar = true;
-
-        } 
-            
-
-        if (event.type == ALLEGRO_EVENT_KEY_DOWN && event.keyboard.keycode == ALLEGRO_KEY_E) {
-            if (atual == MUNDO) {
-                for (int i = 0; i < NUM_ENTRADAS; i++) {
-                    if (colisao(jogador.x, jogador.y, jogador.raio,
-                        entradaX[i], entradaY[i], comprimentoPorta, alturaPorta)) {
-                        atual = ANIMAL;
-                       
-                        break;
-                    }
+                    cenarios(atual, &ctx);
+                    desenharjogador(&jogador);
+                    al_flip_display();
                 }
             }
-            else if (atual == ANIMAL) {
-                if (colisao(jogador.x, jogador.y, jogador.raio,
-                    saidaX, saidaY, comprimentoPorta, alturaPorta)) {
-                    atual = MUNDO;
-                    
-                }
-            }
+
+            destruir_allegro(&ctx);
+            return 0;
         }
-
-
-        if (desenhar && al_is_event_queue_empty(ctx.event_queue)) {
-            desenhar = false;
-
-            cenarios(atual,&ctx);
-            desenharjogador(&jogador);
-            al_flip_display();
-        }
-    }
-
-    destruir_allegro(&ctx);
-    return 0;
-}

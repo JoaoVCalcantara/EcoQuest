@@ -12,6 +12,8 @@
 #include <stdbool.h>
 #include <math.h>
 
+//Inicia todos os addons usados do allegro
+
 int inicializar_allegro(AllegroContext* ctx) {
     if (!al_init()) {
         fprintf(stderr, "Erro: falha ao inicializar Allegro.\n");

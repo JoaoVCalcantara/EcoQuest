@@ -3,12 +3,16 @@
 #include "entidades.h"
 #include "allegro_init.h"
 
+//Enumera e nomeia valores inteiros, como o nome de cada cenario.
+
 typedef enum {
 	
-	MUNDO,
-	ANIMAL,
+	mundo,
+	caverna1,
+	caverna2,
+	caverna3,
+	caverna4,
 	
-
 }CenasDoJogo;
 
 void quadrado(AllegroContext* ctx);

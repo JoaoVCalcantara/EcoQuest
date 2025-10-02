@@ -8,6 +8,8 @@
 #include <allegro5/allegro_primitives.h>
 
 
+//struct que centraliza todos as criações que vão ser chamadas da allegro_init.c
+
 typedef struct {
     ALLEGRO_DISPLAY* display;
     ALLEGRO_TIMER* timer;
