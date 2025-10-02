@@ -35,24 +35,16 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-<<<<<<< HEAD
     <ClInclude Include="allegro_init.h">
-=======
-    <ClInclude Include="entidades.h">
->>>>>>> d9fdfa19086c7d0ddddcd8badce85e5e32dc0a15
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="cenario.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-<<<<<<< HEAD
     <ClInclude Include="entidades.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="cavernas.h">
-=======
-    <ClInclude Include="allegro_init.h">
->>>>>>> d9fdfa19086c7d0ddddcd8badce85e5e32dc0a15
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
   </ItemGroup>
