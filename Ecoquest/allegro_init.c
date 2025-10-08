@@ -99,7 +99,12 @@ int inicializar_allegro(AllegroContext* ctx) {
 
     ctx->width = al_get_display_width(ctx->display);
     ctx->height = al_get_display_height(ctx->display);
-    ctx->tamanho = ctx->width * 0.125f;
+
+    ctx->CoresFundo[0] = al_map_rgb(0, 0, 0);
+    ctx->CoresFundo[1] = al_map_rgb(255, 0, 0);
+    ctx->CoresFundo[2] = al_map_rgb(0, 255, 0);
+    ctx->CoresFundo[3] = al_map_rgb(0, 0, 255);
+    ctx->CoresFundo[4] = al_map_rgb(255, 255, 255);
 
     return 1; // sucesso
 }

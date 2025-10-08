@@ -1,26 +1,35 @@
 #include "cavernas.h"
 #include "entidades.h"
+#include "allegro_init.h"
 
 //aloca as variaveis definidas no header
-
-float entradaX[NUM_ENTRADAS];
-float entradaY[NUM_ENTRADAS];
+float entradaX1[NUM_ENTRADAS];
+float entradaY1[NUM_ENTRADAS];
+float entradaX2[NUM_ENTRADAS];
+float entradaY2[NUM_ENTRADAS];
 float saidaX;
 float saidaY;
 float comprimentoPorta;
 float alturaPorta;
+float tamanho;
 
 //inicia alguma das variaveis
 
 void initPortas(int width, int height) {
-    float tamanho = width * 0.125f;
-    comprimentoPorta = tamanho;
-    alturaPorta = tamanho;
 
-    entradaX[0] = 0.0f; entradaY[0] = 0.0f;
-    entradaX[1] = width - tamanho; entradaY[1] = 0.0f;
-    entradaX[2] = 0.0f; entradaY[2] = height - tamanho;
-    entradaX[3] = width - tamanho; entradaY[3] = height - tamanho;
+        tamanho = width * 0.125;
+        comprimentoPorta = tamanho;
+        alturaPorta = tamanho;
+
+    entradaX1[0] = 0.0f;                entradaY1[0] = 0.0f;
+    entradaX1[1] = width - tamanho;   entradaY1[1] = 0.0f;
+    entradaX1[2] = 0.0f;             entradaY1[2] = height - tamanho;
+    entradaX1[3] = width - tamanho; entradaY1[3] = height - tamanho;
+
+    entradaX2[0] = tamanho;         entradaY2[0] = tamanho;
+    entradaX2[1] = width;           entradaY2[1] = alturaPorta;
+    entradaX2[2] = comprimentoPorta;  entradaY2[2] = height;
+    entradaX2[3] = width;               entradaY2[3] = height;
 
 }
 
@@ -31,27 +40,35 @@ void checarEntrada(entidade* jogador, CenasDoJogo* atual) {
     if (*atual == mundo) {
         for (int i = 0; i < NUM_ENTRADAS; i++) {
             if (colisao(jogador->x, jogador->y, jogador->raio,
-                entradaX[i], entradaY[i], comprimentoPorta, alturaPorta)) {
+                entradaX1[i], entradaY1[i], entradaX2[i], entradaY2[i])) {
                 switch (i) {
                 case 0:
                     *atual = caverna1;
-                    saidaX = 0.0f;
-                    saidaY = 0.0f;
+                    saidaX = entradaX1[0];
+                    saidaY = entradaY1[0];
+                    comprimentoPorta = entradaX2[0];
+                    alturaPorta = entradaY2[0];
                     break;
                 case 1:
                     *atual = caverna2;
-                    saidaX = 1280;
-                    saidaY = 0;
+                    saidaX = entradaX1[1];
+                    saidaY = entradaY1[1];
+                    comprimentoPorta = entradaX2[1];
+                    alturaPorta = entradaY2[1];
                     break;
                 case 2:
                     *atual = caverna3;
-                    saidaX = 0;
-                    saidaY = 720;
+                    saidaX = entradaX1[2];
+                    saidaY = entradaY1[2];
+                    comprimentoPorta = entradaX2[2];
+                    alturaPorta = entradaY2[2];
                     break;
                 case 3:
                     *atual = caverna4;
-                    saidaX = 1280;
-                    saidaY = 720;
+                    saidaX = entradaX1[3];
+                    saidaY = entradaY1[3];
+                    comprimentoPorta = entradaX2[3];
+                    alturaPorta = entradaY2[3];
                     break;
 
                 }

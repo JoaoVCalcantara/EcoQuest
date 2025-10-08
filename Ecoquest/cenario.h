@@ -15,7 +15,7 @@ typedef enum {
 	
 }CenasDoJogo;
 
-void quadrado(AllegroContext* ctx);
+void quadrado(float entradaX1[], float entradaY1[], float entradaX2[], float entradaY2[],ALLEGRO_COLOR cor);
 
 void cenarios(CenasDoJogo atual, AllegroContext *ctx);
 

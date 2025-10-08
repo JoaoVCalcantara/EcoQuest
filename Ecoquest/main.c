@@ -39,22 +39,21 @@
                 else if (event.type == ALLEGRO_EVENT_TIMER) {
                     ALLEGRO_KEYBOARD_STATE estado;
                     al_get_keyboard_state(&estado);
-
                     processar_teclado(&estado, &jogador, ctx.width, ctx.height);
 
                     desenhar = true;
 
                 }
-
                 if (event.type == ALLEGRO_EVENT_KEY_DOWN && event.keyboard.keycode == ALLEGRO_KEY_E) {
-                    checarEntrada(&jogador,&atual);
+                    checarEntrada(&jogador, &atual);
                 }
-
                 if (desenhar && al_is_event_queue_empty(ctx.event_queue)) {
                     desenhar = false;
 
                     cenarios(atual, &ctx);
                     desenharjogador(&jogador);
+
+
                     al_flip_display();
                 }
             }

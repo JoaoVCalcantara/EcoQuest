@@ -18,9 +18,11 @@ typedef struct {
     ALLEGRO_BITMAP* dragao;
     ALLEGRO_BITMAP* batalha;
     ALLEGRO_EVENT_QUEUE* event_queue;
-    int width;
-    int height;
-    float tamanho;
+    ALLEGRO_COLOR CoresFundo[5];
+
+    float width;
+    float height;
+    
 } AllegroContext;
 
 int inicializar_allegro(AllegroContext* ctx);

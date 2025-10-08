@@ -17,7 +17,7 @@ void iniciarentidade(entidade *p,float width,float height) {
 // Desenha o jogador na tela
 
 void desenharjogador(entidade* p) {
-	al_draw_filled_circle(p->x, p->y, p->raio, al_map_rgb(0, 255, 0));
+	al_draw_filled_circle(p->x, p->y, p->raio, al_map_rgb(255,255,0));
 
 }
 
