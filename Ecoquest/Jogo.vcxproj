@@ -20,7 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="allegro_init.c" />
-    <ClCompile Include="cavernas.c" />
     <ClCompile Include="cenario.c" />
     <ClCompile Include="entidades.c" />
     <ClCompile Include="main.c" />
@@ -30,7 +29,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="allegro_init.h" />
-    <ClInclude Include="cavernas.h" />
     <ClInclude Include="cenario.h" />
     <ClInclude Include="entidades.h" />
   </ItemGroup>

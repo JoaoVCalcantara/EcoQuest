@@ -1,23 +1,41 @@
-#ifndef cenario_h
-#define cenario_h
-#include "entidades.h"
-#include "allegro_init.h"
+#ifndef CENARIO_H
+#define CENARIO_H
 
-//Enumera e nomeia valores inteiros, como o nome de cada cenario.
+#include <allegro5/allegro_color.h>
+#include <stdbool.h>
+
+#define NUM_ENTRADAS 4
+#define ENTRADA_RATIO 0.125f
+
+// CORREÇÃO: Forward declarations para evitar includes cíclicos
+struct AllegroContext;
+struct CavernaState;
+struct entidade;
+enum JogoCenas;
 
 typedef enum {
-	
-	mundo,
-	caverna1,
-	caverna2,
-	caverna3,
-	caverna4,
-	
-}CenasDoJogo;
+    MUNDO,
+    CAVERNA1,
+    CAVERNA2,
+    CAVERNA3,
+    CAVERNA4
+} JogoCenas; 
 
-void quadrado(float entradaX1[], float entradaY1[], float entradaX2[], float entradaY2[],ALLEGRO_COLOR cor);
+typedef struct {
+    float entradaX1[NUM_ENTRADAS];
+    float entradaY1[NUM_ENTRADAS];
+    float entradaX2[NUM_ENTRADAS];
+    float entradaY2[NUM_ENTRADAS];
+    float saidaX;
+    float saidaY;
+    float comprimentoPorta;
+    float alturaPorta;
+    float tamanho;
+} CavernaState;
 
-void cenarios(CenasDoJogo atual, AllegroContext *ctx);
+void desenhar_entradas(const struct CavernaState* state, ALLEGRO_COLOR cor);
+void cenarios(JogoCenas atual, const struct AllegroContext* ctx, const struct CavernaState* state);
+void init_portas(CavernaState* state, float width, float height);
+bool checar_interacao_porta(entidade* jogador,JogoCenas* atual, CavernaState* state);
 
-
-#endif
+#endif // CENARIO_H

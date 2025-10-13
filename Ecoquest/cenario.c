@@ -1,63 +1,103 @@
-#include "cenario.h"
-#include "entidades.h"
+#include "entidades.h" // CORREÇÃO: Necessário para a definição COMPLETA de 'entidade'
+#include "cenario.h"   // CORREÇÃO: Necessário para a definição COMPLETA de 'JogoCenas'
 #include "allegro_init.h"
-#include "cavernas.h"
-#include <allegro5/allegro_primitives.h>
-// desenha os quatro quadrados que representam a entrada das cavernas
+#include <math.h>
 
+void init_portas(CavernaState* state, float width, float height) {
+    state->tamanho = width * ENTRADA_RATIO;
+    float size = state->tamanho;
 
-void quadrado(float entradaX1[], float entradaY1[], float entradaX2[], float entradaY2[], ALLEGRO_COLOR cor) {
- 
-        al_draw_filled_rectangle(entradaX1[0], entradaY1[0], entradaX2[0], entradaY2[0], cor);
-        al_draw_filled_rectangle(entradaX1[1], entradaY1[1], entradaX2[1], entradaY2[1], cor);
-        al_draw_filled_rectangle(entradaX1[2], entradaY1[2], entradaX2[2], entradaY2[2], cor);
-        al_draw_filled_rectangle(entradaX1[3], entradaY1[3], entradaX2[3], entradaY2[3], cor);
-       
+    // Posições das 4 entradas nos cantos da tela
+    float positions[NUM_ENTRADAS][4] = {
+        {0.0f, 0.0f, size, size},
+        {width - size, 0.0f, width, size},
+        {0.0f, height - size, size, height},
+        {width - size, height - size, width, height}
+    };
+
+    for (int i = 0; i < NUM_ENTRADAS; i++) {
+        state->entradaX1[i] = positions[i][0];
+        state->entradaY1[i] = positions[i][1];
+        state->entradaX2[i] = positions[i][2];
+        state->entradaY2[i] = positions[i][3];
     }
 
-//desenha os cenarios, como cavernas e o mundo
+    state->saidaX = 0.0f;
+    state->saidaY = 0.0f;
+    state->comprimentoPorta = size;
+    state->alturaPorta = size;
+}
 
-void cenarios(CenasDoJogo atual, AllegroContext *ctx) {
-    
-    static float frame = 0.f; 
-    static int current_frame_y = 161;
-    int spriteX = 0;
-   
-       
+bool checar_interacao_porta(entidade* jogador, JogoCenas* atual, CavernaState* state) {
+    if (*atual == MUNDO) {
+        for (int i = 0; i < NUM_ENTRADAS; i++) {
+            float rw = state->entradaX2[i] - state->entradaX1[i];
+            float rh = state->entradaY2[i] - state->entradaY1[i];
 
+            if (colisao(jogador->x, jogador->y, jogador->raio, state->entradaX1[i], state->entradaY1[i], rw, rh)) {
+                *atual = (JogoCenas)(CAVERNA1 + i);
+
+                state->saidaX = state->entradaX1[i];
+                state->saidaY = state->entradaY1[i];
+                return true;
+            }
+        }
+    }
+    else { // Se estiver dentro de uma caverna
+        if (colisao(jogador->x, jogador->y, jogador->raio, state->saidaX, state->saidaY, state->comprimentoPorta, state->alturaPorta)) {
+            *atual = MUNDO;
+            // MELHORIA: Reposiciona o jogador fora da porta ao retornar para o mundo.
+            reposicionar_jogador_saida(jogador, state);
+            return true;
+        }
+    }
+    return false;
+}
+
+/* desenha entradas (squares) */
+void desenhar_entradas(const CavernaState* state, ALLEGRO_COLOR cor) {
+    for (int i = 0; i < NUM_ENTRADAS; i++) {
+        al_draw_filled_rectangle(
+            state->entradaX1[i], state->entradaY1[i],
+            state->entradaX2[i], state->entradaY2[i],
+            cor
+        );
+    }
+}
+
+/* helper para desenhar a saída da caverna */
+static void draw_exit(const CavernaState* state) {
+    float exit_x2 = state->saidaX + state->comprimentoPorta;
+    float exit_y2 = state->saidaY + state->alturaPorta;
+    // MELHORIA: A saída agora é sempre um quadrado branco para se destacar.
+    al_draw_filled_rectangle(state->saidaX, state->saidaY, exit_x2, exit_y2, al_map_rgb(255, 255, 255));
+}
+
+void cenarios(JogoCenas atual, const AllegroContext* ctx, const CavernaState* state) {
     switch (atual) {
-    case mundo:
-
-        al_clear_to_color(al_map_rgb(0, 0, 0));
-        quadrado(entradaX1, entradaY1, entradaX2, entradaY2, ctx->CoresFundo[4]);
-
-
+    case MUNDO:
+        al_clear_to_color(al_map_rgb(173, 216, 230)); // Fundo azul claro (melhor que branco puro)
+        // MELHORIA: Desenha o mapa se ele foi carregado com sucesso.
+        if (ctx->mapa) {
+            al_draw_bitmap(ctx->mapa, 0, 0, 0);
+        }
+        desenhar_entradas(state, al_map_rgb(0, 0, 0));
         break;
-
-    case caverna1:
-       
-        
-       
-
-        al_clear_to_color(ctx->CoresFundo[0]);
-        al_draw_bitmap_region(ctx->dragao,(int)frame,current_frame_y,191,161,spriteX,ctx->height/2,0);
-        al_draw_filled_rectangle(saidaX, saidaY, comprimentoPorta, alturaPorta, ctx->CoresFundo[4]);
-
+    case CAVERNA1:
+        al_clear_to_color(ctx->CoresFundo[0]); // Preto
+        draw_exit(state);
         break;
-    case caverna2:
-        al_clear_to_color(ctx->CoresFundo[1]);
-        al_draw_filled_rectangle(saidaX, saidaY, comprimentoPorta, alturaPorta, ctx->CoresFundo[4]);
-
+    case CAVERNA2:
+        al_clear_to_color(ctx->CoresFundo[1]); // Vermelho escuro
+        draw_exit(state);
         break;
-    case caverna3:
-        al_clear_to_color(ctx->CoresFundo[2]);
-        al_draw_filled_rectangle(saidaX, saidaY, comprimentoPorta, alturaPorta, ctx->CoresFundo[4]);
-
+    case CAVERNA3:
+        al_clear_to_color(ctx->CoresFundo[2]); // Verde escuro
+        draw_exit(state);
         break;
-    case caverna4:
-        al_clear_to_color(ctx->CoresFundo[3]);
-        al_draw_filled_rectangle(saidaX, saidaY, comprimentoPorta, alturaPorta, ctx->CoresFundo[4]);
-
+    case CAVERNA4:
+        al_clear_to_color(ctx->CoresFundo[3]); // Azul escuro
+        draw_exit(state);
         break;
     }
 }
