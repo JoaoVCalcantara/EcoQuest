@@ -1,4 +1,4 @@
-#ifndef CENARIO_H
+Ôªø#ifndef CENARIO_H
 #define CENARIO_H
 
 #include <allegro5/allegro_color.h>
@@ -7,7 +7,7 @@
 #define NUM_ENTRADAS 4
 #define ENTRADA_RATIO 0.125f
 
-// CORRE«√O: Forward declarations para evitar includes cÌclicos
+// CORRE√á√ÉO: Forward declarations para evitar includes c√≠clicos
 struct AllegroContext;
 struct CavernaState;
 struct entidade;
@@ -37,5 +37,6 @@ void desenhar_entradas(const struct CavernaState* state, ALLEGRO_COLOR cor);
 void cenarios(JogoCenas atual, const struct AllegroContext* ctx, const struct CavernaState* state);
 void init_portas(CavernaState* state, float width, float height);
 bool checar_interacao_porta(entidade* jogador,JogoCenas* atual, CavernaState* state);
+bool colisao_logo(const entidade* jogador, const AllegroContext* ctx);
 
 #endif // CENARIO_H

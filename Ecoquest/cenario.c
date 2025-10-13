@@ -82,6 +82,12 @@ void cenarios(JogoCenas atual, const AllegroContext* ctx, const CavernaState* st
             al_draw_bitmap(ctx->mapa, 0, 0, 0);
         }
         desenhar_entradas(state, al_map_rgb(0, 0, 0));
+        if (ctx->logo) {
+            float logo_x = (ctx->width - al_get_bitmap_width(ctx->logo)) / 2;
+            float logo_y = (ctx->height - al_get_bitmap_height(ctx->logo)) / 2;
+            al_draw_bitmap(ctx->logo, logo_x, logo_y, 0);
+        }
+
         break;
     case CAVERNA1:
         al_clear_to_color(ctx->CoresFundo[0]); // Preto
@@ -100,4 +106,12 @@ void cenarios(JogoCenas atual, const AllegroContext* ctx, const CavernaState* st
         draw_exit(state);
         break;
     }
+}
+bool colisao_logo(const entidade* jogador, const AllegroContext* ctx) {
+    float logo_x = (ctx->width - al_get_bitmap_width(ctx->logo)) / 2;
+    float logo_y = (ctx->height - al_get_bitmap_height(ctx->logo)) / 2;
+    float logo_w = al_get_bitmap_width(ctx->logo);
+    float logo_h = al_get_bitmap_height(ctx->logo);
+
+    return colisao(jogador->x, jogador->y, jogador->raio, logo_x, logo_y, logo_w, logo_h);
 }

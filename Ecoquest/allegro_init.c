@@ -31,6 +31,11 @@ int inicializar_allegro(AllegroContext* ctx) {
     if (!ctx->mapa) {
         fprintf(stderr, "Aviso: Nao foi possivel carregar o mapa.png\n");
     }
+    ctx->logo = al_load_bitmap("./assets/img/estruturas/Cabana.png");
+    if (!ctx->logo) {
+        fprintf(stderr, "Aviso: Nao foi possivel carregar ecoquest.png\n");
+    }
+
   
 
     // Inicializar 'font' como NULL.
@@ -71,4 +76,6 @@ void destruir_allegro(AllegroContext* ctx) {
     if (ctx->timer) al_destroy_timer(ctx->timer);
     if (ctx->event_queue) al_destroy_event_queue(ctx->event_queue);
     if (ctx->display) al_destroy_display(ctx->display);
+    if (ctx->logo) al_destroy_bitmap(ctx->logo);
+
 }

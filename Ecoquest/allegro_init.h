@@ -17,6 +17,7 @@ typedef struct AllegroContext {
     ALLEGRO_TIMER* timer;
     ALLEGRO_EVENT_QUEUE* event_queue;
     ALLEGRO_BITMAP* mapa;
+    ALLEGRO_BITMAP* logo;  // nova imagem (ecoquest.png)
     ALLEGRO_FONT* font; // <-- atualmente isso aqui não faz nada
     int width;
     int height;
