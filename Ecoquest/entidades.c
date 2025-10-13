@@ -6,6 +6,9 @@
 #include <allegro5/allegro_color.h>
 #include <math.h>
 
+
+
+
 void iniciar_entidade(entidade* p, float width, float height) {
     p->x = width / 2.0f;
     p->y = height / 2.0f;
@@ -68,3 +71,8 @@ bool colisao(float cx, float cy, float r, float rx, float ry, float rw, float rh
     float dy = cy - closestY;
     return (dx * dx + dy * dy) <= (r * r);
 }
+ 
+
+
+
+

@@ -28,6 +28,7 @@ void init_portas(CavernaState* state, float width, float height) {
     state->alturaPorta = size;
 }
 
+
 bool checar_interacao_porta(entidade* jogador, JogoCenas* atual, CavernaState* state) {
     if (*atual == MUNDO) {
         for (int i = 0; i < NUM_ENTRADAS; i++) {
@@ -73,30 +74,63 @@ static void draw_exit(const CavernaState* state) {
     al_draw_filled_rectangle(state->saidaX, state->saidaY, exit_x2, exit_y2, al_map_rgb(255, 255, 255));
 }
 
+
 void cenarios(JogoCenas atual, const AllegroContext* ctx, const CavernaState* state) {
+
     switch (atual) {
     case MUNDO:
-        al_clear_to_color(al_map_rgb(173, 216, 230)); // Fundo azul claro (melhor que branco puro)
-        // MELHORIA: Desenha o mapa se ele foi carregado com sucesso.
-        if (ctx->mapa) {
-            al_draw_bitmap(ctx->mapa, 0, 0, 0);
-        }
-        desenhar_entradas(state, al_map_rgb(0, 0, 0));
+        al_clear_to_color(al_map_rgb(173, 216, 230)); 
+        
+        desenhar_entradas(state, ctx->CoresFundo[4]);
         break;
     case CAVERNA1:
         al_clear_to_color(ctx->CoresFundo[0]); // Preto
+
+        al_draw_scaled_bitmap(
+            ctx->regioes[0],
+            0, 0,                                     // início da origem
+            ctx->metadelargura, ctx->metadealtura,    // largura e altura do sub-bitmap
+            0, 0,                                     // posição na tela
+            ctx->width, ctx->height,                  // largura e altura da tela
+            0                                         // flags (nenhum)
+        );
+
         draw_exit(state);
         break;
     case CAVERNA2:
         al_clear_to_color(ctx->CoresFundo[1]); // Vermelho escuro
+        al_draw_scaled_bitmap(
+            ctx->regioes[1],
+            0, 0,                                     // início da origem
+            ctx->metadelargura, ctx->metadealtura,    // largura e altura do sub-bitmap
+            0, 0,                                     // posição na tela
+            ctx->width, ctx->height,                  // largura e altura da tela
+            0                                         // flags (nenhum)
+        );
         draw_exit(state);
         break;
     case CAVERNA3:
         al_clear_to_color(ctx->CoresFundo[2]); // Verde escuro
+        al_draw_scaled_bitmap(
+            ctx->regioes[2],
+            0, 0,                                     // início da origem
+            ctx->metadelargura, ctx->metadealtura,    // largura e altura do sub-bitmap
+            0, 0,                                     // posição na tela
+            ctx->width, ctx->height,                  // largura e altura da tela
+            0                                         // flags (nenhum)
+        );
         draw_exit(state);
         break;
     case CAVERNA4:
         al_clear_to_color(ctx->CoresFundo[3]); // Azul escuro
+        al_draw_scaled_bitmap(
+            ctx->regioes[3],
+            0, 0,                                     // início da origem
+            ctx->metadelargura, ctx->metadealtura,    // largura e altura do sub-bitmap
+            0, 0,                                     // posição na tela
+            ctx->width, ctx->height,                  // largura e altura da tela
+            0                                         // flags (nenhum)
+        );
         draw_exit(state);
         break;
     }

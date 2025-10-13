@@ -13,6 +13,8 @@ int inicializar_allegro(AllegroContext* ctx) {
     al_init_primitives_addon();
     al_install_keyboard();
 
+    al_set_new_bitmap_flags(0);
+
     //Usando as constantes definidas no .h
     ctx->display = al_create_display(LARGURA_TELA, ALTURA_TELA);
     if (!ctx->display) {
@@ -31,8 +33,24 @@ int inicializar_allegro(AllegroContext* ctx) {
     if (!ctx->mapa) {
         fprintf(stderr, "Aviso: Nao foi possivel carregar o mapa.png\n");
     }
-  
+    if (ctx->mapa) {
+        ctx->altura = al_get_bitmap_height(ctx->mapa);
+        ctx->largura = al_get_bitmap_width(ctx->mapa);
+        ctx->metadealtura = ctx->altura / 2;
+        ctx->metadelargura = ctx->largura / 2;
+        /* criar regioes ... */
+    }
+    else {
+        ctx->altura = ctx->largura = 0;
+        ctx->metadealtura = ctx->metadelargura = 0;
+        /* lidar com regioes = NULL ou criar bitmaps fallback */
+    }
 
+    ctx->regioes[0] = al_create_sub_bitmap(ctx->mapa, 0, 0, ctx->metadelargura, ctx->metadealtura);
+    ctx->regioes[1] = al_create_sub_bitmap(ctx->mapa, ctx->metadelargura, 0, ctx->metadelargura, ctx->metadealtura);
+    ctx->regioes[2] = al_create_sub_bitmap(ctx->mapa, 0, ctx->metadealtura, ctx->metadelargura, ctx->metadealtura);
+    ctx->regioes[3] = al_create_sub_bitmap(ctx->mapa, ctx->metadelargura, ctx->metadealtura, ctx->metadelargura, ctx->metadealtura);
+   
     // Inicializar 'font' como NULL.
     ctx->font = NULL;
 

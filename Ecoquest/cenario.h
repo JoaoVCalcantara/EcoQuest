@@ -4,14 +4,11 @@
 #include <allegro5/allegro_color.h>
 #include <stdbool.h>
 
+#include "entidades.h" /* precisa de 'camera' e 'entidade' */
+
+/* constantes */
 #define NUM_ENTRADAS 4
 #define ENTRADA_RATIO 0.125f
-
-// CORREÇÃO: Forward declarations para evitar includes cíclicos
-struct AllegroContext;
-struct CavernaState;
-struct entidade;
-enum JogoCenas;
 
 typedef enum {
     MUNDO,
@@ -19,7 +16,7 @@ typedef enum {
     CAVERNA2,
     CAVERNA3,
     CAVERNA4
-} JogoCenas; 
+} JogoCenas;
 
 typedef struct {
     float entradaX1[NUM_ENTRADAS];
@@ -33,9 +30,10 @@ typedef struct {
     float tamanho;
 } CavernaState;
 
-void desenhar_entradas(const struct CavernaState* state, ALLEGRO_COLOR cor);
-void cenarios(JogoCenas atual, const struct AllegroContext* ctx, const struct CavernaState* state);
+/* protótipos */
+void desenhar_entradas(const CavernaState* state, ALLEGRO_COLOR cor);
+void cenarios(JogoCenas atual, const struct AllegroContext* ctx, const CavernaState* state);
 void init_portas(CavernaState* state, float width, float height);
-bool checar_interacao_porta(entidade* jogador,JogoCenas* atual, CavernaState* state);
+bool checar_interacao_porta(entidade* jogador, JogoCenas* atual, CavernaState* state);
 
 #endif // CENARIO_H
