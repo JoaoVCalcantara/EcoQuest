@@ -12,6 +12,7 @@ struct CavernaState;
 // Constants
 #define PLAYER_RADIUS 50.0f
 #define PLAYER_SPEED 8.0f
+#define TAM_QUADRADO_CENTRO 80
 
 // Estrutura completa das entidades
 typedef struct {
