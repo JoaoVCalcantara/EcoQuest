@@ -22,7 +22,7 @@ extern float camera_y;
 JogoCenas verificar_area_atual(const entidade* jogador);
 JogoCenas cenarios(JogoCenas atual, const AllegroContext* ctx, const entidade* jogador);
 void atualizar_camera(const entidade* jogador, float* camera_x, float* camera_y,
-                     float largura_tela, float altura_tela,
-                     float largura_mapa, float altura_mapa);
+    float largura_tela, float altura_tela,
+    float largura_mapa, float altura_mapa);
 
 #endif // CENARIO_H
