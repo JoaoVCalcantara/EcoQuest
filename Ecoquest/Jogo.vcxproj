@@ -20,17 +20,23 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="allegro_init.c" />
+    <ClCompile Include="batalha.c" />
     <ClCompile Include="cenario.c" />
     <ClCompile Include="entidades.c" />
+    <ClCompile Include="inimigo.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="menu.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="allegro_init.h" />
+    <ClInclude Include="batalha.h" />
     <ClInclude Include="cenario.h" />
     <ClInclude Include="entidades.h" />
+    <ClInclude Include="inimigo.h" />
+    <ClInclude Include="menu.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
