@@ -54,7 +54,7 @@ typedef struct camera {
 
 void iniciar_entidade(entidade* p, float width, float height);
 void desenhar_jogador(const entidade* p, ALLEGRO_COLOR cor);
-void limitar_jogador(entidade* jogador, float largura_mapa, float altura_mapa);
+void limitar_jogador(entidade* p, float width, float height);
 void processar_teclado(ALLEGRO_KEYBOARD_STATE* estado, entidade* jogador);
 bool colisao(float cx, float cy, float r, float rx, float ry, float rw, float rh);
 void destruir_entidade(entidade* p);
