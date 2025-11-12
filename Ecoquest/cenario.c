@@ -1,137 +1,74 @@
-#include "entidades.h" // CORREÇÃO: Necessário para a definição COMPLETA de 'entidade'
-#include "cenario.h"   // CORREÇÃO: Necessário para a definição COMPLETA de 'JogoCenas'
+#include "entidades.h"
+#include "cenario.h"
 #include "allegro_init.h"
 #include <math.h>
+#include <allegro5/allegro_primitives.h>
 
-void init_portas(CavernaState* state, float width, float height) {
-    state->tamanho = width * ENTRADA_RATIO;
-    float size = state->tamanho;
+float camera_x = 0.0f;
+float camera_y = 0.0f;
 
-    // Posições das 4 entradas nos cantos da tela
-    float positions[NUM_ENTRADAS][4] = {
-        {0.0f, 0.0f, size, size},
-        {width - size, 0.0f, width, size},
-        {0.0f, height - size, size, height},
-        {width - size, height - size, width, height}
-    };
+void atualizar_camera(const entidade* jogador, float* camera_x_ptr, float* camera_y_ptr,
+                    float largura_tela, float altura_tela,
+                    float largura_mapa, float altura_mapa) {
+    if (!jogador || !camera_x_ptr || !camera_y_ptr) return;
 
-    for (int i = 0; i < NUM_ENTRADAS; i++) {
-        state->entradaX1[i] = positions[i][0];
-        state->entradaY1[i] = positions[i][1];
-        state->entradaX2[i] = positions[i][2];
-        state->entradaY2[i] = positions[i][3];
-    }
+    *camera_x_ptr = jogador->x - (largura_tela / 2.0f / ZOOM_FACTOR);
+    *camera_y_ptr = jogador->y - (altura_tela / 2.0f / ZOOM_FACTOR);
 
-    state->saidaX = 0.0f;
-    state->saidaY = 0.0f;
-    state->comprimentoPorta = size;
-    state->alturaPorta = size;
+    float max_x = largura_mapa - largura_tela / ZOOM_FACTOR;
+    float max_y = altura_mapa - altura_tela / ZOOM_FACTOR;
+
+    if (*camera_x_ptr < 0) *camera_x_ptr = 0;
+    if (*camera_y_ptr < 0) *camera_y_ptr = 0;
+    if (*camera_x_ptr > max_x) *camera_x_ptr = max_x;
+    if (*camera_y_ptr > max_y) *camera_y_ptr = max_y;
 }
 
-
-bool checar_interacao_porta(entidade* jogador, JogoCenas* atual, CavernaState* state) {
-    if (*atual == MUNDO) {
-        for (int i = 0; i < NUM_ENTRADAS; i++) {
-            float rw = state->entradaX2[i] - state->entradaX1[i];
-            float rh = state->entradaY2[i] - state->entradaY1[i];
-
-            if (colisao(jogador->x, jogador->y, jogador->raio, state->entradaX1[i], state->entradaY1[i], rw, rh)) {
-                *atual = (JogoCenas)(CAVERNA1 + i);
-
-                state->saidaX = state->entradaX1[i];
-                state->saidaY = state->entradaY1[i];
-                return true;
-            }
+JogoCenas verificar_area_atual(const entidade* jogador) {
+    if (jogador->x < 640.0f) {
+        if (jogador->y < 360.0f) {
+            return CENARIO1; // Superior esquerdo
+        } else {
+            return CENARIO2; // Inferior esquerdo
+        }
+    } else {
+        if (jogador->y < 360.0f) {
+            return CENARIO3; // Superior direito
+        } else {
+            return CENARIO4; // Inferior direito
         }
     }
-    else { // Se estiver dentro de uma caverna
-        if (colisao(jogador->x, jogador->y, jogador->raio, state->saidaX, state->saidaY, state->comprimentoPorta, state->alturaPorta)) {
-            *atual = MUNDO;
-            // MELHORIA: Reposiciona o jogador fora da porta ao retornar para o mundo.
-            reposicionar_jogador_saida(jogador, state);
-            return true;
-        }
-    }
-    return false;
 }
 
-/* desenha entradas (squares) */
-void desenhar_entradas(const CavernaState* state, ALLEGRO_COLOR cor) {
-    for (int i = 0; i < NUM_ENTRADAS; i++) {
-        al_draw_filled_rectangle(
-            state->entradaX1[i], state->entradaY1[i],
-            state->entradaX2[i], state->entradaY2[i],
-            cor
-        );
+JogoCenas cenarios(JogoCenas atual, const AllegroContext* ctx, const entidade *jogador) {
+    float largura_mapa = al_get_bitmap_width(ctx->mapa);
+    float altura_mapa = al_get_bitmap_height(ctx->mapa);
+
+    JogoCenas area_atual = verificar_area_atual(jogador);
+    
+    if (area_atual != atual) {
+        atual = area_atual;
     }
-}
 
-/* helper para desenhar a saída da caverna */
-static void draw_exit(const CavernaState* state) {
-    float exit_x2 = state->saidaX + state->comprimentoPorta;
-    float exit_y2 = state->saidaY + state->alturaPorta;
-    // MELHORIA: A saída agora é sempre um quadrado branco para se destacar.
-    al_draw_filled_rectangle(state->saidaX, state->saidaY, exit_x2, exit_y2, al_map_rgb(255, 255, 255));
-}
+    atualizar_camera(jogador, &camera_x, &camera_y,
+                    (float)ctx->width, (float)ctx->height,
+                    largura_mapa, altura_mapa);
 
-
-void cenarios(JogoCenas atual, const AllegroContext* ctx, const CavernaState* state) {
-
-    switch (atual) {
-    case MUNDO:
-        al_clear_to_color(al_map_rgb(173, 216, 230)); 
-        
-        desenhar_entradas(state, ctx->CoresFundo[4]);
-        break;
-    case CAVERNA1:
-        al_clear_to_color(ctx->CoresFundo[0]); // Preto
-
-        al_draw_scaled_bitmap(
-            ctx->regioes[0],
-            0, 0,                                     // início da origem
-            ctx->metadelargura, ctx->metadealtura,    // largura e altura do sub-bitmap
-            0, 0,                                     // posição na tela
-            ctx->width, ctx->height,                  // largura e altura da tela
-            0                                         // flags (nenhum)
-        );
-
-        draw_exit(state);
-        break;
-    case CAVERNA2:
-        al_clear_to_color(ctx->CoresFundo[1]); // Vermelho escuro
-        al_draw_scaled_bitmap(
-            ctx->regioes[1],
-            0, 0,                                     // início da origem
-            ctx->metadelargura, ctx->metadealtura,    // largura e altura do sub-bitmap
-            0, 0,                                     // posição na tela
-            ctx->width, ctx->height,                  // largura e altura da tela
-            0                                         // flags (nenhum)
-        );
-        draw_exit(state);
-        break;
-    case CAVERNA3:
-        al_clear_to_color(ctx->CoresFundo[2]); // Verde escuro
-        al_draw_scaled_bitmap(
-            ctx->regioes[2],
-            0, 0,                                     // início da origem
-            ctx->metadelargura, ctx->metadealtura,    // largura e altura do sub-bitmap
-            0, 0,                                     // posição na tela
-            ctx->width, ctx->height,                  // largura e altura da tela
-            0                                         // flags (nenhum)
-        );
-        draw_exit(state);
-        break;
-    case CAVERNA4:
-        al_clear_to_color(ctx->CoresFundo[3]); // Azul escuro
-        al_draw_scaled_bitmap(
-            ctx->regioes[3],
-            0, 0,                                     // início da origem
-            ctx->metadelargura, ctx->metadealtura,    // largura e altura do sub-bitmap
-            0, 0,                                     // posição na tela
-            ctx->width, ctx->height,                  // largura e altura da tela
-            0                                         // flags (nenhum)
-        );
-        draw_exit(state);
-        break;
-    }
+    al_clear_to_color(ctx->CoresFundo[atual]); // Usa o índice do cenário como índice da cor
+    
+    // Desenha o mapa com zoom aplicado
+    al_draw_scaled_bitmap(
+        ctx->mapa, 
+        camera_x, 
+        camera_y, 
+        ctx->width / ZOOM_FACTOR, 
+        ctx->height / ZOOM_FACTOR, 
+        0, 
+        0, 
+        ctx->width, 
+        ctx->height, 
+        0
+    );
+    
+    return atual;
 }

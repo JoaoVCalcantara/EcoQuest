@@ -8,26 +8,26 @@
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_color.h>
 
-// MELHORIA: Definir dimensões da tela como constantes
 #define LARGURA_TELA 1280
 #define ALTURA_TELA 720
 
 typedef struct AllegroContext {
+    // Recursos principais do Allegro
     ALLEGRO_DISPLAY* display;
     ALLEGRO_TIMER* timer;
     ALLEGRO_EVENT_QUEUE* event_queue;
+    ALLEGRO_FONT* font;
+    
+    // Recursos de mapa e gráficos
     ALLEGRO_BITMAP* mapa;
-
     ALLEGRO_BITMAP* regioes[4];
     
-
-    ALLEGRO_FONT* font; // <-- atualmente isso aqui não faz nada
-    int width;
-    int height;
-    int largura;
-    int altura;
-    int metadelargura;
-    int metadealtura;
+    // Dimensões
+    int width, height;          // Dimensões da tela
+    int largura, altura;        // Dimensões do mapa
+    int metadelargura, metadealtura;  // Metades do mapa
+    
+    // Cores
     ALLEGRO_COLOR CoresFundo[5];
 } AllegroContext;
 

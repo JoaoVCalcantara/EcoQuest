@@ -4,36 +4,25 @@
 #include <allegro5/allegro_color.h>
 #include <stdbool.h>
 
-#include "entidades.h" /* precisa de 'camera' e 'entidade' */
+#include "entidades.h"
+#include "allegro_init.h"
 
-/* constantes */
-#define NUM_ENTRADAS 4
-#define ENTRADA_RATIO 0.125f
+#define ZOOM_FACTOR 4.0f
 
 typedef enum {
-    MUNDO,
-    CAVERNA1,
-    CAVERNA2,
-    CAVERNA3,
-    CAVERNA4
+    CENARIO1,
+    CENARIO2,
+    CENARIO3,
+    CENARIO4
 } JogoCenas;
 
-typedef struct {
-    float entradaX1[NUM_ENTRADAS];
-    float entradaY1[NUM_ENTRADAS];
-    float entradaX2[NUM_ENTRADAS];
-    float entradaY2[NUM_ENTRADAS];
-    float saidaX;
-    float saidaY;
-    float comprimentoPorta;
-    float alturaPorta;
-    float tamanho;
-} CavernaState;
+extern float camera_x;
+extern float camera_y;
 
-/* protótipos */
-void desenhar_entradas(const CavernaState* state, ALLEGRO_COLOR cor);
-void cenarios(JogoCenas atual, const struct AllegroContext* ctx, const CavernaState* state);
-void init_portas(CavernaState* state, float width, float height);
-bool checar_interacao_porta(entidade* jogador, JogoCenas* atual, CavernaState* state);
+JogoCenas verificar_area_atual(const entidade* jogador);
+JogoCenas cenarios(JogoCenas atual, const AllegroContext* ctx, const entidade* jogador);
+void atualizar_camera(const entidade* jogador, float* camera_x, float* camera_y,
+                     float largura_tela, float altura_tela,
+                     float largura_mapa, float altura_mapa);
 
 #endif // CENARIO_H
