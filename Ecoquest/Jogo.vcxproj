@@ -26,6 +26,7 @@
     <ClCompile Include="inimigo.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="menu.c" />
+    <ClCompile Include="sprites.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -37,6 +38,7 @@
     <ClInclude Include="entidades.h" />
     <ClInclude Include="inimigo.h" />
     <ClInclude Include="menu.h" />
+    <ClInclude Include="sprites.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
