@@ -1,74 +1,34 @@
-#include "entidades.h"
 #include "cenario.h"
-#include "allegro_init.h"
-#include <math.h>
 #include <allegro5/allegro_primitives.h>
 
-float camera_x = 0.0f;
-float camera_y = 0.0f;
-
-void atualizar_camera(const entidade* jogador, float* camera_x_ptr, float* camera_y_ptr,
-                    float largura_tela, float altura_tela,
-                    float largura_mapa, float altura_mapa) {
-    if (!jogador || !camera_x_ptr || !camera_y_ptr) return;
-
-    *camera_x_ptr = jogador->x - (largura_tela / 2.0f / ZOOM_FACTOR);
-    *camera_y_ptr = jogador->y - (altura_tela / 2.0f / ZOOM_FACTOR);
-
-    float max_x = largura_mapa - largura_tela / ZOOM_FACTOR;
-    float max_y = altura_mapa - altura_tela / ZOOM_FACTOR;
-
-    if (*camera_x_ptr < 0) *camera_x_ptr = 0;
-    if (*camera_y_ptr < 0) *camera_y_ptr = 0;
-    if (*camera_x_ptr > max_x) *camera_x_ptr = max_x;
-    if (*camera_y_ptr > max_y) *camera_y_ptr = max_y;
-}
+float camera_x = 0;
+float camera_y = 0;
 
 JogoCenas verificar_area_atual(const entidade* jogador) {
-    if (jogador->x < 640.0f) {
-        if (jogador->y < 360.0f) {
-            return CENARIO1; // Superior esquerdo
-        } else {
-            return CENARIO2; // Inferior esquerdo
-        }
-    } else {
-        if (jogador->y < 360.0f) {
-            return CENARIO3; // Superior direito
-        } else {
-            return CENARIO4; // Inferior direito
-        }
-    }
+    if (jogador->x < 640) return CENARIO1;
+    if (jogador->x < 1280) return CENARIO2;
+    if (jogador->x < 1920) return CENARIO3;
+    return CENARIO4;
 }
 
-JogoCenas cenarios(JogoCenas atual, const AllegroContext* ctx, const entidade *jogador) {
-    float largura_mapa = al_get_bitmap_width(ctx->mapa);
-    float altura_mapa = al_get_bitmap_height(ctx->mapa);
+JogoCenas cenarios(JogoCenas atual, const AllegroContext* ctx, const entidade* jogador) {
+    al_clear_to_color(al_map_rgb(20, 20, 30));
+    atualizar_camera(jogador, &camera_x, &camera_y, ctx->width, ctx->height, 1280, 720);
 
-    JogoCenas area_atual = verificar_area_atual(jogador);
-    
-    if (area_atual != atual) {
-        atual = area_atual;
-    }
+    // Bot fixo
+    al_draw_filled_rectangle(600 - camera_x, 300 - camera_y, 650 - camera_x, 350 - camera_y, al_map_rgb(255, 50, 50));
 
-    atualizar_camera(jogador, &camera_x, &camera_y,
-                    (float)ctx->width, (float)ctx->height,
-                    largura_mapa, altura_mapa);
+    return verificar_area_atual(jogador);
+}
 
-    al_clear_to_color(ctx->CoresFundo[atual]); // Usa o índice do cenário como índice da cor
-    
-    // Desenha o mapa com zoom aplicado
-    al_draw_scaled_bitmap(
-        ctx->mapa, 
-        camera_x, 
-        camera_y, 
-        ctx->width / ZOOM_FACTOR, 
-        ctx->height / ZOOM_FACTOR, 
-        0, 
-        0, 
-        ctx->width, 
-        ctx->height, 
-        0
-    );
-    
-    return atual;
+void atualizar_camera(const entidade* jogador, float* camera_x, float* camera_y,
+    float largura_tela, float altura_tela,
+    float largura_mapa, float altura_mapa) {
+    *camera_x = jogador->x - largura_tela / 2.0f;
+    *camera_y = jogador->y - altura_tela / 2.0f;
+
+    if (*camera_x < 0) *camera_x = 0;
+    if (*camera_y < 0) *camera_y = 0;
+    if (*camera_x > largura_mapa - largura_tela) *camera_x = largura_mapa - largura_tela;
+    if (*camera_y > altura_mapa - altura_tela) *camera_y = altura_mapa - altura_tela;
 }
