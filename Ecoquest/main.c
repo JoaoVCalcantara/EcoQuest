@@ -74,13 +74,16 @@ int main(void) {
     if (!jogador.usar_sprite) {
 		printf("Aviso: Sprites do jogador nao carregaram corretamente. Usando circulo simples.\n");
     }
+
+
+
     
     // Cria bots em diferentes cenarios
     Bot bots[MAX_BOTS];
-    iniciar_bot(&bots[0], 150.0f, 100.0f, "Tigre", "Carnivoro", CENARIO1);
-    iniciar_bot(&bots[1], 400.0f, 500.0f, "Panda", "Herbivoro", CENARIO2);
-    iniciar_bot(&bots[2], 900.0f, 150.0f, "Aguia", "Carnivoro", CENARIO3);
-    iniciar_bot(&bots[3], 1000.0f, 600.0f, "Urso", "Onivoro", CENARIO4);
+    iniciar_bot_com_sprite(&bots[0], 150.0f, 100.0f, "Raposa", "Carnivoro", CENARIO1, "assets/img/animais/raposa.png");
+    iniciar_bot_com_sprite(&bots[1], 400.0f, 500.0f, "Jacare", "Carnivoro", CENARIO2, "assets/img/animais/jacare.png");
+    iniciar_bot_com_sprite(&bots[2], 900.0f, 150.0f, "Boto", "Carnivoro", CENARIO3, "assets/img/animais/boto.png");
+    iniciar_bot_com_sprite(&bots[3], 1000.0f, 600.0f, "Onca", "Carnivoro", CENARIO4, "assets/img/animais/onca.png");
 
     JogoCenas cena_atual = CENARIO1;
     
@@ -199,6 +202,9 @@ int main(void) {
         }
     }
 	destruir_entidade(&jogador);
+    for(int i = 0; i < MAX_BOTS; i++) {
+        destruir_bot(&bots[i]);
+	}
     al_destroy_font(fonte);
     destruir_allegro(&ctx);
     return 0;

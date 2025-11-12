@@ -3,6 +3,7 @@
 #include <allegro5/allegro_primitives.h>
 #include <math.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <time.h>
 
 void iniciar_bot(Bot* bot, float x, float y, const char* nome, const char* tipo, int cenario) {
@@ -21,6 +22,22 @@ void iniciar_bot(Bot* bot, float x, float y, const char* nome, const char* tipo,
     bot->animal_data.alimentado = false;
     bot->animal_data.nome = nome;
     bot->animal_data.tipo = tipo;
+
+	bot->sprite_animal = NULL;
+	bot->usar_sprite = false;
+	bot->escala_sprite = 0.03f ;
+}
+
+void iniciar_bot_com_sprite(Bot* bot, float x, float y, const char* nome, const char* tipo, int cenario, const char* caminho_sprite) {
+    iniciar_bot(bot, x, y, nome, tipo, cenario);
+    if (caminho_sprite) {
+        bot->sprite_animal = criar_sprite(caminho_sprite);
+        bot->usar_sprite = (bot->sprite_animal && bot->sprite_animal->carregado);
+
+        if (!bot->usar_sprite) {
+            printf("Aviso: Nao foi possivel carregar sprite do bot %s\n", nome);
+		}
+    }
 }
 
 void atualizar_bot(Bot* bot, float largura_mapa, float altura_mapa, float delta_time) {
@@ -59,6 +76,18 @@ void desenhar_bot(const Bot* bot, ALLEGRO_COLOR cor, float camera_x, float camer
     
     float bot_x_tela = (bot->x - camera_x) * ZOOM_FACTOR;
     float bot_y_tela = (bot->y - camera_y) * ZOOM_FACTOR;
+    if(bot->usar_sprite && bot->sprite_animal) {
+        desenhar_sprite_camera(
+            bot->sprite_animal,
+            bot->x,
+            bot->y,
+            camera_x,
+            camera_y,
+            bot->escala_sprite,
+            ZOOM_FACTOR
+        );
+        return;
+	}
     
     al_draw_filled_circle(bot_x_tela, bot_y_tela, bot->raio * ZOOM_FACTOR, cor);
     al_draw_circle(bot_x_tela, bot_y_tela, bot->raio * ZOOM_FACTOR, al_map_rgb(255, 255, 255), 2.0f);
@@ -72,4 +101,13 @@ bool verificar_colisao_bot(const entidade* jogador, const Bot* bot) {
     float distancia = sqrtf(dx * dx + dy * dy);
     
     return distancia <= (jogador->raio + bot->raio);
+}
+
+void destruir_bot(Bot* bot) {
+	if (!bot) return;
+
+    if (bot->sprite_animal) {
+        destruir_sprite(bot->sprite_animal);
+		bot->sprite_animal = NULL;
+    }
 }
