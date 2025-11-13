@@ -19,17 +19,17 @@ typedef struct {
 // Configurações individuais para cada animal
 static const ConfigAnimal configs_animais[] = {
     {"raposa", 0.25f, 250.0f, 325.0f},
-    {"jacare", 0.25f, 275.0f, 125.0f},
-    {"boto", 0.25f, 280.0f, 280.0f},
-    {"onca", 0.25f, 250.0f, 175.0f}
+    {"jacare", 0.25f, 275.0f, 150.0f},
+    {"boto", 0.25f, 280.0f, 320.0f},
+    {"onca", 0.25f, 250.0f, 200.0f}
 };
 
 // NOVO: Configurações de posição do sprite do jogador para cada animal
 static const ConfigSpriteJogador configs_jogador[] = {
     {"raposa", 100.0f, 150.0f, 0.5f},   // x, y, escala
-    {"jacare", 80.0f, 400.0f, 0.5f},
-    {"boto", 90.0f, 380.0f, 0.5f},
-    {"onca", 100.0f, 370.0f, 0.5f}
+    {"jacare", 125.0f, 150.0f, 0.5f},
+    {"boto", 175.0f, 175.0f, 0.5f},
+    {"onca", 175.0f, 175.0f, 0.5f}
 };
 
 // Obtém a configuração específica do animal pelo nome
@@ -296,25 +296,33 @@ void iniciar_batalha(ALLEGRO_FONT* fonte, Animal* animal, ALLEGRO_EVENT_QUEUE* e
     // Define caminhos dos recursos baseados no animal
     const char* caminho_caixa_texto = "assets/img/estruturas/caixa_de_texto.png";
     const char* caminho_fundo = animal->caminho_fundo_batalha ? animal->caminho_fundo_batalha : "assets/img/estruturas/selva.png";
-    const char* caminho_sprite_jogador = "assets/img/Heroi/idle_right.png";  // NOVO: Sprite padrão do jogador
+    const char* caminho_sprite_jogador = "assets/img/Heroi/idle_right.png";
     
     // Obtém o caminho do sprite do animal (converte nome para minúsculas)
     char caminho_sprite_animal[256];
     snprintf(caminho_sprite_animal, sizeof(caminho_sprite_animal), "assets/img/animais/%s.png", animal->nome);
     
-    // Converte para minúsculas (caso o sistema de arquivos seja case-sensitive)
+    // Converte para minúsculas
     for (int i = 0; caminho_sprite_animal[i]; i++) {
         if (caminho_sprite_animal[i] >= 'A' && caminho_sprite_animal[i] <= 'Z') {
             caminho_sprite_animal[i] = caminho_sprite_animal[i] + ('a' - 'A');
         }
     }
 
-    // Carrega recursos visuais (AGORA COM SPRITE DO JOGADOR)
+    // Carrega recursos visuais
     RecursosBatalha* recursos = carregar_recursos_batalha(caminho_fundo, caminho_caixa_texto, caminho_sprite_animal, caminho_sprite_jogador);
+    
+    // ✅ Desenha a tela inicial da batalha ANTES do loop
+    desenhar_menu_batalha(fonte, opcao, display, animal, recursos);
 
     while (batalhando) {
         ALLEGRO_EVENT ev;
         al_wait_for_event(event_queue, &ev);
+
+        // ✅ IGNORA EVENTOS DE TIMER DURANTE A BATALHA
+        if (ev.type == ALLEGRO_EVENT_TIMER) {
+            continue;  // Pula para o próximo evento
+        }
 
         if (ev.type == ALLEGRO_EVENT_KEY_DOWN) {
             switch (ev.keyboard.keycode) {
@@ -376,9 +384,10 @@ void iniciar_batalha(ALLEGRO_FONT* fonte, Animal* animal, ALLEGRO_EVENT_QUEUE* e
                 batalhando = false;
                 break;
             }
+            
+            // ✅ Redesenha após processar a tecla
+            desenhar_menu_batalha(fonte, opcao, display, animal, recursos);
         }
-
-        desenhar_menu_batalha(fonte, opcao, display, animal, recursos);
     }
 
     // Libera recursos ao sair da batalha

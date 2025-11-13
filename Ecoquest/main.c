@@ -167,16 +167,12 @@ int main(void) {
                 if (bots[i].ativo && verificar_colisao_bot(&jogador, &bots[i])) {
                     printf("Colisao com %s!\n", bots[i].animal_data.nome);
                     
-                    // PAUSA O TIMER DO JOGO
-                    al_stop_timer(ctx.timer);
+                    // ✅ NÃO PAUSA O TIMER - A batalha ignora eventos de timer
                     
-                    // Inicia batalha (o timer está pausado aqui)
+                    // Inicia batalha
                     iniciar_batalha(fonte, &bots[i].animal_data, ctx.event_queue, ctx.display);
                     
-                    // RETOMA O TIMER DO JOGO
-                    al_start_timer(ctx.timer);
-                    
-                    // Reinicia contagem de tempo
+                    // ✅ Reinicia contagem de tempo (o timer continuou rodando)
                     tempo_anterior = al_get_time();
                     
                     // Define cooldown APÓS a batalha
