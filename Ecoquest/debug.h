@@ -45,7 +45,11 @@ void debug_desenhar_hitbox_circulo(float x, float y, float raio, ALLEGRO_COLOR c
 void debug_desenhar_hitbox_retangulo(float x, float y, float largura, float altura, ALLEGRO_COLOR cor, float camera_x, float camera_y, float zoom);
 void debug_desenhar_area_circular(float centro_x, float centro_y, float raio, ALLEGRO_COLOR cor, float camera_x, float camera_y, float zoom);
 void debug_desenhar_area_retangular(float min_x, float max_x, float min_y, float max_y, ALLEGRO_COLOR cor, float camera_x, float camera_y, float zoom);
-void debug_desenhar_area_eliptica(float centro_x, float centro_y, float raio_h, float raio_v, ALLEGRO_COLOR cor, float camera_x, float camera_y, float zoom);
+void debug_desenhar_area_eliptica(float centro_x, float centro_y, 
+                                   float raio_h, float raio_v, 
+                                   ALLEGRO_COLOR cor, 
+                                   float camera_x, float camera_y, 
+                                   float zoom);
 void debug_desenhar_grid(int largura_mapa, int altura_mapa, int tamanho_celula, ALLEGRO_COLOR cor, float camera_x, float camera_y, float zoom);
 void debug_desenhar_linha(float x1, float y1, float x2, float y2, ALLEGRO_COLOR cor, float espessura, float camera_x, float camera_y, float zoom);
 void debug_desenhar_ponto(float x, float y, float tamanho, ALLEGRO_COLOR cor, float camera_x, float camera_y, float zoom);

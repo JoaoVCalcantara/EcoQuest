@@ -226,12 +226,26 @@ void debug_desenhar_painel_info(DebugContext* debug, float jogador_x, float joga
     al_draw_text(debug->fonte_debug, al_map_rgb(150, 150, 150), 10, y_offset, 0, "[F5] Grid");
 }
 
-// Adicione a implementação:
-void debug_desenhar_area_eliptica(float centro_x, float centro_y, float raio_h, float raio_v, ALLEGRO_COLOR cor, float camera_x, float camera_y, float zoom) {
-    float cx = (centro_x - camera_x) * zoom;
-    float cy = (centro_y - camera_y) * zoom;
+void debug_desenhar_area_eliptica(float centro_x, float centro_y, 
+                                   float raio_h, float raio_v, 
+                                   ALLEGRO_COLOR cor, 
+                                   float camera_x, float camera_y, 
+                                   float zoom) {
+    // Converte coordenadas do mundo para coordenadas da tela
+    float cx_tela = (centro_x - camera_x) * zoom;
+    float cy_tela = (centro_y - camera_y) * zoom;
+    float rx = raio_h * zoom;
+    float ry = raio_v * zoom;
     
-    al_draw_ellipse(cx, cy, raio_h * zoom, raio_v * zoom, cor, 2.0f);
+    // Desenha a elipse
+    al_draw_ellipse(cx_tela, cy_tela, rx, ry, cor, 2.0f);
+    
+    // Desenha uma cruz no centro para marcar o ponto central
+    float tamanho_cruz = 5.0f;
+    al_draw_line(cx_tela - tamanho_cruz, cy_tela, 
+                 cx_tela + tamanho_cruz, cy_tela, cor, 1.0f);
+    al_draw_line(cx_tela, cy_tela - tamanho_cruz, 
+                 cx_tela, cy_tela + tamanho_cruz, cor, 1.0f);
 }
 
 const char* debug_obter_nome_tecla(int keycode) {

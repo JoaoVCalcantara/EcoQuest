@@ -1,5 +1,6 @@
 #include "inimigo.h"
 #include "cenario.h"
+#include "sprites.h"  // ADICIONAR
 #include <allegro5/allegro_primitives.h>
 #include <math.h>
 #include <stdlib.h>
@@ -59,9 +60,15 @@ void iniciar_bot_com_area_circular(Bot* bot, float x, float y, const char* nome,
     printf("Bot %s limitado a area circular: Centro(%.0f, %.0f) Raio=%.0f\n", nome, centro_x, centro_y, raio_area);
 }
 
-void iniciar_bot_com_area_eliptica(Bot* bot, float x, float y, const char* nome, const char* tipo, int cenario, const char* caminho_sprite, float centro_x, float centro_y, float raio_h, float raio_v) {
-    iniciar_bot_com_sprite(bot, x, y, nome, tipo, cenario, caminho_sprite);
+void iniciar_bot_com_area_eliptica(Bot* bot, float x, float y, const char* nome, const char* tipo, 
+                                    JogoCenas cenario, const char* caminho_sprite, 
+                                    const char* fundo_batalha_path,
+                                    float centro_x, float centro_y, 
+                                    float raio_h, float raio_v) {
+    // Usa a função básica para inicializar
+    iniciar_bot_com_sprite_e_fundo(bot, x, y, nome, tipo, cenario, caminho_sprite, fundo_batalha_path);
     
+    // Configura a área elíptica
     bot->area_restrita.tipo = AREA_ELIPTICA;
     bot->area_restrita.centro_elipse_x = centro_x;
     bot->area_restrita.centro_elipse_y = centro_y;
@@ -231,4 +238,48 @@ void destruir_bot(Bot* bot) {
         destruir_sprite(bot->sprite_animal);
         bot->sprite_animal = NULL;
     }
+}
+
+void iniciar_bot_com_sprite_e_fundo(Bot* bot, float x, float y, const char* nome, const char* tipo, 
+                                     JogoCenas cenario, const char* sprite_path, const char* fundo_batalha_path) {
+    bot->x = x;
+    bot->y = y;
+    bot->raio = 8.0f;  // Mantém o valor original
+    bot->velocidade = 0.5f;  // Mantém o valor original
+    bot->ativo = true;
+    bot->cenario = cenario;
+    bot->cooldown_colisao = 0.0f;
+    bot->tempo_mudanca = 0.0f;
+    bot->direcao_x = 1.0f;
+    bot->direcao_y = 0.0f;
+    
+    // Configura dados do animal
+    bot->animal_data.nome = nome;
+    bot->animal_data.tipo = tipo;
+    bot->animal_data.experiencia = 0;
+    bot->animal_data.nivel_alimentacao = 0;
+    bot->animal_data.nivel = 1;
+    bot->animal_data.alimentado = false;
+    bot->animal_data.domado = false;
+    bot->animal_data.estudado = false;
+    bot->animal_data.caminho_fundo_batalha = fundo_batalha_path;  // ADICIONA fundo de batalha
+    
+    // Carrega sprite do bot
+    bot->caminho_sprite_batalha = sprite_path;
+    if (sprite_path) {
+        bot->sprite_animal = criar_sprite(sprite_path);
+        bot->usar_sprite = (bot->sprite_animal && bot->sprite_animal->carregado);
+
+        if (!bot->usar_sprite) {
+            printf("Aviso: Nao foi possivel carregar sprite do bot %s\n", nome);
+        }
+    } else {
+        bot->sprite_animal = NULL;
+        bot->usar_sprite = false;
+    }
+    
+    bot->escala_sprite = 0.03f;
+    
+    // Sem restrição de área por padrão
+    bot->area_restrita.tipo = AREA_NENHUMA;
 }

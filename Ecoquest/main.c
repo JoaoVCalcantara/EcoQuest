@@ -79,13 +79,17 @@ int main(void) {
 
     // Cria bots em diferentes cenarios
     Bot bots[MAX_BOTS];
-    iniciar_bot_com_sprite(&bots[0], 150.0f, 100.0f, "Raposa", "Carnivoro", CENARIO1, "assets/img/animais/raposa.png");
-    iniciar_bot_com_sprite(&bots[1], 400.0f, 500.0f, "Jacare", "Carnivoro", CENARIO2, "assets/img/animais/jacare.png");
+    iniciar_bot_com_sprite_e_fundo(&bots[0], 150.0f, 100.0f, "Raposa", "Carnivoro", CENARIO1, 
+                                "assets/img/animais/raposa.png", "assets/img/estruturas/selva.png");
+    iniciar_bot_com_sprite_e_fundo(&bots[1], 400.0f, 500.0f, "Jacare", "Carnivoro", CENARIO2, 
+                                "assets/img/animais/jacare.png", "assets/img/estruturas/pantano.png");
     iniciar_bot_com_area_eliptica(&bots[2], 1000.0f, 150.0f, "Boto", "Carnivoro", CENARIO3, 
                               "assets/img/animais/boto.png", 
+                              "assets/img/estruturas/lago.png",
                               950.0f, 205.0f,   // Centro da elipse (centro do lago)
                               165.0f, 105.0f);  // Raio horizontal e vertical
-    iniciar_bot_com_sprite(&bots[3], 1000.0f, 600.0f, "Onca", "Carnivoro", CENARIO4, "assets/img/animais/onca.png");
+    iniciar_bot_com_sprite_e_fundo(&bots[3], 1000.0f, 600.0f, "Onca", "Carnivoro", CENARIO4, 
+                                "assets/img/animais/onca.png", "assets/img/estruturas/cerrado.png");
 
     JogoCenas cena_atual = CENARIO1;
     
@@ -174,7 +178,7 @@ int main(void) {
                     }
                     // Se foi domado mas não estudado, mantém no mapa
                     else if (bots[i].animal_data.domado) {
-                        printf("%s esta domado e permanece no mapa para estudo!\n", bots[i].animal_data.nome);
+                        printf("%s esta domado e permanece no mapa para estudio!\n", bots[i].animal_data.nome);
                     }
                     
                     // Recua o jogador para evitar colisao continua
@@ -249,16 +253,19 @@ int main(void) {
                 for (int i = 0; i < MAX_BOTS; i++) {
                     if (bots[i].cenario == cena_atual) {
                         if (bots[i].area_restrita.tipo == AREA_ELIPTICA) {
-                            debug_desenhar_area_eliptica(
-                                bots[i].area_restrita.centro_elipse_x,
-                                bots[i].area_restrita.centro_elipse_y,
-                                bots[i].area_restrita.raio_horizontal,
-                                bots[i].area_restrita.raio_vertical,
-                                al_map_rgb(0, 200, 255),
-                                camera_x, camera_y, ZOOM_FACTOR
-                            );
+                            // ADICIONE ESTA VERIFICAÇÃO:
+                            if (bots[i].area_restrita.raio_horizontal > 0 && 
+                                bots[i].area_restrita.raio_vertical > 0) {
+                                debug_desenhar_area_eliptica(
+                                    bots[i].area_restrita.centro_elipse_x,
+                                    bots[i].area_restrita.centro_elipse_y,
+                                    bots[i].area_restrita.raio_horizontal,
+                                    bots[i].area_restrita.raio_vertical,
+                                    al_map_rgb(0, 200, 255),
+                                    camera_x, camera_y, ZOOM_FACTOR
+                                );
+                            }
                         } else if (bots[i].area_restrita.tipo == AREA_CIRCULAR) {
-                            // Mantenha a visualização circular se houver outros bots com área circular
                             float cx = (bots[i].area_restrita.centro_x - camera_x) * ZOOM_FACTOR;
                             float cy = (bots[i].area_restrita.centro_y - camera_y) * ZOOM_FACTOR;
                             al_draw_circle(cx, cy, bots[i].area_restrita.raio_area * ZOOM_FACTOR, 
