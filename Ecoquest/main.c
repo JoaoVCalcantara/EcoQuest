@@ -17,7 +17,7 @@
 int main(void) {
 
     // Inicializa gerador de numeros aleatorios para IA dos bots
-    srand((unsigned int)time(NULL));
+    srand(time(NULL));
 
     AllegroContext ctx;
 
@@ -157,7 +157,7 @@ int main(void) {
                 }
             }
             
-            // Atualiza todos os bots
+            // Atualiza todos os bots (CONTINUA NORMALMENTE - cooldown NÃO será decrementado durante batalha)
             for (int i = 0; i < MAX_BOTS; i++) {
                 atualizar_bot(&bots[i], 1280.0f, 720.0f, delta_time);
             }
@@ -167,21 +167,31 @@ int main(void) {
                 if (bots[i].ativo && verificar_colisao_bot(&jogador, &bots[i])) {
                     printf("Colisao com %s!\n", bots[i].animal_data.nome);
                     
-                    // Inicia batalha
-                    iniciar_batalha(fonte, &bots[i].animal_data, ctx.event_queue, ctx.display);
-                    bots[i].cooldown_colisao = 3.0f;
+                    // PAUSA O TIMER DO JOGO
+                    al_stop_timer(ctx.timer);
                     
-                    // Se o animal foi completamente estudado, desativa o bot permanentemente
+                    // Inicia batalha (o timer está pausado aqui)
+                    iniciar_batalha(fonte, &bots[i].animal_data, ctx.event_queue, ctx.display);
+                    
+                    // RETOMA O TIMER DO JOGO
+                    al_start_timer(ctx.timer);
+                    
+                    // Reinicia contagem de tempo
+                    tempo_anterior = al_get_time();
+                    
+                    // Define cooldown APÓS a batalha
+                    bots[i].cooldown_colisao = 6.0f;
+                    
+                    // Lógica de estudo/domação
                     if (bots[i].animal_data.estudado) {
                         bots[i].ativo = false;
                         printf("%s foi totalmente estudado e nao aparecera mais!\n", bots[i].animal_data.nome);
                     }
-                    // Se foi domado mas não estudado, mantém no mapa
                     else if (bots[i].animal_data.domado) {
                         printf("%s esta domado e permanece no mapa para estudio!\n", bots[i].animal_data.nome);
                     }
                     
-                    // Recua o jogador para evitar colisao continua
+                    // Recua o jogador
                     jogador.y += 20.0f;
                 }
             }

@@ -24,14 +24,23 @@ typedef struct {
     ALLEGRO_BITMAP* fundo_batalha;
     ALLEGRO_BITMAP* caixa_texto;
     ALLEGRO_BITMAP* sprite_animal;
+    ALLEGRO_BITMAP* sprite_jogador;  // NOVO: Sprite do jogador
 } RecursosBatalha;
+
+// Configuração de posição do sprite do jogador por animal
+typedef struct {
+    const char* nome_animal;
+    float jogador_x;
+    float jogador_y;
+    float jogador_escala;
+} ConfigSpriteJogador;
 
 // Funções principais
 void desenhar_menu_batalha(ALLEGRO_FONT* fonte, int opcao, ALLEGRO_DISPLAY* display, Animal* animal, RecursosBatalha* recursos);
 void iniciar_batalha(ALLEGRO_FONT* fonte, Animal* animal, ALLEGRO_EVENT_QUEUE* event_queue, ALLEGRO_DISPLAY* display);
 
 // Funções auxiliares para gerenciar recursos
-RecursosBatalha* carregar_recursos_batalha(const char* caminho_fundo, const char* caminho_caixa_texto, const char* caminho_sprite_animal);
+RecursosBatalha* carregar_recursos_batalha(const char* caminho_fundo, const char* caminho_caixa_texto, const char* caminho_sprite_animal, const char* caminho_sprite_jogador);
 void destruir_recursos_batalha(RecursosBatalha* recursos);
 
-#endif 
+#endif
