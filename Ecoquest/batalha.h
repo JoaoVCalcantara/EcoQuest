@@ -7,9 +7,12 @@
 #include <allegro5/allegro.h>
 
 typedef struct {
-    int experiencia;
+    int experiencia;        // XP de estudo (0-100)
+    int nivel_alimentacao;  // Nível de alimentação (0-100)
     int nivel;
-    bool alimentado;
+    bool alimentado;        //True quando nivel_alimentacao >= 100
+    bool domado;            // True quando alimentado pela primeira vez
+    bool estudado;          // True quando experiencia >= 100
     const char* nome;
     const char* tipo;
 } Animal;

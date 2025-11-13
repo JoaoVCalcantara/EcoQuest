@@ -11,7 +11,7 @@ struct CavernaState;
 struct AllegroContext; /* necessário porque alguns protótipos usam AllegroContext* */
 
 /* Constants */
-#define PLAYER_RADIUS 15.0f
+#define PLAYER_RADIUS 17.0f
 #define PLAYER_SPEED 2.0f
 
 typedef enum {
