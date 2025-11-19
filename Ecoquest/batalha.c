@@ -2,14 +2,13 @@
 
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_font.h>
-#include <allegro5/allegro_ttf.h>
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_image.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 #include "batalha.h"
+#include "bestiario.h"
 
 // Estrutura para configurar posição individual de cada animal
 typedef struct {
@@ -114,7 +113,6 @@ static void mostrar_popup_estudo(ALLEGRO_FONT* fonte, ALLEGRO_DISPLAY* display, 
     float box_x = (largura - box_w) / 2.0f;
     float box_y = (altura - box_h) / 2.0f;
 
-    // Cria cópia do texto para manipulação
     char buffer[4096];
     strncpy(buffer, texto, sizeof(buffer) - 1);
     buffer[sizeof(buffer) - 1] = '\0';
@@ -124,40 +122,31 @@ static void mostrar_popup_estudo(ALLEGRO_FONT* fonte, ALLEGRO_DISPLAY* display, 
     float max_width = box_w - 40;
     float line_height = al_get_font_line_height(fonte) + 4;
 
-    // Desenha o popup
     al_clear_to_color(al_map_rgb(0, 0, 0));
     
-    // Overlay escuro
     al_draw_filled_rectangle(0, 0, (float)largura, (float)altura, al_map_rgba(0, 0, 0, 180));
 
-    // Caixa de texto
     al_draw_filled_rounded_rectangle(box_x, box_y, box_x + box_w, box_y + box_h, 10, 10, al_map_rgb(240, 240, 230));
     al_draw_rounded_rectangle(box_x, box_y, box_x + box_w, box_y + box_h, 10, 10, al_map_rgb(100, 70, 30), 3);
 
-    // Título
     al_draw_text(fonte, al_map_rgb(40, 20, 0), box_x + box_w / 2, box_y + 15, ALLEGRO_ALIGN_CENTRE, "=== INFORMACAO DO ANIMAL ===");
 
-    // Quebra de texto palavra por palavra
     char linha_atual[512] = "";
     char* palavra_ptr = buffer;
     
     while (*palavra_ptr != '\0') {
-        // Pula espaços
         while (*palavra_ptr == ' ') palavra_ptr++;
         if (*palavra_ptr == '\0') break;
         
-        // Encontra fim da palavra
         char* fim_palavra = palavra_ptr;
         while (*fim_palavra != '\0' && *fim_palavra != ' ') fim_palavra++;
         
-        // Cria palavra temporária
         char palavra[256];
         size_t len_palavra = fim_palavra - palavra_ptr;
         if (len_palavra >= sizeof(palavra)) len_palavra = sizeof(palavra) - 1;
         strncpy(palavra, palavra_ptr, len_palavra);
         palavra[len_palavra] = '\0';
         
-        // Testa se cabe na linha atual
         char teste[512];
         if (strlen(linha_atual) == 0) {
             strncpy(teste, palavra, sizeof(teste) - 1);
@@ -169,12 +158,10 @@ static void mostrar_popup_estudo(ALLEGRO_FONT* fonte, ALLEGRO_DISPLAY* display, 
         float w = al_get_text_width(fonte, teste);
         
         if (w > max_width && strlen(linha_atual) > 0) {
-            // Desenha linha atual e começa nova
             al_draw_text(fonte, al_map_rgb(0, 0, 0), text_x, text_y, ALLEGRO_ALIGN_LEFT, linha_atual);
             text_y += line_height;
             strncpy(linha_atual, palavra, sizeof(linha_atual) - 1);
         } else {
-            // Adiciona palavra à linha
             strncpy(linha_atual, teste, sizeof(linha_atual) - 1);
         }
         linha_atual[sizeof(linha_atual) - 1] = '\0';
@@ -182,18 +169,14 @@ static void mostrar_popup_estudo(ALLEGRO_FONT* fonte, ALLEGRO_DISPLAY* display, 
         palavra_ptr = fim_palavra;
     }
 
-    // Desenha última linha
     if (strlen(linha_atual) > 0) {
         al_draw_text(fonte, al_map_rgb(0, 0, 0), text_x, text_y, ALLEGRO_ALIGN_LEFT, linha_atual);
     }
 
-    // Instrução
     al_draw_text(fonte, al_map_rgb(100, 100, 100), box_x + box_w / 2, box_y + box_h - 30, ALLEGRO_ALIGN_CENTRE, "Pressione ENTER para continuar");
 
-    // CRÍTICO: Atualiza display ANTES de esperar input
     al_flip_display();
 
-    // Aguarda tecla
     if (event_queue) {
         bool esperando = true;
         while (esperando) {
@@ -212,12 +195,11 @@ static void mostrar_popup_estudo(ALLEGRO_FONT* fonte, ALLEGRO_DISPLAY* display, 
             }
         }
     } else {
-        // Fallback se não houver event_queue
         al_rest(3.0);
     }
 }
 
-ConfigAnimal obter_config_animal(const char* nome_animal) {
+static ConfigAnimal obter_config_animal(const char* nome_animal) {
     ConfigAnimal padrao = { "desconhecido", 0.3f, 250.0f, 280.0f };
 
     if (!nome_animal) return padrao;
@@ -239,7 +221,7 @@ ConfigAnimal obter_config_animal(const char* nome_animal) {
     return padrao;
 }
 
-ConfigSpriteJogador obter_config_sprite_jogador(const char* nome_animal) {
+static ConfigSpriteJogador obter_config_sprite_jogador(const char* nome_animal) {
     ConfigSpriteJogador padrao = { "desconhecido", 100.0f, 350.0f, 0.15f };
 
     if (!nome_animal) return padrao;
@@ -355,8 +337,8 @@ void desenhar_menu_batalha(ALLEGRO_FONT* fonte, int opcao, ALLEGRO_DISPLAY* disp
     }
 
     float caixa_y = (float)altura - 125.0f;
-    float caixa_x_real;
-    float caixa_largura_escalada;
+    float caixa_x_real = 0.0f;
+    float caixa_largura_escalada = 0.0f;
 
     if (recursos && recursos->caixa_texto) {
         float caixa_largura = (float)al_get_bitmap_width(recursos->caixa_texto);
@@ -469,7 +451,6 @@ void iniciar_batalha(ALLEGRO_FONT* fonte, Animal* animal, ALLEGRO_EVENT_QUEUE* e
 
     RecursosBatalha* recursos = carregar_recursos_batalha(caminho_fundo, caminho_caixa_texto, caminho_sprite_animal, caminho_sprite_jogador);
 
-    // Sistema de controle de frases já exibidas
     int total_frases = 0;
     const char** frases_disponiveis = obter_frases_animal(animal->nome, &total_frases);
     bool* frases_exibidas = NULL;
@@ -507,7 +488,7 @@ void iniciar_batalha(ALLEGRO_FONT* fonte, Animal* animal, ALLEGRO_EVENT_QUEUE* e
             case ALLEGRO_KEY_ENTER:
             case ALLEGRO_KEY_SPACE:
                 switch (opcao) {
-                case 0: // Alimentar
+                case 0:
                     printf("Opcao selecionada: Alimentar\n");
                     animal->nivel_alimentacao += 15;
 
@@ -520,7 +501,7 @@ void iniciar_batalha(ALLEGRO_FONT* fonte, Animal* animal, ALLEGRO_EVENT_QUEUE* e
                     }
                     break;
 
-                case 1: // Estudar
+                case 1:
                     if (!animal->domado) {
                         printf("O animal precisa estar domado para ser estudado!\n");
                         break;
@@ -528,7 +509,6 @@ void iniciar_batalha(ALLEGRO_FONT* fonte, Animal* animal, ALLEGRO_EVENT_QUEUE* e
 
                     printf("Opcao selecionada: Estudar\n");
 
-                    // Seleciona frase não repetida
                     if (total_frases > 0 && frases_exibidas && frases_disponiveis) {
                         int frases_restantes = 0;
                         for (int i = 0; i < total_frases; i++) {
@@ -550,7 +530,6 @@ void iniciar_batalha(ALLEGRO_FONT* fonte, Animal* animal, ALLEGRO_EVENT_QUEUE* e
                             }
                         }
                         else {
-                            // Todas as frases foram exibidas, reseta
                             for (int i = 0; i < total_frases; i++) {
                                 frases_exibidas[i] = false;
                             }
@@ -570,7 +549,7 @@ void iniciar_batalha(ALLEGRO_FONT* fonte, Animal* animal, ALLEGRO_EVENT_QUEUE* e
                     }
                     break;
 
-                case 2: // Correr
+                case 2:
                     printf("Voce correu da batalha!\n");
                     batalhando = false;
                     break;
@@ -586,10 +565,157 @@ void iniciar_batalha(ALLEGRO_FONT* fonte, Animal* animal, ALLEGRO_EVENT_QUEUE* e
         }
     }
 
-    // Libera memória do controle de frases
     if (frases_exibidas) {
         free(frases_exibidas);
     }
 
     destruir_recursos_batalha(recursos);
 }
+
+void iniciar_batalha_com_bestiario(ALLEGRO_FONT* fonte, Animal* animal, 
+                                   ALLEGRO_EVENT_QUEUE* event_queue, 
+                                   ALLEGRO_DISPLAY* display,
+                                   Bestiario* bestiario) {
+    bool batalhando = true;
+    int opcao = 0;
+
+    const char* caminho_caixa_texto = "assets/img/estruturas/caixa_de_texto.png";
+    const char* caminho_fundo = animal->caminho_fundo_batalha ? animal->caminho_fundo_batalha : "assets/img/estruturas/selva.png";
+    const char* caminho_sprite_jogador = "assets/img/Heroi/idle_right.png";
+
+    char caminho_sprite_animal[256];
+    snprintf(caminho_sprite_animal, sizeof(caminho_sprite_animal), "assets/img/animais/%s.png", animal->nome);
+
+    for (size_t i = 0; caminho_sprite_animal[i]; i++) {
+        if (caminho_sprite_animal[i] >= 'A' && caminho_sprite_animal[i] <= 'Z') {
+            caminho_sprite_animal[i] = caminho_sprite_animal[i] + ('a' - 'A');
+        }
+    }
+
+    RecursosBatalha* recursos = carregar_recursos_batalha(caminho_fundo, caminho_caixa_texto, caminho_sprite_animal, caminho_sprite_jogador);
+
+    int total_frases = 0;
+    const char** frases_disponiveis = obter_frases_animal(animal->nome, &total_frases);
+    bool* frases_exibidas = NULL;
+
+    if (total_frases > 0) {
+        frases_exibidas = (bool*)calloc((size_t)total_frases, sizeof(bool));
+    }
+
+    desenhar_menu_batalha(fonte, opcao, display, animal, recursos);
+
+    while (batalhando) {
+        ALLEGRO_EVENT ev;
+        al_wait_for_event(event_queue, &ev);
+
+        if (ev.type == ALLEGRO_EVENT_TIMER) {
+            continue;
+        }
+
+        if (ev.type == ALLEGRO_EVENT_KEY_DOWN) {
+            switch (ev.keyboard.keycode) {
+            case ALLEGRO_KEY_W:
+            case ALLEGRO_KEY_UP:
+                do {
+                    opcao = (opcao + 2) % 3;
+                } while (opcao == 1 && !animal->domado);
+                break;
+
+            case ALLEGRO_KEY_S:
+            case ALLEGRO_KEY_DOWN:
+                do {
+                    opcao = (opcao + 1) % 3;
+                } while (opcao == 1 && !animal->domado);
+                break;
+
+            case ALLEGRO_KEY_ENTER:
+            case ALLEGRO_KEY_SPACE:
+                switch (opcao) {
+                case 0:
+                    printf("Opcao selecionada: Alimentar\n");
+                    animal->nivel_alimentacao += 15;
+
+                    if (animal->nivel_alimentacao >= 100) {
+                        animal->nivel_alimentacao = 100;
+                        animal->alimentado = true;
+                        animal->domado = true;
+                        printf("%s foi domado!\n", animal->nome);
+                        opcao = 1;
+                    }
+                    break;
+
+                case 1:
+                    if (!animal->domado) {
+                        printf("O animal precisa estar domado para ser estudado!\n");
+                        break;
+                    }
+
+                    printf("Opcao selecionada: Estudar\n");
+
+                    if (total_frases > 0 && frases_exibidas && frases_disponiveis) {
+                        int frases_restantes = 0;
+                        for (int i = 0; i < total_frases; i++) {
+                            if (!frases_exibidas[i]) frases_restantes++;
+                        }
+
+                        if (frases_restantes > 0) {
+                            int idx_escolhido = -1;
+                            int tentativas = 0;
+
+                            do {
+                                idx_escolhido = rand() % total_frases;
+                                tentativas++;
+                            } while (frases_exibidas[idx_escolhido] && tentativas < total_frases * 2);
+
+                            if (!frases_exibidas[idx_escolhido]) {
+                                mostrar_popup_estudo(fonte, display, event_queue, frases_disponiveis[idx_escolhido]);
+                                frases_exibidas[idx_escolhido] = true;
+                            }
+                        }
+                        else {
+                            for (int i = 0; i < total_frases; i++) {
+                                frases_exibidas[i] = false;
+                            }
+                            int idx = rand() % total_frases;
+                            mostrar_popup_estudo(fonte, display, event_queue, frases_disponiveis[idx]);
+                            frases_exibidas[idx] = true;
+                        }
+                    }
+
+                    animal->experiencia += 15;
+
+                    if (animal->experiencia >= 100) {
+                        animal->experiencia = 100;
+                        animal->estudado = true;
+                        printf("%s foi completamente estudado!\n", animal->nome);
+                        
+                        if (bestiario) {
+                            desbloquear_entrada_bestiario(bestiario, animal->nome);
+                        }
+                        
+                        batalhando = false;
+                    }
+                    break;
+
+                case 2:
+                    printf("Voce correu da batalha!\n");
+                    batalhando = false;
+                    break;
+                }
+                break;
+
+            case ALLEGRO_KEY_ESCAPE:
+                batalhando = false;
+                break;
+            }
+
+            desenhar_menu_batalha(fonte, opcao, display, animal, recursos);
+        }
+    }
+
+    if (frases_exibidas) {
+        free(frases_exibidas);
+    }
+
+    destruir_recursos_batalha(recursos);
+ }

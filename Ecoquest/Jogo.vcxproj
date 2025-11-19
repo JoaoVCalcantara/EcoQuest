@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="allegro_init.c" />
     <ClCompile Include="batalha.c" />
+    <ClCompile Include="bestiario.c" />
     <ClCompile Include="cenario.c" />
     <ClCompile Include="debug.c" />
     <ClCompile Include="entidades.c" />
@@ -35,6 +36,7 @@
   <ItemGroup>
     <ClInclude Include="allegro_init.h" />
     <ClInclude Include="batalha.h" />
+    <ClInclude Include="bestiario.h" />
     <ClInclude Include="cenario.h" />
     <ClInclude Include="debug.h" />
     <ClInclude Include="entidades.h" />
