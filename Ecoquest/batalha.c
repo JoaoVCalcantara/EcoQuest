@@ -3,9 +3,7 @@
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_primitives.h>
-#include <allegro5/allegro_image.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include "batalha.h"
 #include "bestiario.h"
@@ -20,7 +18,8 @@ typedef struct {
 
 // Configurações individuais para cada animal
 static const ConfigAnimal configs_animais[] = {
-    {"raposa", 0.25f, 250.0f, 325.0f},
+    {"lobo_guara", 0.25f, 250.0f, 325.0f},
+    {"lobo guara", 0.25f, 250.0f, 325.0f},
     {"jacare", 0.25f, 275.0f, 150.0f},
     {"boto", 0.25f, 280.0f, 320.0f},
     {"onca", 0.25f, 250.0f, 200.0f}
@@ -28,14 +27,15 @@ static const ConfigAnimal configs_animais[] = {
 
 // Configurações de posição do sprite do jogador para cada animal
 static const ConfigSpriteJogador configs_jogador[] = {
-    {"raposa", 100.0f, 150.0f, 0.5f},
+    {"lobo_guara", 100.0f, 150.0f, 0.5f},
+    {"lobo guara", 100.0f, 150.0f, 0.5f},
     {"jacare", 125.0f, 150.0f, 0.5f},
     {"boto", 175.0f, 175.0f, 0.5f},
     {"onca", 175.0f, 175.0f, 0.5f}
 };
 
 // Arrays de frases informativas por animal
-static const char* frases_raposa[] = {
+static const char* frases_lobo_guara[] = {
     "Pernas Longas e Esguias - Adaptacao Evolutiva: A caracteristica mais marcante do lobo-guara, suas pernas longas e finas, eh uma adaptacao crucial para a locomocao no capim alto do Cerrado e em areas abertas. Essa estrutura permite que ele enxergue acima da vegetacao rasteira e persiga suas presas de forma eficiente nesse tipo de terreno. Essa caracteristica o diferencia dos lobos e raposas de florestas mais densas.",
     "Dieta Onivora (Especializacao em Frutos) - Adaptacao Evolutiva: Diferente da maioria dos grandes canideos, que sao predominantemente carnivoros, o lobo-guara desenvolveu uma dieta onivora, com grande consumo de frutos (chegando a 90% da dieta em certas epocas). Essa dieta e uma resposta a disponibilidade sazonal de recursos no Cerrado. Papel Ecologico: Essa evolucao alimentar fez dele um dispersor de sementes vital para o bioma, especialmente da lobeira (Solanum lycocarpum), estabelecendo uma relacao de mutualismo.",
     "Orelhas Grandes - Adaptacao Evolutiva: Suas orelhas grandes e eretas sao essenciais para detectar presas noturnas (como pequenos roedores e insetos) e para a comunicacao em um ambiente de vegetacao aberta, onde o som pode se propagar melhor do que em uma floresta densa.",
@@ -80,9 +80,22 @@ static const char** obter_frases_animal(const char* nome_animal, int* total_fras
         }
     }
 
-    if (strcmp(nome_lower, "raposa") == 0) {
-        *total_frases = (int)(sizeof(frases_raposa) / sizeof(frases_raposa[0]));
-        return frases_raposa;
+    // Remove espaços e substitui por underscore para normalização
+    char nome_normalizado[64];
+    int j = 0;
+    for (int i = 0; nome_lower[i] && j < 63; i++) {
+        if (nome_lower[i] == ' ') {
+            nome_normalizado[j++] = '_';
+        }
+        else {
+            nome_normalizado[j++] = nome_lower[i];
+        }
+    }
+    nome_normalizado[j] = '\0';
+
+    if (strcmp(nome_normalizado, "lobo_guara") == 0) {
+        *total_frases = (int)(sizeof(frases_lobo_guara) / sizeof(frases_lobo_guara[0]));
+        return frases_lobo_guara;
     }
     else if (strcmp(nome_lower, "jacare") == 0) {
         *total_frases = (int)(sizeof(frases_jacare) / sizeof(frases_jacare[0]));
@@ -123,7 +136,7 @@ static void mostrar_popup_estudo(ALLEGRO_FONT* fonte, ALLEGRO_DISPLAY* display, 
     float line_height = al_get_font_line_height(fonte) + 4;
 
     al_clear_to_color(al_map_rgb(0, 0, 0));
-    
+
     al_draw_filled_rectangle(0, 0, (float)largura, (float)altura, al_map_rgba(0, 0, 0, 180));
 
     al_draw_filled_rounded_rectangle(box_x, box_y, box_x + box_w, box_y + box_h, 10, 10, al_map_rgb(240, 240, 230));
@@ -133,39 +146,41 @@ static void mostrar_popup_estudo(ALLEGRO_FONT* fonte, ALLEGRO_DISPLAY* display, 
 
     char linha_atual[512] = "";
     char* palavra_ptr = buffer;
-    
+
     while (*palavra_ptr != '\0') {
         while (*palavra_ptr == ' ') palavra_ptr++;
         if (*palavra_ptr == '\0') break;
-        
+
         char* fim_palavra = palavra_ptr;
         while (*fim_palavra != '\0' && *fim_palavra != ' ') fim_palavra++;
-        
+
         char palavra[256];
         size_t len_palavra = fim_palavra - palavra_ptr;
         if (len_palavra >= sizeof(palavra)) len_palavra = sizeof(palavra) - 1;
         strncpy(palavra, palavra_ptr, len_palavra);
         palavra[len_palavra] = '\0';
-        
+
         char teste[512];
         if (strlen(linha_atual) == 0) {
             strncpy(teste, palavra, sizeof(teste) - 1);
-        } else {
+        }
+        else {
             snprintf(teste, sizeof(teste), "%s %s", linha_atual, palavra);
         }
         teste[sizeof(teste) - 1] = '\0';
-        
+
         float w = al_get_text_width(fonte, teste);
-        
+
         if (w > max_width && strlen(linha_atual) > 0) {
             al_draw_text(fonte, al_map_rgb(0, 0, 0), text_x, text_y, ALLEGRO_ALIGN_LEFT, linha_atual);
             text_y += line_height;
             strncpy(linha_atual, palavra, sizeof(linha_atual) - 1);
-        } else {
+        }
+        else {
             strncpy(linha_atual, teste, sizeof(linha_atual) - 1);
         }
         linha_atual[sizeof(linha_atual) - 1] = '\0';
-        
+
         palavra_ptr = fim_palavra;
     }
 
@@ -184,7 +199,7 @@ static void mostrar_popup_estudo(ALLEGRO_FONT* fonte, ALLEGRO_DISPLAY* display, 
             al_wait_for_event(event_queue, &ev);
 
             if (ev.type == ALLEGRO_EVENT_KEY_DOWN) {
-                if (ev.keyboard.keycode == ALLEGRO_KEY_ENTER || 
+                if (ev.keyboard.keycode == ALLEGRO_KEY_ENTER ||
                     ev.keyboard.keycode == ALLEGRO_KEY_SPACE ||
                     ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
                     esperando = false;
@@ -194,7 +209,8 @@ static void mostrar_popup_estudo(ALLEGRO_FONT* fonte, ALLEGRO_DISPLAY* display, 
                 esperando = false;
             }
         }
-    } else {
+    }
+    else {
         al_rest(3.0);
     }
 }
@@ -212,8 +228,22 @@ static ConfigAnimal obter_config_animal(const char* nome_animal) {
         }
     }
 
+    // Remove espaços e substitui por underscore
+    char nome_normalizado[64];
+    int j = 0;
+    for (int i = 0; nome_lower[i] && j < 63; i++) {
+        if (nome_lower[i] == ' ') {
+            nome_normalizado[j++] = '_';
+        }
+        else {
+            nome_normalizado[j++] = nome_lower[i];
+        }
+    }
+    nome_normalizado[j] = '\0';
+
     for (size_t i = 0; i < sizeof(configs_animais) / sizeof(ConfigAnimal); i++) {
-        if (strcmp(configs_animais[i].nome, nome_lower) == 0) {
+        if (strcmp(configs_animais[i].nome, nome_normalizado) == 0 ||
+            strcmp(configs_animais[i].nome, nome_lower) == 0) {
             return configs_animais[i];
         }
     }
@@ -234,8 +264,22 @@ static ConfigSpriteJogador obter_config_sprite_jogador(const char* nome_animal) 
         }
     }
 
+    // Remove espaços e substitui por underscore
+    char nome_normalizado[64];
+    int j = 0;
+    for (int i = 0; nome_lower[i] && j < 63; i++) {
+        if (nome_lower[i] == ' ') {
+            nome_normalizado[j++] = '_';
+        }
+        else {
+            nome_normalizado[j++] = nome_lower[i];
+        }
+    }
+    nome_normalizado[j] = '\0';
+
     for (size_t i = 0; i < sizeof(configs_jogador) / sizeof(ConfigSpriteJogador); i++) {
-        if (strcmp(configs_jogador[i].nome_animal, nome_lower) == 0) {
+        if (strcmp(configs_jogador[i].nome_animal, nome_normalizado) == 0 ||
+            strcmp(configs_jogador[i].nome_animal, nome_lower) == 0) {
             return configs_jogador[i];
         }
     }
@@ -447,6 +491,9 @@ void iniciar_batalha(ALLEGRO_FONT* fonte, Animal* animal, ALLEGRO_EVENT_QUEUE* e
         if (caminho_sprite_animal[i] >= 'A' && caminho_sprite_animal[i] <= 'Z') {
             caminho_sprite_animal[i] = caminho_sprite_animal[i] + ('a' - 'A');
         }
+        if (caminho_sprite_animal[i] == ' ') {
+            caminho_sprite_animal[i] = '_';
+        }
     }
 
     RecursosBatalha* recursos = carregar_recursos_batalha(caminho_fundo, caminho_caixa_texto, caminho_sprite_animal, caminho_sprite_jogador);
@@ -572,10 +619,10 @@ void iniciar_batalha(ALLEGRO_FONT* fonte, Animal* animal, ALLEGRO_EVENT_QUEUE* e
     destruir_recursos_batalha(recursos);
 }
 
-void iniciar_batalha_com_bestiario(ALLEGRO_FONT* fonte, Animal* animal, 
-                                   ALLEGRO_EVENT_QUEUE* event_queue, 
-                                   ALLEGRO_DISPLAY* display,
-                                   Bestiario* bestiario) {
+void iniciar_batalha_com_bestiario(ALLEGRO_FONT* fonte, Animal* animal,
+    ALLEGRO_EVENT_QUEUE* event_queue,
+    ALLEGRO_DISPLAY* display,
+    Bestiario* bestiario) {
     bool batalhando = true;
     int opcao = 0;
 
@@ -589,6 +636,9 @@ void iniciar_batalha_com_bestiario(ALLEGRO_FONT* fonte, Animal* animal,
     for (size_t i = 0; caminho_sprite_animal[i]; i++) {
         if (caminho_sprite_animal[i] >= 'A' && caminho_sprite_animal[i] <= 'Z') {
             caminho_sprite_animal[i] = caminho_sprite_animal[i] + ('a' - 'A');
+        }
+        if (caminho_sprite_animal[i] == ' ') {
+            caminho_sprite_animal[i] = '_';
         }
     }
 
@@ -688,11 +738,11 @@ void iniciar_batalha_com_bestiario(ALLEGRO_FONT* fonte, Animal* animal,
                         animal->experiencia = 100;
                         animal->estudado = true;
                         printf("%s foi completamente estudado!\n", animal->nome);
-                        
+
                         if (bestiario) {
                             desbloquear_entrada_bestiario(bestiario, animal->nome);
                         }
-                        
+
                         batalhando = false;
                     }
                     break;
@@ -718,4 +768,4 @@ void iniciar_batalha_com_bestiario(ALLEGRO_FONT* fonte, Animal* animal,
     }
 
     destruir_recursos_batalha(recursos);
- }
+}

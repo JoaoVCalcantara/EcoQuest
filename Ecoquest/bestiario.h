@@ -67,7 +67,7 @@ void mostrar_bestiario_popup(Bestiario* bestiario, ALLEGRO_FONT* fonte, ALLEGRO_
 // Funções auxiliares
 const char* obter_nome_nivel_trofico(NivelTrofico nivel);
 const char* obter_nome_posicao_cadeia(PosicaoCadeiaAlimentar posicao);
-InformacoesEcologicas criar_info_ecologica_raposa(void);
+InformacoesEcologicas criar_info_ecologica_lobo_guara(void);
 InformacoesEcologicas criar_info_ecologica_jacare(void);
 InformacoesEcologicas criar_info_ecologica_boto(void);
 InformacoesEcologicas criar_info_ecologica_onca(void);

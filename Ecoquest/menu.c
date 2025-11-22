@@ -1,8 +1,5 @@
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_font.h>
-#include <allegro5/allegro_ttf.h>
-#include <allegro5/allegro_image.h>
-#include <allegro5/allegro_primitives.h>
 #include <stdio.h>
 
 #include "menu.h"
@@ -13,9 +10,9 @@ void desenhar_tela_inicio(AllegroContext* ctx, ALLEGRO_FONT* fonte, ALLEGRO_BITM
         al_draw_scaled_bitmap(
             fundo,
             0, 0,
-            al_get_bitmap_width(fundo), al_get_bitmap_height(fundo),
+            (float)al_get_bitmap_width(fundo), (float)al_get_bitmap_height(fundo),
             0, 0,
-            ctx->width, ctx->height,
+            (float)ctx->width, (float)ctx->height,
             0
         );
     }
@@ -27,8 +24,8 @@ void desenhar_tela_inicio(AllegroContext* ctx, ALLEGRO_FONT* fonte, ALLEGRO_BITM
         al_draw_text(
             fonte,
             al_map_rgb(255, 255, 255),
-            ctx->width / 2,
-            ctx->height - 100,
+            (float)ctx->width / 2.0f,
+            (float)ctx->height - 100.0f,
             ALLEGRO_ALIGN_CENTRE,
             "Pressione ENTER"
         );
@@ -40,7 +37,7 @@ void desenhar_tela_inicio(AllegroContext* ctx, ALLEGRO_FONT* fonte, ALLEGRO_BITM
 bool executar_menu_inicial(AllegroContext* ctx) {
     ALLEGRO_FONT* fonte = al_create_builtin_font();
     ALLEGRO_BITMAP* fundo_menu = al_load_bitmap("assets/img/Estruturas/ecoquest.png");
-    
+
     if (!fundo_menu) {
         fprintf(stderr, "Aviso: Nao foi possivel carregar ecoquest.png\n");
     }
@@ -55,7 +52,7 @@ bool executar_menu_inicial(AllegroContext* ctx) {
         al_wait_for_event(ctx->event_queue, &event);
 
         if (event.type == ALLEGRO_EVENT_TIMER) {
-            tempo_texto += 1.0 / 60.0;
+            tempo_texto += 1.0f / 60.0f;
             if (tempo_texto >= 0.7f) {
                 mostrar_texto = !mostrar_texto;
                 tempo_texto = 0.0f;

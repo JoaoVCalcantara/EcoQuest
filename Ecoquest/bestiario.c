@@ -8,7 +8,7 @@
 
 // ========== INFORMAÇÕES ECOLÓGICAS ==========
 
-InformacoesEcologicas criar_info_ecologica_raposa(void) {
+InformacoesEcologicas criar_info_ecologica_lobo_guara(void) {
     InformacoesEcologicas info;
     info.nome_cientifico = "Chrysocyon brachyurus";
     info.nivel_trofico = NIVEL_CONSUMIDOR_TERCIARIO;
@@ -108,11 +108,11 @@ Bestiario* criar_bestiario(void) {
 
 void adicionar_especie_bestiario(Bestiario* bestiario, Animal* animal) {
     if (!bestiario || !animal || bestiario->total_especies >= 4) return;
-    
+
     int idx = bestiario->total_especies;
     bestiario->entradas[idx].animal_ref = animal;
     bestiario->entradas[idx].desbloqueado = false;
-    
+
     // Atribui informações ecológicas
     char nome_lower[64];
     snprintf(nome_lower, sizeof(nome_lower), "%s", animal->nome);
@@ -121,17 +121,33 @@ void adicionar_especie_bestiario(Bestiario* bestiario, Animal* animal) {
             nome_lower[i] = nome_lower[i] + ('a' - 'A');
         }
     }
-    
-    if (strcmp(nome_lower, "raposa") == 0) {
-        bestiario->entradas[idx].info_ecologica = criar_info_ecologica_raposa();
-    } else if (strcmp(nome_lower, "jacare") == 0) {
+
+    // Normaliza nome com underscore
+    char nome_normalizado[64];
+    int j = 0;
+    for (int i = 0; nome_lower[i] && j < 63; i++) {
+        if (nome_lower[i] == ' ') {
+            nome_normalizado[j++] = '_';
+        }
+        else {
+            nome_normalizado[j++] = nome_lower[i];
+        }
+    }
+    nome_normalizado[j] = '\0';
+
+    if (strcmp(nome_lower, "lobo guara") == 0 || strcmp(nome_normalizado, "lobo_guara") == 0) {
+        bestiario->entradas[idx].info_ecologica = criar_info_ecologica_lobo_guara();
+    }
+    else if (strcmp(nome_lower, "jacare") == 0) {
         bestiario->entradas[idx].info_ecologica = criar_info_ecologica_jacare();
-    } else if (strcmp(nome_lower, "boto") == 0) {
+    }
+    else if (strcmp(nome_lower, "boto") == 0) {
         bestiario->entradas[idx].info_ecologica = criar_info_ecologica_boto();
-    } else if (strcmp(nome_lower, "onca") == 0) {
+    }
+    else if (strcmp(nome_lower, "onca") == 0) {
         bestiario->entradas[idx].info_ecologica = criar_info_ecologica_onca();
     }
-    
+
     bestiario->total_especies++;
 }
 
