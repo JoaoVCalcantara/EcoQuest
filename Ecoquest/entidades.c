@@ -57,18 +57,35 @@ void desenhar_jogador(const entidade* p, ALLEGRO_COLOR cor) {
             }
         }
         else {
+            // Estado IDLE - com fallback para frame 0 do movimento
             switch (p->Direcao_atual) {
             case DIRECAO_CIMA:
                 sprite_atual = p->sprite_idle_cima;
+                // FALLBACK: Se idle_cima não existe, usa frame 0 do movimento
+                if (!sprite_animado_frames_valido(sprite_atual)) {
+                    sprite_atual = p->sprite_cima;
+                }
                 break;
             case DIRECAO_BAIXO:
                 sprite_atual = p->sprite_idle_baixo;
+                // FALLBACK: Se idle_baixo não existe, usa frame 0 do movimento
+                if (!sprite_animado_frames_valido(sprite_atual)) {
+                    sprite_atual = p->sprite_baixo;
+                }
                 break;
             case DIRECAO_ESQ:
                 sprite_atual = p->sprite_idle_esquerda;
+                // FALLBACK: Se idle_esquerda não existe, usa frame 0 do movimento
+                if (!sprite_animado_frames_valido(sprite_atual)) {
+                    sprite_atual = p->sprite_esquerda;
+                }
                 break;
             case DIRECAO_DIR:
                 sprite_atual = p->sprite_idle_direita;
+                // FALLBACK: Se idle_direita não existe, usa frame 0 do movimento
+                if (!sprite_animado_frames_valido(sprite_atual)) {
+                    sprite_atual = p->sprite_direita;
+                }
                 break;
             }
         }
@@ -139,15 +156,15 @@ void limitar_jogador_com_progresso(entidade* jogador, float largura_mapa, float 
     
     // 3. Bloqueia CENARIO4 se CENARIO3 não foi completado
     else if (!progresso->cenario3_completo) {
-        // Bloqueia movimento para CENARIO4 (baixo-direita)
-        if (jogador->x > 640.0f - jogador->raio && jogador->y > 360.0f) {
-            // Pode vir de cima ou da esquerda, então empurra nas duas direções
-            if (jogador->y > 360.0f) {
-                jogador->y = 360.0f - jogador->raio;
-            }
-            if (jogador->x > 640.0f) {
-                jogador->x = 640.0f - jogador->raio;
-            }
+        // CORREÇÃO: Bloquear baseado na posição anterior
+        // Se está no CENARIO3 (x > 640 e y < 360) e tenta descer
+        if (jogador->x > 640.0f && jogador->y > 360.0f - jogador->raio && jogador->y < 360.0f + 50.0f) {
+            jogador->y = 360.0f - jogador->raio;
+        }
+        
+        // Se está no CENARIO2 (x < 640 e y > 360) e tenta ir para direita
+        if (jogador->y > 360.0f && jogador->x > 640.0f - jogador->raio && jogador->x < 640.0f + 50.0f) {
+            jogador->x = 640.0f - jogador->raio;
         }
     }
 }

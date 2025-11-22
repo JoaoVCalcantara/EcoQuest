@@ -7,6 +7,8 @@
 #include <string.h>
 #include "batalha.h"
 #include "bestiario.h"
+#include "cacador.h"
+#include "entidades.h"
 
 // Estrutura para configurar posição individual de cada animal
 typedef struct {
@@ -18,11 +20,11 @@ typedef struct {
 
 // Configurações individuais para cada animal
 static const ConfigAnimal configs_animais[] = {
-    {"lobo_guara", 0.25f, 250.0f, 325.0f},
+    {"lobo_guara", 0.25f, 250.0f, 200.0f},
     {"lobo guara", 0.25f, 250.0f, 325.0f},
     {"jacare", 0.25f, 275.0f, 150.0f},
     {"boto", 0.25f, 280.0f, 320.0f},
-    {"onca", 0.25f, 250.0f, 200.0f}
+    {"onca", 0.25f, 250.0f, 325.0f}
 };
 
 // Configurações de posição do sprite do jogador para cada animal
@@ -32,6 +34,15 @@ static const ConfigSpriteJogador configs_jogador[] = {
     {"jacare", 125.0f, 150.0f, 0.5f},
     {"boto", 175.0f, 175.0f, 0.5f},
     {"onca", 175.0f, 175.0f, 0.5f}
+};
+
+// Configurações de posição do sprite do caçador - ALINHADAS COM OS ANIMAIS
+static const ConfigSpriteCacador configs_cacador[] = {
+    {"Cacador da Selva", 250.0f, 325.0f, 0.25f},         // Onça
+    {"Cacador do Pantano", 275.0f, 150.0f, 0.25f},       // Jacaré
+    {"Cacador do Lago", 280.0f, 320.0f, 0.25f},          // Boto - CORRIGIDO
+    {"Cacador do Cerrado", 250.0f, 200.0f, 0.25f},       // Lobo-guará
+    {"Cacador Chefe", 250.0f, 325.0f, 0.3f}              // Boss - mesma posição da Onça
 };
 
 // Arrays de frases informativas por animal
@@ -55,7 +66,7 @@ static const char* frases_jacare[] = {
 static const char* frases_boto[] = {
     "Boto Coloracao Rosada: Os botos nao nascem cor-de-rosa; eles nascem cinzentos e a coloracao surge com a idade. A tonalidade rosa e influenciada pela idade, sexo e, principalmente, por cicatrizes de arranhoes em troncos ou disputas entre machos. Isso pode ser uma forma de selecao sexual, onde os machos mais rosados (mais marcados por lutas) sao mais desejaveis.",
     "Flexibilidade Corporal e Pescoco Articulado: Ao contrario dos golfinhos marinhos, cujas vertebras cervicais sao fundidas, as do boto nao sao. Adaptacao Evolutiva: Essa flexibilidade permite que ele vire a cabeca em um angulo de ate 90 graus, essencial para manobrar e cacar em areas alagadas, igapos e entre troncos de arvores, algo inviavel em mar aberto.",
-    "Focinho Longo e Dentes Adaptados: O boto possui um focinho mais longo e fino do que a maioria dos golfinhos marinhos, com dentes diferentes na frente (para agarrar) e no fundo da boca (para triturar). Adaptacao Evolutiva: Essa especializacao permite a captura de uma dieta variada, incluindo peixes, tartarugas e caranguejos, adaptando-se aos recursos disponiveis nos rios.",
+    "Focinho Longo e Dentes Adaptados: O boto possui um focinho mais longo e fino do que a maioria dos golfinhos marinhos, com dentes diferentes na frente (para agarrar) e no fundo da boca (para triturar). Adaptacao Evolutiva: Essa specializacao permite a captura de uma dieta variada, incluindo peixes, tartarugas e caranguejos, adaptando-se aos recursos disponiveis nos rios.",
     "Visao Reduzida e Ecolocalizacao Aprimorada: Embora ainda funcional, a visao do boto e menos desenvolvida do que a de golfinhos marinhos, o que faz sentido em aguas turvas e escuras da Amazonia. Adaptacao Evolutiva: Em compensacao, seu sistema de ecolocalizacao e extremamente sofisticado, permitindo-lhe navegar e cacar com precisao em condicoes de pouca ou nenhuma visibilidade.",
     "Ausencia de Nadadeira Dorsal Proeminente: Em vez de uma barbatana dorsal alta e rigida, o boto tem apenas uma pequena crista dorsal. Adaptacao Evolutiva: Isso facilita a natacao em aguas rasas e a passagem por baixo de galhos e vegetacao densa durante as cheias sazonais da Amazonia.",
     "Cerebro Grande e Complexo: O boto-cor-de-rosa tem o maior cerebro entre os golfinhos de agua doce e, proporcionalmente, utiliza mais capacidade cerebral que os humanos."
@@ -287,10 +298,41 @@ static ConfigSpriteJogador obter_config_sprite_jogador(const char* nome_animal) 
     return padrao;
 }
 
+static ConfigSpriteCacador obter_config_sprite_cacador(const char* nome_cacador) {
+    ConfigSpriteCacador padrao = { "desconhecido", 850.0f, 200.0f, 0.15f };
+
+    if (!nome_cacador) return padrao;
+
+    for (size_t i = 0; i < sizeof(configs_cacador) / sizeof(ConfigSpriteCacador); i++) {
+        if (strcmp(configs_cacador[i].nome_cacador, nome_cacador) == 0) {
+            return configs_cacador[i];
+        }
+    }
+
+    return padrao;
+}
+
 RecursosBatalha* carregar_recursos_batalha(const char* caminho_fundo, const char* caminho_caixa_texto, const char* caminho_sprite_animal, const char* caminho_sprite_jogador) {
     RecursosBatalha* recursos = (RecursosBatalha*)malloc(sizeof(RecursosBatalha));
     if (!recursos) {
         fprintf(stderr, "Erro ao alocar memoria para Recursos Batalha\n");
+        return NULL;
+    }
+
+    recursos->fundo_batalha = al_load_bitmap(caminho_fundo);
+    recursos->caixa_texto = al_load_bitmap(caminho_caixa_texto);
+    recursos->sprite_animal = al_load_bitmap(caminho_sprite_animal);
+    recursos->sprite_jogador = al_load_bitmap(caminho_sprite_jogador);
+    recursos->sprite_cacador = NULL;  // ADICIONAR ESTA LINHA
+
+    return recursos;
+}
+
+RecursosBatalha* carregar_recursos_batalha_cacador(const char* caminho_fundo, const char* caminho_caixa_texto, 
+                                                     const char* caminho_sprite_cacador, const char* caminho_sprite_jogador) {
+    RecursosBatalha* recursos = (RecursosBatalha*)malloc(sizeof(RecursosBatalha));
+    if (!recursos) {
+        fprintf(stderr, "Erro ao alocar memoria para Recursos Batalha Cacador\n");
         return NULL;
     }
 
@@ -304,9 +346,9 @@ RecursosBatalha* carregar_recursos_batalha(const char* caminho_fundo, const char
         fprintf(stderr, "Erro ao carregar caixa de texto: %s\n", caminho_caixa_texto);
     }
 
-    recursos->sprite_animal = al_load_bitmap(caminho_sprite_animal);
-    if (!recursos->sprite_animal) {
-        fprintf(stderr, "Erro ao carregar sprite do animal: %s\n", caminho_sprite_animal);
+    recursos->sprite_cacador = al_load_bitmap(caminho_sprite_cacador);
+    if (!recursos->sprite_cacador) {
+        fprintf(stderr, "Erro ao carregar sprite do cacador: %s\n", caminho_sprite_cacador);
     }
 
     recursos->sprite_jogador = al_load_bitmap(caminho_sprite_jogador);
@@ -314,24 +356,19 @@ RecursosBatalha* carregar_recursos_batalha(const char* caminho_fundo, const char
         fprintf(stderr, "Erro ao carregar sprite do jogador: %s\n", caminho_sprite_jogador);
     }
 
+    recursos->sprite_animal = NULL;
+
     return recursos;
 }
 
 void destruir_recursos_batalha(RecursosBatalha* recursos) {
     if (!recursos) return;
 
-    if (recursos->fundo_batalha) {
-        al_destroy_bitmap(recursos->fundo_batalha);
-    }
-    if (recursos->caixa_texto) {
-        al_destroy_bitmap(recursos->caixa_texto);
-    }
-    if (recursos->sprite_animal) {
-        al_destroy_bitmap(recursos->sprite_animal);
-    }
-    if (recursos->sprite_jogador) {
-        al_destroy_bitmap(recursos->sprite_jogador);
-    }
+    if (recursos->fundo_batalha) al_destroy_bitmap(recursos->fundo_batalha);
+    if (recursos->caixa_texto) al_destroy_bitmap(recursos->caixa_texto);
+    if (recursos->sprite_animal) al_destroy_bitmap(recursos->sprite_animal);
+    if (recursos->sprite_jogador) al_destroy_bitmap(recursos->sprite_jogador);
+    if (recursos->sprite_cacador) al_destroy_bitmap(recursos->sprite_cacador);  // ADICIONAR
 
     free(recursos);
 }
@@ -767,5 +804,191 @@ void iniciar_batalha_com_bestiario(ALLEGRO_FONT* fonte, Animal* animal,
         free(frases_exibidas);
     }
 
+    destruir_recursos_batalha(recursos);
+}
+
+void desenhar_menu_batalha_cacador(ALLEGRO_FONT* fonte, int opcao, ALLEGRO_DISPLAY* display, 
+                                    Cacador* cacador, entidade* jogador, RecursosBatalha* recursos,
+                                    int vida_jogador, bool turno_jogador) {
+    int largura = al_get_display_width(display);
+    int altura = al_get_display_height(display);
+
+    al_clear_to_color(al_map_rgb(0, 0, 0));
+
+    // Fundo
+    if (recursos && recursos->fundo_batalha) {
+        al_draw_scaled_bitmap(recursos->fundo_batalha, 0, 0,
+            (float)al_get_bitmap_width(recursos->fundo_batalha),
+            (float)al_get_bitmap_height(recursos->fundo_batalha),
+            0, 0, (float)largura, (float)altura, 0);
+    }
+
+    // Sprite do jogador
+    if (recursos && recursos->sprite_jogador) {
+        float jog_w = (float)al_get_bitmap_width(recursos->sprite_jogador);
+        float jog_h = (float)al_get_bitmap_height(recursos->sprite_jogador);
+        al_draw_scaled_bitmap(recursos->sprite_jogador, 0, 0, jog_w, jog_h,
+            100.0f, 300.0f, jog_w * 0.5f, jog_h * 0.5f, 0);
+    }
+
+    // Sprite do caçador
+    if (recursos && recursos->sprite_cacador) {
+        ConfigSpriteCacador config = obter_config_sprite_cacador(cacador->nome);
+        float cac_w = (float)al_get_bitmap_width(recursos->sprite_cacador);
+        float cac_h = (float)al_get_bitmap_height(recursos->sprite_cacador);
+        al_draw_scaled_bitmap(recursos->sprite_cacador, 0, 0, cac_w, cac_h,
+            config.cacador_x, config.cacador_y,
+            cac_w * config.cacador_escala, cac_h * config.cacador_escala, 0);
+    }
+
+    // Caixa de texto
+    float caixa_y = (float)altura - 125.0f;
+    float caixa_x_real = 0.0f;
+    float caixa_largura_escalada = 0.0f;
+
+    if (recursos && recursos->caixa_texto) {
+        float caixa_w = (float)al_get_bitmap_width(recursos->caixa_texto);
+        float caixa_h = (float)al_get_bitmap_height(recursos->caixa_texto);
+        float escala = 0.3f;
+        caixa_x_real = ((largura - caixa_w * escala) / 2.0f) + 250.0f;
+        caixa_largura_escalada = caixa_w * escala;
+        al_draw_scaled_bitmap(recursos->caixa_texto, 0, 0, caixa_w, caixa_h,
+            caixa_x_real, caixa_y, caixa_largura_escalada, caixa_h * escala, 0);
+    }
+
+    // Informações
+    float cx = largura / 2.0f;
+    char texto[256];
+    
+    snprintf(texto, sizeof(texto), "BATALHA - %s", cacador->nome);
+    al_draw_text(fonte, al_map_rgb(255, 255, 255), cx, 20, ALLEGRO_ALIGN_CENTRE, texto);
+
+    // Barras de vida
+    snprintf(texto, sizeof(texto), "Vida Cacador: %d/%d", cacador->vida, cacador->vida_maxima);
+    al_draw_text(fonte, al_map_rgb(255, 100, 100), cx, 50, ALLEGRO_ALIGN_CENTRE, texto);
+    
+    float barra_x = cx - 100, barra_y = 70;
+    al_draw_filled_rectangle(barra_x, barra_y, barra_x + 200, barra_y + 15, al_map_rgb(50, 50, 50));
+    al_draw_filled_rectangle(barra_x, barra_y, barra_x + (200.0f * cacador->vida / cacador->vida_maxima),
+        barra_y + 15, al_map_rgb(255, 0, 0));  // LINHA CORRETA
+
+    snprintf(texto, sizeof(texto), "Sua Vida: %d/100", vida_jogador);
+    al_draw_text(fonte, al_map_rgb(100, 255, 100), cx, 100, ALLEGRO_ALIGN_CENTRE, texto);
+    
+    barra_y = 120;
+    al_draw_filled_rectangle(barra_x, barra_y, barra_x + 200, barra_y + 15, al_map_rgb(50, 50, 50));
+    al_draw_filled_rectangle(barra_x, barra_y, barra_x + (200.0f * vida_jogador / 100.0f),
+        barra_y + 15, al_map_rgb(0, 255, 0));
+
+    // Turno
+    if (turno_jogador) {
+        al_draw_text(fonte, al_map_rgb(255, 255, 0), cx, 160, ALLEGRO_ALIGN_CENTRE, "SEU TURNO!");
+        
+        float opt_x = (caixa_x_real + (caixa_largura_escalada / 2.0f)) - 100;
+        float opt_y = caixa_y + 25;
+        const char* opcoes[] = { "Atacar", "Defender", "Fugir" };
+        
+        for (int i = 0; i < 3; i++) {
+            ALLEGRO_COLOR cor = (i == opcao) ? al_map_rgb(0, 255, 255) : al_map_rgb(0, 0, 0);
+            al_draw_text(fonte, cor, opt_x, opt_y + (i * 20), ALLEGRO_ALIGN_CENTRE, opcoes[i]);
+        }
+    } else {
+        al_draw_text(fonte, al_map_rgb(255, 100, 100), cx, 160, ALLEGRO_ALIGN_CENTRE, "TURNO DO CACADOR!");
+    }
+
+    al_flip_display();
+}
+
+void iniciar_batalha_cacador_visual(ALLEGRO_FONT* fonte, Cacador* cacador, 
+                                     ALLEGRO_EVENT_QUEUE* event_queue, 
+                                     ALLEGRO_DISPLAY* display, entidade* jogador) {
+    if (!cacador || !jogador) return;
+
+    bool batalhando = true;
+    int opcao = 0, vida_jogador = 100, dano_jogador = 20;
+    bool turno_jogador = true;
+
+    const char* caminho_fundo = cacador->dados_batalha.caminho_fundo_batalha;
+    const char* caminho_caixa = "assets/img/estruturas/caixa_de_texto.png";
+    const char* caminho_jog = "assets/img/Heroi/idle_right.png";
+    const char* caminho_cac = cacador->dados_batalha.caminho_sprite;
+
+    RecursosBatalha* recursos = carregar_recursos_batalha_cacador(
+        caminho_fundo, caminho_caixa, caminho_cac, caminho_jog);
+
+    desenhar_menu_batalha_cacador(fonte, opcao, display, cacador, jogador, recursos, vida_jogador, turno_jogador);
+
+    while (batalhando && cacador->vida > 0 && vida_jogador > 0) {
+        ALLEGRO_EVENT ev;
+        al_wait_for_event(event_queue, &ev);
+
+        if (ev.type == ALLEGRO_EVENT_KEY_DOWN && turno_jogador) {
+            switch (ev.keyboard.keycode) {
+            case ALLEGRO_KEY_W: case ALLEGRO_KEY_UP:
+                opcao = (opcao + 2) % 3; break;
+            case ALLEGRO_KEY_S: case ALLEGRO_KEY_DOWN:
+                opcao = (opcao + 1) % 3; break;
+            case ALLEGRO_KEY_ENTER: case ALLEGRO_KEY_SPACE:
+                switch (opcao) {
+                case 0: {  // Atacar
+                    int dano = dano_jogador + (rand() % 10 - 5);
+                    cacador->vida -= (dano < 0 ? 0 : dano);
+                    turno_jogador = false;
+                    desenhar_menu_batalha_cacador(fonte, opcao, display, cacador, jogador, recursos, vida_jogador, turno_jogador);
+                    al_rest(1.5);
+                    if (cacador->vida > 0) {
+                        vida_jogador -= cacador->dano_ataque;
+                        al_rest(1.0);
+                    }
+                    turno_jogador = true;
+                    break;
+                }
+                case 1:  // Defender
+                    turno_jogador = false;
+                    desenhar_menu_batalha_cacador(fonte, opcao, display, cacador, jogador, recursos, vida_jogador, turno_jogador);
+                    al_rest(1.5);
+                    vida_jogador -= cacador->dano_ataque / 2;
+                    al_rest(1.0);
+                    turno_jogador = true;
+                    break;
+                case 2:  // Fugir
+                    batalhando = false;
+                    break;
+                }
+                break;
+            case ALLEGRO_KEY_ESCAPE:
+                batalhando = false;
+                break;
+            }
+            desenhar_menu_batalha_cacador(fonte, opcao, display, cacador, jogador, recursos, vida_jogador, turno_jogador);
+        }
+    }
+
+    // Tela de resultado
+    if (cacador->vida <= 0) {
+        cacador->derrotado = true;
+        cacador->ativo = false;
+        al_clear_to_color(al_map_rgb(0, 50, 0));
+        al_draw_text(fonte, al_map_rgb(255, 255, 0), 640, 300, ALLEGRO_ALIGN_CENTRE, "VOCE VENCEU!");
+        al_draw_text(fonte, al_map_rgb(200, 200, 200), 640, 350, ALLEGRO_ALIGN_CENTRE, "Pressione ENTER");
+        al_flip_display();
+        while (true) {
+            ALLEGRO_EVENT ev;
+            al_wait_for_event(event_queue, &ev);
+            if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_ENTER) break;
+        }
+    } else if (vida_jogador <= 0) {
+        al_clear_to_color(al_map_rgb(50, 0, 0));
+        al_draw_text(fonte, al_map_rgb(255, 0, 0), 640, 300, ALLEGRO_ALIGN_CENTRE, "VOCE FOI DERROTADO!");
+        al_draw_text(fonte, al_map_rgb(200, 200, 200), 640, 350, ALLEGRO_ALIGN_CENTRE, "Pressione ENTER");
+        al_flip_display();
+        while (true) {
+            ALLEGRO_EVENT ev;
+            al_wait_for_event(event_queue, &ev);
+            if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_ENTER) break;
+        }
+    }
+
+    cacador->cooldown_batalha = 5.0f;
     destruir_recursos_batalha(recursos);
 }
