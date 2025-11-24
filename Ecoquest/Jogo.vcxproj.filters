@@ -39,9 +39,6 @@
     <ClCompile Include="sprites.c">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="debug.c">
-      <Filter>Arquivos de Origem</Filter>
-    </ClCompile>
     <ClCompile Include="bestiario.c">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
@@ -51,6 +48,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="config_cacador.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="allegro_init.h">
@@ -74,13 +74,16 @@
     <ClInclude Include="sprites.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="debug.h">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
     <ClInclude Include="bestiario.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="cacador.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="config_jogo.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="config_ui.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
   </ItemGroup>

@@ -39,6 +39,10 @@ typedef struct {
 
     Animal animal_data;
 
+    // NOVO: Barra de vida visual no cenário (separada da alimentação)
+    int vida_visual_atual;
+    int vida_visual_maxima;
+
     Sprite* sprite_animal;
     bool usar_sprite;
     float escala_sprite;
@@ -57,7 +61,10 @@ void iniciar_bot(Bot* bot, float x, float y, const char* nome, const char* tipo,
 void iniciar_bot_com_sprite(Bot* bot, float x, float y, const char* nome, const char* tipo, int cenario, const char* caminho_sprite);
 void iniciar_bot_com_area_circular(Bot* bot, float x, float y, const char* nome, const char* tipo, int cenario, const char* caminho_sprite, float centro_x, float centro_y, float raio_area);
 void iniciar_bot_com_area_eliptica(Bot* bot, float x, float y, const char* nome, const char* tipo, JogoCenas cenario, const char* caminho_sprite, const char* fundo_batalha_path, float centro_x, float centro_y, float raio_h, float raio_v);
-void iniciar_bot_com_sprite_e_fundo(Bot* bot, float x, float y, const char* nome, const char* tipo, JogoCenas cenario, const char* sprite_path, const char* fundo_batalha_path);
+void iniciar_bot_com_sprite_e_fundo(Bot* bot, float x, float y, const char* nome,
+    const char* tipo, int cenario,
+    const char* caminho_sprite,
+    const char* caminho_fundo_batalha);
 
 void atualizar_bot(Bot* bot, float largura_mapa, float altura_mapa, float delta_time);
 void atualizar_bot_com_cacador(Bot* bot, Cacador* cacador, float largura_mapa, float altura_mapa, float delta_time);

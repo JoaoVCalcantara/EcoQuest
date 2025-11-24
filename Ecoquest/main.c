@@ -12,9 +12,144 @@
 #include "cacador.h"
 #include "sprites.h"
 #include "bestiario.h"
+#include "config_jogo.h"       // NOVO: Configurações do jogo
+#include "config_ui.h"         // NOVO: Configurações de UI
+#include "config_cacador.h"    // JÁ EXISTENTE
 
-#define MAX_BOTS 4
-#define MAX_CACADORES 4
+// Mensagens de cooldown – precisam estar no escopo de todo o main para serem
+// visíveis tanto durante a atualização quanto na renderização.
+static float msg_cooldown_animal = 0.0f;
+static float msg_cooldown_cacador = 0.0f;
+
+static bool forcar_reinicio = false;
+void marcar_reinicio_jogo(void) { forcar_reinicio = true; }
+
+static void inicializar_jogo(AllegroContext* ctx,
+                             entidade* jogador,
+                             Bot bots[TOTAL_ANIMAIS],
+                             Cacador cacadores[TOTAL_CACADORES],
+                             CacadorChefe* boss,
+                             Bestiario** bestiario,
+                             int* cacadores_derrotados,
+                             bool* boss_foi_derrotado,
+                             ALLEGRO_FONT* fonte) {
+
+    /* ========== LIBERAR SPRITES ANTIGOS DO JOGADOR ========== */
+    if (jogador->sprite_cima) destruir_sprite_animado_frames(jogador->sprite_cima);
+    if (jogador->sprite_baixo) destruir_sprite_animado_frames(jogador->sprite_baixo);
+    if (jogador->sprite_direita) destruir_sprite_animado_frames(jogador->sprite_direita);
+    if (jogador->sprite_esquerda) destruir_sprite_animado_frames(jogador->sprite_esquerda);
+    if (jogador->sprite_idle_baixo) destruir_sprite_animado_frames(jogador->sprite_idle_baixo);
+    if (jogador->sprite_idle_cima) destruir_sprite_animado_frames(jogador->sprite_idle_cima);
+    if (jogador->sprite_idle_direita) destruir_sprite_animado_frames(jogador->sprite_idle_direita);
+    if (jogador->sprite_idle_esquerda) destruir_sprite_animado_frames(jogador->sprite_idle_esquerda);
+
+    /* Reset jogador */
+    *jogador = (entidade){0};
+    iniciar_entidade(jogador, (float)ctx->width, (float)ctx->height);
+
+    /* Sprites jogador - USANDO CONFIGURAÇÕES */
+    const char* frames_jogador_cima[2] = { PATH_JOGADOR_CIMA_0, PATH_JOGADOR_CIMA_1 };
+    const char* frames_jogador_baixo[2] = { PATH_JOGADOR_BAIXO_0, PATH_JOGADOR_BAIXO_1 };
+    const char* frames_jogador_dir[2]  = { PATH_JOGADOR_DIR_0, PATH_JOGADOR_DIR_1 };
+    const char* frames_jogador_esq[2]  = { PATH_JOGADOR_ESQ_0, PATH_JOGADOR_ESQ_1 };
+    const char* idle_baixo[1]   = { PATH_JOGADOR_IDLE_BAIXO };
+    const char* idle_cima[1]    = { PATH_JOGADOR_IDLE_CIMA };
+    const char* idle_dir[1]     = { PATH_JOGADOR_IDLE_DIR };
+    const char* idle_esq[1]     = { PATH_JOGADOR_IDLE_ESQ };
+
+    jogador->sprite_cima     = criar_sprite_animado_array(frames_jogador_cima, 2, TEMPO_FRAME_MOVIMENTO);
+    jogador->sprite_baixo    = criar_sprite_animado_array(frames_jogador_baixo, 2, TEMPO_FRAME_MOVIMENTO);
+    jogador->sprite_direita  = criar_sprite_animado_array(frames_jogador_dir, 2, TEMPO_FRAME_MOVIMENTO);
+    jogador->sprite_esquerda = criar_sprite_animado_array(frames_jogador_esq, 2, TEMPO_FRAME_MOVIMENTO);
+    jogador->sprite_idle_baixo    = criar_sprite_animado_array(idle_baixo, 1, TEMPO_FRAME_IDLE);
+    jogador->sprite_idle_cima     = criar_sprite_animado_array(idle_cima, 1, TEMPO_FRAME_IDLE);
+    jogador->sprite_idle_direita  = criar_sprite_animado_array(idle_dir, 1, TEMPO_FRAME_IDLE);
+    jogador->sprite_idle_esquerda = criar_sprite_animado_array(idle_esq, 1, TEMPO_FRAME_IDLE);
+    jogador->usar_sprite = sprite_animado_frames_valido(jogador->sprite_baixo) &&
+                           sprite_animado_frames_valido(jogador->sprite_cima);
+
+    /* Bots - USANDO CONFIGURAÇÕES */
+    iniciar_bot_com_sprite_e_fundo(&bots[0], POS_INICIAL_ONCA_X, POS_INICIAL_ONCA_Y, 
+        NOME_ANIMAL_ONCA, TIPO_CARNIVORO, CENARIO1,
+        PATH_ANIMAL_ONCA, PATH_ESTRUTURA_SELVA);
+        
+    iniciar_bot_com_sprite_e_fundo(&bots[1], POS_INICIAL_JACARE_X, POS_INICIAL_JACARE_Y, 
+        NOME_ANIMAL_JACARE, TIPO_CARNIVORO, CENARIO2,
+        PATH_ANIMAL_JACARE, PATH_ESTRUTURA_PANTANO);
+        
+    iniciar_bot_com_area_eliptica(&bots[2], POS_INICIAL_BOTO_X, POS_INICIAL_BOTO_Y, 
+        NOME_ANIMAL_BOTO, TIPO_CARNIVORO, CENARIO3,
+        PATH_ANIMAL_BOTO, PATH_ESTRUTURA_LAGO,
+        ELIPSE_BOTO_CENTRO_X, ELIPSE_BOTO_CENTRO_Y, ELIPSE_BOTO_RAIO_H, ELIPSE_BOTO_RAIO_V);
+        
+    iniciar_bot_com_sprite_e_fundo(&bots[3], POS_INICIAL_LOBO_X, POS_INICIAL_LOBO_Y, 
+        NOME_ANIMAL_LOBO, TIPO_ONIVORO, CENARIO4,
+        PATH_ANIMAL_LOBO, PATH_ESTRUTURA_CERRADO);
+
+    /* Caçadores - USANDO CONFIGURAÇÕES */
+    iniciar_cacador_com_alvo(&cacadores[0], POS_INICIAL_CACADOR1_X, POS_INICIAL_CACADOR1_Y, 
+        CENARIO1, &bots[0], NOME_CACADOR_SELVA, PATH_CACADOR_NORMAL);
+        
+    iniciar_cacador_com_alvo(&cacadores[1], POS_INICIAL_CACADOR2_X, POS_INICIAL_CACADOR2_Y, 
+        CENARIO2, &bots[1], NOME_CACADOR_PANTANO, PATH_CACADOR_NORMAL);
+        
+    iniciar_cacador_com_alvo(&cacadores[2], POS_INICIAL_CACADOR3_X, POS_INICIAL_CACADOR3_Y, 
+        CENARIO3, &bots[2], NOME_CACADOR_LAGO, PATH_CACADOR_NORMAL);
+        
+    iniciar_cacador_com_alvo(&cacadores[3], POS_INICIAL_CACADOR4_X, POS_INICIAL_CACADOR4_Y, 
+        CENARIO4, &bots[3], NOME_CACADOR_CERRADO, PATH_CACADOR_NORMAL);
+
+    for (int i = 0; i < TOTAL_CACADORES; i++) {
+        cacadores[i].raio_deteccao = RAIO_DETECCAO_PADRAO;
+        cacadores[i].raio_abandono = RAIO_ABANDONO_PADRAO;
+        cacadores[i].velocidade = VELOCIDADE_PATRULHA;
+        cacadores[i].velocidade_perseguicao = VELOCIDADE_PERSEGUICAO;
+        cacadores[i].tempo_dano_interval = COOLDOWN_DANO_CACADOR;
+        cacadores[i].ativo = false;
+    }
+
+    /* Boss - USANDO CONFIGURAÇÕES */
+    iniciar_cacador_chefe(boss, POS_INICIAL_BOSS_X, POS_INICIAL_BOSS_Y, CENARIO1,
+        PATH_CACADOR_BOSS, PATH_ESTRUTURA_SELVA);
+
+    *cacadores_derrotados = 0;
+    *boss_foi_derrotado = false;
+
+    /* Reinicia bestiario */
+    if (*bestiario) destruir_bestiario(*bestiario);
+    *bestiario = criar_bestiario();
+    if (*bestiario) {
+        for (int i = 0; i < TOTAL_ANIMAIS; i++)
+            adicionar_especie_bestiario(*bestiario, &bots[i].animal_data);
+    }
+
+    msg_cooldown_animal = 0.0f;
+    msg_cooldown_cacador = 0.0f;
+    forcar_reinicio = false;
+}
+
+static void mostrar_tela_derrota(ALLEGRO_FONT* fonte, ALLEGRO_DISPLAY* display, ALLEGRO_EVENT_QUEUE* queue) {
+    al_clear_to_color(al_map_rgb(COR_FUNDO_DERROTA_TELA_R, COR_FUNDO_DERROTA_TELA_G, COR_FUNDO_DERROTA_TELA_B));
+    
+    al_draw_text(fonte, al_map_rgb(COR_TEXTO_VERMELHO_R, COR_TEXTO_VERMELHO_G, COR_TEXTO_VERMELHO_B), 
+                 POS_TEXTO_CENTRO_X, POS_TEXTO_DERROTA_TITULO_Y, ALLEGRO_ALIGN_CENTRE, MSG_VOCE_PERDEU);
+                 
+    al_draw_text(fonte, al_map_rgb(COR_TEXTO_CINZA_CLARO_R, COR_TEXTO_CINZA_CLARO_G, COR_TEXTO_CINZA_CLARO_B), 
+                 POS_TEXTO_CENTRO_X, POS_TEXTO_DERROTA_DESC_Y, ALLEGRO_ALIGN_CENTRE, MSG_ANIMAL_CAPTURADO);
+                 
+    al_draw_text(fonte, al_map_rgb(COR_TEXTO_AMARELO_R, COR_TEXTO_AMARELO_G, COR_TEXTO_AMARELO_B), 
+                 POS_TEXTO_CENTRO_X, POS_TEXTO_DERROTA_ENTER_Y, ALLEGRO_ALIGN_CENTRE, MSG_PRESSIONE_ENTER_REINICIAR);
+                 
+    al_flip_display();
+    
+    while (true) {
+        ALLEGRO_EVENT ev;
+        al_wait_for_event(queue, &ev);
+        if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_ENTER) break;
+        if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) break;
+    }
+}
 
 int main(void) {
     srand((unsigned int)time(NULL));
@@ -31,96 +166,84 @@ int main(void) {
         return 0;
     }
 
-    // ========== INICIALIZAÇÃO DO JOGADOR ==========
-    const char* frames_jogador_cima[2] = {
-        "assets/img/Heroi/rear_0.png",
-        "assets/img/Heroi/rear_1.png"
-    };
-    const char* frames_jogador_baixo[2] = {
-        "assets/img/Heroi/front_0.png",
-        "assets/img/Heroi/front_1.png"
-    };
-    const char* frames_jogador_direita[2] = {
-        "assets/img/heroi/player_right_0.png",
-        "assets/img/heroi/player_right_1.png"
-    };
-    const char* frames_jogador_esquerda[2] = {
-        "assets/img/heroi/player_left_0.png",
-        "assets/img/heroi/player_left_1.png"
-    };
-    const char* arr_idle_baixo[1] = { "assets/img/Heroi/idle_down.png" };
-    const char* arr_idle_cima[1] = { "assets/img/Heroi/idle_up.png" };
-    const char* arr_idle_direita[1] = { "assets/img/Heroi/idle_right.png" };
-    const char* arr_idle_esquerda[1] = { "assets/img/Heroi/idle_left.png" };
+    // ========== INICIALIZAÇÃO DO JOGADOR - USANDO CONFIGURAÇÕES ==========
+    const char* frames_jogador_cima[2] = { PATH_JOGADOR_CIMA_0, PATH_JOGADOR_CIMA_1 };
+    const char* frames_jogador_baixo[2] = { PATH_JOGADOR_BAIXO_0, PATH_JOGADOR_BAIXO_1 };
+    const char* frames_jogador_direita[2] = { PATH_JOGADOR_DIR_0, PATH_JOGADOR_DIR_1 };
+    const char* frames_jogador_esquerda[2] = { PATH_JOGADOR_ESQ_0, PATH_JOGADOR_ESQ_1 };
+    const char* arr_idle_baixo[1] = { PATH_JOGADOR_IDLE_BAIXO };
+    const char* arr_idle_cima[1] = { PATH_JOGADOR_IDLE_CIMA };
+    const char* arr_idle_direita[1] = { PATH_JOGADOR_IDLE_DIR };
+    const char* arr_idle_esquerda[1] = { PATH_JOGADOR_IDLE_ESQ };
 
     entidade jogador = { 0 };
     iniciar_entidade(&jogador, (float)ctx.width, (float)ctx.height);
 
-    jogador.sprite_cima = criar_sprite_animado_array(frames_jogador_cima, 2, 0.2f);
-    jogador.sprite_baixo = criar_sprite_animado_array(frames_jogador_baixo, 2, 0.2f);
-    jogador.sprite_esquerda = criar_sprite_animado_array(frames_jogador_esquerda, 2, 0.2f);
-    jogador.sprite_direita = criar_sprite_animado_array(frames_jogador_direita, 2, 0.2f);
+    jogador.sprite_cima = criar_sprite_animado_array(frames_jogador_cima, 2, TEMPO_FRAME_MOVIMENTO);
+    jogador.sprite_baixo = criar_sprite_animado_array(frames_jogador_baixo, 2, TEMPO_FRAME_MOVIMENTO);
+    jogador.sprite_esquerda = criar_sprite_animado_array(frames_jogador_esquerda, 2, TEMPO_FRAME_MOVIMENTO);
+    jogador.sprite_direita = criar_sprite_animado_array(frames_jogador_direita, 2, TEMPO_FRAME_MOVIMENTO);
 
-    jogador.sprite_idle_baixo = criar_sprite_animado_array(arr_idle_baixo, 1, 1.0f);
-    jogador.sprite_idle_direita = criar_sprite_animado_array(arr_idle_direita, 1, 1.0f);
-    jogador.sprite_idle_esquerda = criar_sprite_animado_array(arr_idle_esquerda, 1, 1.0f);
-    jogador.sprite_idle_cima = criar_sprite_animado_array(arr_idle_cima, 1, 1.0f);
+    jogador.sprite_idle_baixo = criar_sprite_animado_array(arr_idle_baixo, 1, TEMPO_FRAME_IDLE);
+    jogador.sprite_idle_direita = criar_sprite_animado_array(arr_idle_direita, 1, TEMPO_FRAME_IDLE);
+    jogador.sprite_idle_esquerda = criar_sprite_animado_array(arr_idle_esquerda, 1, TEMPO_FRAME_IDLE);
+    jogador.sprite_idle_cima = criar_sprite_animado_array(arr_idle_cima, 1, TEMPO_FRAME_IDLE);
         
     jogador.usar_sprite = sprite_animado_frames_valido(jogador.sprite_baixo) &&
-        sprite_animado_frames_valido(jogador.sprite_cima);
+                          sprite_animado_frames_valido(jogador.sprite_cima);
 
     if (!jogador.usar_sprite) {
         printf("Aviso: Sprites do jogador nao carregaram corretamente. Usando circulo simples.\n");
     }
 
-    // ========== INICIALIZAÇÃO DOS ANIMAIS ==========
-    Bot bots[MAX_BOTS];
-    iniciar_bot_com_sprite_e_fundo(&bots[0], 150.0f, 100.0f, "onca", "Carnivoro", CENARIO1,
-        "assets/img/animais/onca.png", "assets/img/estruturas/selva.png");
+    // ========== INICIALIZAÇÃO DOS ANIMAIS - USANDO CONFIGURAÇÕES ==========
+    Bot bots[TOTAL_ANIMAIS];
     
-    iniciar_bot_com_sprite_e_fundo(&bots[1], 400.0f, 500.0f, "Jacare", "Carnivoro", CENARIO2,
-        "assets/img/animais/jacare.png", "assets/img/estruturas/pantano.png");
+    iniciar_bot_com_sprite_e_fundo(&bots[0], POS_INICIAL_ONCA_X, POS_INICIAL_ONCA_Y, 
+        NOME_ANIMAL_ONCA, TIPO_CARNIVORO, CENARIO1,
+        PATH_ANIMAL_ONCA, PATH_ESTRUTURA_SELVA);
     
-    iniciar_bot_com_area_eliptica(&bots[2], 1000.0f, 150.0f, "Boto", "Carnivoro", CENARIO3,
-        "assets/img/animais/boto.png",
-        "assets/img/estruturas/lago.png",
-        950.0f, 205.0f,
-        165.0f, 105.0f);
+    iniciar_bot_com_sprite_e_fundo(&bots[1], POS_INICIAL_JACARE_X, POS_INICIAL_JACARE_Y, 
+        NOME_ANIMAL_JACARE, TIPO_CARNIVORO, CENARIO2,
+        PATH_ANIMAL_JACARE, PATH_ESTRUTURA_PANTANO);
     
-    iniciar_bot_com_sprite_e_fundo(&bots[3], 1000.0f, 600.0f, "Lobo guara", "Onivoro", CENARIO4,
-        "assets/img/animais/lobo_guara.png", "assets/img/estruturas/cerrado.png");
+    iniciar_bot_com_area_eliptica(&bots[2], POS_INICIAL_BOTO_X, POS_INICIAL_BOTO_Y, 
+        NOME_ANIMAL_BOTO, TIPO_CARNIVORO, CENARIO3,
+        PATH_ANIMAL_BOTO, PATH_ESTRUTURA_LAGO,
+        ELIPSE_BOTO_CENTRO_X, ELIPSE_BOTO_CENTRO_Y, ELIPSE_BOTO_RAIO_H, ELIPSE_BOTO_RAIO_V);
+    
+    iniciar_bot_com_sprite_e_fundo(&bots[3], POS_INICIAL_LOBO_X, POS_INICIAL_LOBO_Y, 
+        NOME_ANIMAL_LOBO, TIPO_ONIVORO, CENARIO4,
+        PATH_ANIMAL_LOBO, PATH_ESTRUTURA_CERRADO);
 
-    // Inicializar fuga para todos os animais
-    for (int i = 0; i < MAX_BOTS; i++) {
-        bots[i].fugindo = false;
-        bots[i].fuga_timer = 0.0f;
-        bots[i].fuga_velocidade_multiplicador = 2.5f;
+    // ========== INICIALIZAÇÃO DOS CAÇADORES - USANDO CONFIGURAÇÕES ==========
+    Cacador cacadores[TOTAL_CACADORES];
+    
+    iniciar_cacador_com_alvo(&cacadores[0], POS_INICIAL_CACADOR1_X, POS_INICIAL_CACADOR1_Y, 
+        CENARIO1, &bots[0], NOME_CACADOR_SELVA, PATH_CACADOR_NORMAL);
+    
+    iniciar_cacador_com_alvo(&cacadores[1], POS_INICIAL_CACADOR2_X, POS_INICIAL_CACADOR2_Y, 
+        CENARIO2, &bots[1], NOME_CACADOR_PANTANO, PATH_CACADOR_NORMAL);
+    
+    iniciar_cacador_com_alvo(&cacadores[2], POS_INICIAL_CACADOR3_X, POS_INICIAL_CACADOR3_Y, 
+        CENARIO3, &bots[2], NOME_CACADOR_LAGO, PATH_CACADOR_NORMAL);
+    
+    iniciar_cacador_com_alvo(&cacadores[3], POS_INICIAL_CACADOR4_X, POS_INICIAL_CACADOR4_Y, 
+        CENARIO4, &bots[3], NOME_CACADOR_CERRADO, PATH_CACADOR_NORMAL);
+
+    for (int i = 0; i < TOTAL_CACADORES; i++) {
+        cacadores[i].raio_deteccao = RAIO_DETECCAO_PADRAO;
+        cacadores[i].raio_abandono = RAIO_ABANDONO_PADRAO;
+        cacadores[i].velocidade = VELOCIDADE_PATRULHA;
+        cacadores[i].velocidade_perseguicao = VELOCIDADE_PERSEGUICAO;
+        cacadores[i].tempo_dano_interval = COOLDOWN_DANO_CACADOR;
+        cacadores[i].ativo = false;
     }
 
-    // ========== INICIALIZAÇÃO DOS CAÇADORES ==========
-    Cacador cacadores[MAX_CACADORES];
-    
-    // Caçador 1 - CENARIO1
-    iniciar_cacador_com_alvo(&cacadores[0], 200.0f, 200.0f, CENARIO1, &bots[0], 
-        "Cacador da Selva", "assets/img/cacador/cacador.png");
-    
-    // Caçador 2 - CENARIO2
-    iniciar_cacador_com_alvo(&cacadores[1], 300.0f, 600.0f, CENARIO2, &bots[1], 
-        "Cacador do Pantano", "assets/img/cacador/cacador.png");
-    
-    // Caçador 3 - CENARIO3
-    iniciar_cacador_com_alvo(&cacadores[2], 900.0f, 100.0f, CENARIO3, &bots[2], 
-        "Cacador do Lago", "assets/img/cacador/cacador.png");
-    
-    // Caçador 4 - CENARIO4
-    iniciar_cacador_com_alvo(&cacadores[3], 1100.0f, 500.0f, CENARIO4, &bots[3], 
-        "Cacador do Cerrado", "assets/img/cacador/cacador.png");
-
-    // ========== INICIALIZAÇÃO DO BOSS ==========
+    // ========== INICIALIZAÇÃO DO BOSS - USANDO CONFIGURAÇÕES ==========
     CacadorChefe boss;
-    iniciar_cacador_chefe(&boss, 640.0f, 360.0f, CENARIO1,
-        "assets/img/cacador/boss_cacador.png",
-        "assets/img/estruturas/selva.png");
+    iniciar_cacador_chefe(&boss, POS_INICIAL_BOSS_X, POS_INICIAL_BOSS_Y, CENARIO1,
+        PATH_CACADOR_BOSS, PATH_ESTRUTURA_SELVA);
 
     int cacadores_derrotados = 0;
     bool boss_foi_derrotado = false;
@@ -131,7 +254,7 @@ int main(void) {
         fprintf(stderr, "ERRO CRITICO: Falha ao criar bestiario!\n");
     }
     else {
-        for (int i = 0; i < MAX_BOTS; i++) {
+        for (int i = 0; i < TOTAL_ANIMAIS; i++) {
             adicionar_especie_bestiario(bestiario, &bots[i].animal_data);
         }
         printf("[MAIN] Bestiario inicializado com %d especies\n", bestiario->total_especies);
@@ -163,7 +286,7 @@ int main(void) {
             ALLEGRO_KEYBOARD_STATE estado_teclado;
             al_get_keyboard_state(&estado_teclado);
             processar_teclado(&estado_teclado, &jogador);
-            limitar_jogador_com_progresso(&jogador, 1280.0f, 720.0f, &jogador.progresso);
+            limitar_jogador_com_progresso(&jogador, LARGURA_MAPA, ALTURA_MAPA, &jogador.progresso);
 
             // Atualizar animações do jogador
             if (jogador.usar_sprite) {
@@ -201,98 +324,99 @@ int main(void) {
                 }
             }
 
+            // Determinar cenário lógico atual
+            JogoCenas cena_logic = verificar_area_atual(&jogador);
+
+            // ========== SPAWN DOS CAÇADORES POR CENÁRIO ==========
+            for (int i = 0; i < TOTAL_CACADORES; i++) {
+                // Só ativa caçador no cenário atual (e não-derrotado)
+                cacadores[i].ativo = (cacadores[i].cenario == cena_logic) && !cacadores[i].derrotado;
+            }
+
             // ========== ATUALIZAÇÃO DOS ANIMAIS COM CAÇADORES ==========
-            for (int i = 0; i < MAX_BOTS; i++) {
-                if (bots[i].ativo) {
-                    atualizar_bot_com_cacador(&bots[i], &cacadores[i], delta_time, 1280.0f, 720.0f);
+            for (int i = 0; i < TOTAL_ANIMAIS; i++) {
+                if (bots[i].ativo && bots[i].cenario == cena_logic) {
+                    // Só atualiza com caçador se ambos estiverem no mesmo cenário
+                    if (cacadores[i].ativo && cacadores[i].cenario == cena_logic) {
+                        atualizar_bot_com_cacador(&bots[i], &cacadores[i], delta_time, LARGURA_MAPA, ALTURA_MAPA);
+                    }
                 }
             }
 
             // ========== ATUALIZAÇÃO DOS CAÇADORES ==========
-            for (int i = 0; i < MAX_CACADORES; i++) {
-                if (cacadores[i].ativo && !cacadores[i].derrotado && cacadores[i].alvo) {
+            for (int i = 0; i < TOTAL_CACADORES; i++) {
+                if (cacadores[i].ativo && !cacadores[i].derrotado && 
+                    cacadores[i].alvo &&
+                    cacadores[i].alvo->ativo &&
+                    cacadores[i].alvo->cenario == cena_logic &&
+                    cacadores[i].cenario == cena_logic) {
+                    
                     atualizar_cacador(&cacadores[i],
                         cacadores[i].alvo->x,
                         cacadores[i].alvo->y,
                         cacadores[i].alvo->ativo,
                         delta_time,
-                        1280.0f, 720.0f);
-                    
-                    // Aplicar dano ao animal se estiver em contato
+                        LARGURA_MAPA, ALTURA_MAPA);
+                        
                     aplicar_dano_cacador_em_animal(&cacadores[i], cacadores[i].alvo, delta_time);
                 }
             }
 
             // ========== ATUALIZAÇÃO DO BOSS ==========
             if (boss.liberado && !boss.derrotado) {
-                atualizar_cacador_chefe(&boss, &jogador, 1280.0f, 720.0f, delta_time);
+                atualizar_cacador_chefe(&boss, &jogador, LARGURA_MAPA, ALTURA_MAPA, delta_time);
             }
 
+            // Mensagens cooldown decaimento
+            if (msg_cooldown_animal > 0.0f) msg_cooldown_animal -= delta_time;
+            if (msg_cooldown_cacador > 0.0f) msg_cooldown_cacador -= delta_time;
+
             // ========== COLISÃO JOGADOR x ANIMAIS ==========
-            for (int i = 0; i < MAX_BOTS; i++) {
-                if (bots[i].ativo && verificar_colisao_bot(&jogador, &bots[i])) {
+            for (int i = 0; i < TOTAL_ANIMAIS; i++) {
+                if (bots[i].ativo && bots[i].cenario == cena_logic && 
+                    verificar_colisao_bot(&jogador, &bots[i])) {
+                    
+                    if (bots[i].cooldown_colisao > 0.0f) {
+                        msg_cooldown_animal = TEMPO_EXIBICAO_MENSAGEM;
+                        continue;
+                    }
+                    
                     printf("Colisao com %s!\n", bots[i].animal_data.nome);
 
-                    // VERIFICAR SE O CAÇADOR DO CENÁRIO FOI DERROTADO
                     if (!cacadores[i].derrotado) {
-                        // Mostrar mensagem de alerta
                         printf("[BLOQUEADO] Derrote o cacador deste cenario primeiro!\n");
-                        
-                        // Empurrar jogador para trás
-                        jogador.y += 20.0f;
-                        
-                        // Pular para próxima iteração
                         continue;
                     }
 
-                    // Se caçador foi derrotado, permitir interação
                     iniciar_batalha_com_bestiario(fonte, &bots[i].animal_data, ctx.event_queue, ctx.display, bestiario);
 
                     tempo_anterior = al_get_time();
-                    bots[i].cooldown_colisao = 6.0f;
+                    bots[i].cooldown_colisao = COOLDOWN_COLISAO_ANIMAL;
 
                     if (bots[i].animal_data.estudado) {
                         bots[i].ativo = false;
                         printf("%s foi totalmente estudado e nao aparecera mais!\n", bots[i].animal_data.nome);
                         
-                        // Marcar cenário como completo
                         switch (bots[i].cenario) {
-                            case CENARIO1:
-                                jogador.progresso.cenario1_completo = true;
-                                printf("[PROGRESSO] Cenario 1 completo! Novos areas desbloqueadas!\n");
-                                break;
-                            case CENARIO2:
-                                jogador.progresso.cenario2_completo = true;
-                                printf("[PROGRESSO] Cenario 2 completo! Novos areas desbloqueadas!\n");
-                                break;
-                            case CENARIO3:
-                                jogador.progresso.cenario3_completo = true;
-                                printf("[PROGRESSO] Cenario 3 completo! Novos areas desbloqueadas!\n");
-                                break;
-                            case CENARIO4:
-                                jogador.progresso.cenario4_completo = true;
-                                printf("[PROGRESSO] Todos os cenarios completados! Parabens!\n");
-                                break;
+                            case CENARIO1: jogador.progresso.cenario1_completo = true; break;
+                            case CENARIO2: jogador.progresso.cenario2_completo = true; break;
+                            case CENARIO3: jogador.progresso.cenario3_completo = true; break;
+                            case CENARIO4: jogador.progresso.cenario4_completo = true; break;
                         }
+                    } else if (bots[i].animal_data.domado) {
+                        printf("%s esta domado e permanece no mapa para estudo!\n", bots[i].animal_data.nome);
                     }
-                    else if (bots[i].animal_data.domado) {
-                        printf("%s esta domado e permanece no mapa para estudio!\n", bots[i].animal_data.nome);
-                    }
-
-                    jogador.y += 20.0f;
                 }
             }
 
             // ========== COLISÃO JOGADOR x CAÇADORES ==========
-            for (int i = 0; i < MAX_CACADORES; i++) {
+            for (int i = 0; i < TOTAL_CACADORES; i++) {
                 if (cacadores[i].ativo && !cacadores[i].derrotado && 
+                    cacadores[i].cenario == cena_logic &&
                     verificar_colisao_cacador_jogador(&jogador, &cacadores[i])) {
                     
-                    // VERIFICAR COOLDOWN DE BATALHA
                     if (cacadores[i].cooldown_batalha > 0.0f) {
-                        printf("[COOLDOWN] Aguarde %.1f segundos para batalhar novamente.\n", 
-                               cacadores[i].cooldown_batalha);
-                        jogador.y += 25.0f;
+                        msg_cooldown_cacador = TEMPO_EXIBICAO_MENSAGEM;
                         continue;
                     }
                     
@@ -304,9 +428,9 @@ int main(void) {
 
                     if (cacadores[i].derrotado) {
                         cacadores_derrotados++;
-                        printf("[PROGRESSO] Cacadores derrotados: %d/4\n", cacadores_derrotados);
+                        printf("[PROGRESSO] Cacadores derrotados: %d/%d\n", 
+                               cacadores_derrotados, CACADORES_PARA_BOSS);
                         
-                        // Verificar se deve liberar o boss
                         if (verificar_liberacao_boss(cacadores_derrotados) && !boss.liberado) {
                             boss.liberado = true;
                             printf("\n============================================\n");
@@ -316,8 +440,7 @@ int main(void) {
                         }
                     }
 
-                    // Empurrar jogador para trás
-                    jogador.y += 25.0f;
+                    jogador.y += EMPURRAO_JOGADOR_CACADOR;
                 }
             }
 
@@ -343,7 +466,20 @@ int main(void) {
                     printf("============================================\n");
                 }
 
-                jogador.y += 30.0f;
+                jogador.y += EMPURRAO_JOGADOR_BOSS;
+            }
+
+            // ========== REINÍCIO FORÇADO SE ALGUM ANIMAL FOI CAPTURADO ==========
+            if (forcar_reinicio) {
+                mostrar_tela_derrota(fonte, ctx.display, ctx.event_queue);
+                printf("\n[AVISO] Reiniciando jogo apos derrota...\n");
+                for (int i = 0; i < TOTAL_ANIMAIS; i++) destruir_bot(&bots[i]);
+                for (int i = 0; i < TOTAL_CACADORES; i++) destruir_cacador(&cacadores[i]);
+                destruir_cacador(&boss.base);
+                inicializar_jogo(&ctx, &jogador, bots, cacadores, &boss, &bestiario,
+                                 &cacadores_derrotados, &boss_foi_derrotado, fonte);
+                tempo_anterior = al_get_time();
+                continue;
             }
 
             redesenhar = true;
@@ -367,21 +503,21 @@ int main(void) {
             }
         }
 
-        // ========== RENDERIZAÇÃO ==========
+        // ========== RENDERIZAÇÃO - USANDO CONFIGURAÇÕES ==========
         if (redesenhar && al_is_event_queue_empty(ctx.event_queue)) {
             redesenhar = false;
 
             cena_atual = cenarios(cena_atual, &ctx, &jogador);
 
             // Desenhar animais
-            for (int i = 0; i < MAX_BOTS; i++) {
+            for (int i = 0; i < TOTAL_ANIMAIS; i++) {
                 if (bots[i].ativo && bots[i].cenario == cena_atual) {
                     desenhar_bot(&bots[i], al_map_rgb(255, 50, 50), camera_x, camera_y);
                 }
             }
 
             // Desenhar caçadores
-            for (int i = 0; i < MAX_CACADORES; i++) {
+            for (int i = 0; i < TOTAL_CACADORES; i++) {
                 if (cacadores[i].ativo && !cacadores[i].derrotado && cacadores[i].cenario == cena_atual) {
                     desenhar_cacador(&cacadores[i], al_map_rgb(150, 0, 0), camera_x, camera_y);
                 }
@@ -391,60 +527,74 @@ int main(void) {
             if (boss.liberado && !boss.derrotado && boss.base.cenario == cena_atual) {
                 desenhar_cacador(&boss.base, al_map_rgb(200, 0, 200), camera_x, camera_y);
                 
-                // Indicador de boss
                 float boss_x_tela = (boss.base.x - camera_x) * ZOOM_FACTOR;
                 float boss_y_tela = (boss.base.y - camera_y) * ZOOM_FACTOR;
-                al_draw_text(fonte, al_map_rgb(255, 0, 255), boss_x_tela, boss_y_tela - 30.0f * ZOOM_FACTOR, 
+                al_draw_text(fonte, al_map_rgb(COR_TEXTO_MAGENTA_R, COR_TEXTO_MAGENTA_G, COR_TEXTO_MAGENTA_B), 
+                            boss_x_tela, boss_y_tela - 30.0f * ZOOM_FACTOR, 
                             ALLEGRO_ALIGN_CENTRE, "BOSS");
             }
 
             desenhar_jogador(&jogador, ctx.CoresFundo[4]);
             
-            // ========== MENSAGENS NA TELA ==========
+            // ========== MENSAGENS NA TELA - USANDO CONFIGURAÇÕES ==========
             if (fonte) {
                 // Mensagens de área bloqueada
-                if (!jogador.progresso.cenario1_completo && (jogador.y > 340.0f || jogador.x > 620.0f)) {
-                    al_draw_text(fonte, al_map_rgb(255, 255, 0), 640, 10, ALLEGRO_ALIGN_CENTRE, 
-                                 "AREA BLOQUEADA - Estude a Onca na selva primeiro!");
+                if (!jogador.progresso.cenario1_completo && (jogador.y > LIMITE_VERTICAL_MAPA - 20.0f || jogador.x > LIMITE_HORIZONTAL_MAPA - 20.0f)) {
+                    al_draw_text(fonte, al_map_rgb(COR_TEXTO_AMARELO_R, COR_TEXTO_AMARELO_G, COR_TEXTO_AMARELO_B), 
+                                 POS_TEXTO_CENTRO_X, POS_TEXTO_TOPO_Y, ALLEGRO_ALIGN_CENTRE, MSG_AREA_BLOQUEADA_1);
                 }
-                else if (jogador.progresso.cenario1_completo && !jogador.progresso.cenario2_completo && jogador.x > 620.0f) {
-                    al_draw_text(fonte, al_map_rgb(255, 255, 0), 640, 10, ALLEGRO_ALIGN_CENTRE, 
-                                 "AREA BLOQUEADA - Estude o Jacare no pantano primeiro!");
+                else if (jogador.progresso.cenario1_completo && !jogador.progresso.cenario2_completo && 
+                         jogador.x > LIMITE_HORIZONTAL_MAPA - 20.0f) {
+                    al_draw_text(fonte, al_map_rgb(COR_TEXTO_AMARELO_R, COR_TEXTO_AMARELO_G, COR_TEXTO_AMARELO_B), 
+                                 POS_TEXTO_CENTRO_X, POS_TEXTO_TOPO_Y, ALLEGRO_ALIGN_CENTRE, MSG_AREA_BLOQUEADA_2);
                 }
                 else if (jogador.progresso.cenario2_completo && !jogador.progresso.cenario3_completo && 
-                         jogador.x > 620.0f && jogador.y > 340.0f) {
-                    al_draw_text(fonte, al_map_rgb(255, 255, 0), 640, 10, ALLEGRO_ALIGN_CENTRE, 
-                                 "AREA BLOQUEADA - Estude o Boto no lago primeiro!");
+                         jogador.x > LIMITE_HORIZONTAL_MAPA - 20.0f && jogador.y > LIMITE_VERTICAL_MAPA - 20.0f) {
+                    al_draw_text(fonte, al_map_rgb(COR_TEXTO_AMARELO_R, COR_TEXTO_AMARELO_G, COR_TEXTO_AMARELO_B), 
+                                 POS_TEXTO_CENTRO_X, POS_TEXTO_TOPO_Y, ALLEGRO_ALIGN_CENTRE, MSG_AREA_BLOQUEADA_3);
+                }
+
+                // Mensagem de cooldown de animal
+                if (msg_cooldown_animal > 0.0f) {
+                    al_draw_text(fonte, al_map_rgb(COR_TEXTO_LARANJA_R, COR_TEXTO_LARANJA_G, COR_TEXTO_LARANJA_B), 
+                                POS_TEXTO_CENTRO_X, POS_TEXTO_MSG_ANIMAL_Y, ALLEGRO_ALIGN_CENTRE, MSG_ANIMAL_DESCANSO);
+                }
+
+                // Mensagem de cooldown de caçador
+                if (msg_cooldown_cacador > 0.0f) {
+                    al_draw_text(fonte, al_map_rgb(COR_TEXTO_ROSA_R, COR_TEXTO_ROSA_G, COR_TEXTO_ROSA_B), 
+                                POS_TEXTO_CENTRO_X, POS_TEXTO_MSG_CACADOR_Y, ALLEGRO_ALIGN_CENTRE, MSG_CACADOR_RECUPERACAO);
                 }
 
                 // Contador de caçadores derrotados
                 char texto_cacadores[64];
-                snprintf(texto_cacadores, sizeof(texto_cacadores), "Cacadores Derrotados: %d/4", cacadores_derrotados);
-                al_draw_text(fonte, al_map_rgb(255, 200, 0), 10, 10, ALLEGRO_ALIGN_LEFT, texto_cacadores);
+                snprintf(texto_cacadores, sizeof(texto_cacadores), FMT_CACADORES_DERROTADOS, cacadores_derrotados);
+                al_draw_text(fonte, al_map_rgb(COR_TEXTO_OURO_R, COR_TEXTO_OURO_G, COR_TEXTO_OURO_B), 
+                            POS_TEXTO_CONTADOR_X, POS_TEXTO_CONTADOR_Y, ALLEGRO_ALIGN_LEFT, texto_cacadores);
 
                 // Alerta de boss liberado
                 if (boss.liberado && !boss.derrotado) {
-                    al_draw_text(fonte, al_map_rgb(255, 0, 255), 640, 700, ALLEGRO_ALIGN_CENTRE, 
-                                "!!! CACADOR CHEFE NO MAPA !!!");
+                    al_draw_text(fonte, al_map_rgb(COR_TEXTO_MAGENTA_R, COR_TEXTO_MAGENTA_G, COR_TEXTO_MAGENTA_B), 
+                                POS_TEXTO_CENTRO_X, POS_TEXTO_BOSS_Y, ALLEGRO_ALIGN_CENTRE, MSG_BOSS_NO_MAPA);
                 }
 
                 // Mensagem de vitória
                 if (boss_foi_derrotado) {
-                    al_draw_text(fonte, al_map_rgb(0, 255, 0), 640, 350, ALLEGRO_ALIGN_CENTRE, 
-                                "JOGO COMPLETO! PARABENS!");
+                    al_draw_text(fonte, al_map_rgb(COR_TEXTO_VERDE_R, COR_TEXTO_VERDE_G, COR_TEXTO_VERDE_B), 
+                                POS_TEXTO_CENTRO_X, POS_TEXTO_VITORIA_Y, ALLEGRO_ALIGN_CENTRE, MSG_JOGO_COMPLETO);
                 }
 
-                // NOVA: Mensagem de bloqueio de estudo
-                for (int i = 0; i < MAX_BOTS; i++) {
+                // Mensagem de bloqueio de estudo
+                for (int i = 0; i < TOTAL_ANIMAIS; i++) {
                     if (bots[i].ativo && !cacadores[i].derrotado && bots[i].cenario == cena_atual) {
                         float dx = jogador.x - bots[i].x;
                         float dy = jogador.y - bots[i].y;
                         float dist = sqrtf(dx * dx + dy * dy);
                         
-                        if (dist < 50.0f) {  // Próximo do animal
-                            al_draw_text(fonte, al_map_rgb(255, 100, 100), 640, 680, 
-                                        ALLEGRO_ALIGN_CENTRE, 
-                                        "! Derrote o cacador para estudar este animal !");
+                        if (dist < DISTANCIA_DETECCAO_MENSAGEM) {
+                            al_draw_text(fonte, al_map_rgb(COR_TEXTO_VERMELHO_R, COR_TEXTO_VERMELHO_G, COR_TEXTO_VERMELHO_B), 
+                                        POS_TEXTO_CENTRO_X, POS_TEXTO_BLOQUEIO_Y, 
+                                        ALLEGRO_ALIGN_CENTRE, MSG_DERROTE_CACADOR);
                         }
                     }
                 }
@@ -457,11 +607,11 @@ int main(void) {
     // ========== LIMPEZA DE RECURSOS ==========
     destruir_entidade(&jogador);
     
-    for (int i = 0; i < MAX_BOTS; i++) {
+    for (int i = 0; i < TOTAL_ANIMAIS; i++) {
         destruir_bot(&bots[i]);
     }
     
-    for (int i = 0; i < MAX_CACADORES; i++) {
+    for (int i = 0; i < TOTAL_CACADORES; i++) {
         destruir_cacador(&cacadores[i]);
     }
     

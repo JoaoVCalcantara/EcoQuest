@@ -1,0 +1,213 @@
+#ifndef CONFIG_JOGO_H
+#define CONFIG_JOGO_H
+
+/* ========== CONFIGURAÇÕES GLOBAIS DO JOGO ========== */
+
+/* === DISPLAY E RESOLUÇÃO === */
+#define LARGURA_TELA                    1280
+#define ALTURA_TELA                     720
+#define LARGURA_MAPA                    1280.0f
+#define ALTURA_MAPA                     720.0f
+#define FPS_JOGO                        60
+#define ZOOM_FACTOR                     3.5f
+
+/* === DIVISÕES DO MAPA (4 Cenários) === */
+#define LIMITE_HORIZONTAL_MAPA          640.0f
+#define LIMITE_VERTICAL_MAPA            360.0f
+
+/* Cenário 1 - Superior Esquerdo (Selva) */
+#define CENARIO1_MIN_X                  0.0f
+#define CENARIO1_MAX_X                  640.0f
+#define CENARIO1_MIN_Y                  0.0f
+#define CENARIO1_MAX_Y                  360.0f
+
+/* Cenário 2 - Inferior Esquerdo (Pantano) */
+#define CENARIO2_MIN_X                  0.0f
+#define CENARIO2_MAX_X                  640.0f
+#define CENARIO2_MIN_Y                  360.0f
+#define CENARIO2_MAX_Y                  720.0f
+
+/* Cenário 3 - Superior Direito (Lago) */
+#define CENARIO3_MIN_X                  640.0f
+#define CENARIO3_MAX_X                  1280.0f
+#define CENARIO3_MIN_Y                  0.0f
+#define CENARIO3_MAX_Y                  360.0f
+
+/* Cenário 4 - Inferior Direito (Cerrado) */
+#define CENARIO4_MIN_X                  640.0f
+#define CENARIO4_MAX_X                  1280.0f
+#define CENARIO4_MIN_Y                  360.0f
+#define CENARIO4_MAX_Y                  720.0f
+
+/* === JOGADOR === */
+#define RAIO_JOGADOR                    8.0f
+#define VELOCIDADE_JOGADOR              1.4f
+#define VIDA_MAXIMA_JOGADOR             100
+
+/* Animação do Jogador */
+#define TEMPO_FRAME_MOVIMENTO           0.2f
+#define TEMPO_FRAME_IDLE                1.0f
+
+/* === ANIMAIS (BOTS) === */
+#define RAIO_ANIMAL                     8.0f
+#define VELOCIDADE_ANIMAL               0.6f
+#define VIDA_MAXIMA_ANIMAL              100
+#define VELOCIDADE_FUGA_MULTIPLICADOR   1.3f
+
+/* Tempo de mudança de direção */
+#define TEMPO_MUDANCA_MIN               1.5f
+#define TEMPO_MUDANCA_MAX               5.0f
+#define TEMPO_MUDANCA_VARIACAO          3.5f    // MAX - MIN
+#define TEMPO_FUGA_ANIMAL               2.5f
+#define TEMPO_MUDANCA_BORDA             0.3f
+#define TEMPO_MUDANCA_NOVA_DIRECAO      0.1f
+
+/* Raio de fuga e detecção */
+#define RAIO_FUGA_ANIMAL                180.0f
+#define DISTANCIA_TESTE_DIRECAO         50.0f
+#define MARGEM_BORDA_ANIMAL             30.0f
+
+/* Cooldown de colisão */
+#define COOLDOWN_COLISAO_ANIMAL         6.0f
+
+/* Tentativas de direção */
+#define TENTATIVAS_DIRECAO_ALEATORIA    3
+
+/* Peso de score de direção */
+#define SCORE_DIRECAO_VALIDA            1.0f
+
+/* === ELIPSE DO LAGO (BOTO) === */
+#define ELIPSE_BOTO_CENTRO_X            950.0f
+#define ELIPSE_BOTO_CENTRO_Y            205.0f
+#define ELIPSE_BOTO_RAIO_H              165.0f
+#define ELIPSE_BOTO_RAIO_V              105.0f
+
+/* Margens de segurança da elipse */
+#define ELIPSE_MARGEM_VALIDACAO         0.90f
+#define ELIPSE_LIMITE_CORRECAO          0.85f
+#define ELIPSE_PERTO_BORDA              0.75f
+#define EPSILON_ELIPSE                  1e-3f
+
+/* Força de correção */
+#define ELIPSE_FORCA_CORRECAO           3.0f
+
+/* === COLISÕES E INTERAÇÕES === */
+#define DISTANCIA_DETECCAO_MENSAGEM     50.0f
+#define TEMPO_EXIBICAO_MENSAGEM         2.0f
+#define EMPURRAO_JOGADOR_CACADOR        25.0f
+#define EMPURRAO_JOGADOR_BOSS           30.0f
+
+/* === PROGRESSÃO DO JOGO === */
+#define CACADORES_PARA_BOSS             4
+#define TOTAL_ANIMAIS                   4
+#define TOTAL_CACADORES                 4
+
+/* === CORES DE VIDA (RGB) === */
+/* Vida Alta (> 60%) */
+#define COR_VIDA_ALTA_R                 50
+#define COR_VIDA_ALTA_G                 200
+#define COR_VIDA_ALTA_B                 50
+
+/* Vida Média (30% - 60%) */
+#define COR_VIDA_MEDIA_R                255
+#define COR_VIDA_MEDIA_G                200
+#define COR_VIDA_MEDIA_B                0
+
+/* Vida Baixa (< 30%) */
+#define COR_VIDA_BAIXA_R                255
+#define COR_VIDA_BAIXA_G                50
+#define COR_VIDA_BAIXA_B                50
+
+/* Limiares de vida */
+#define LIMIAR_VIDA_ALTA                0.6f
+#define LIMIAR_VIDA_MEDIA               0.3f
+
+/* === CAMINHOS DE ASSETS === */
+/* Estruturas */
+#define PATH_ESTRUTURA_SELVA            "assets/img/estruturas/selva.png"
+#define PATH_ESTRUTURA_PANTANO          "assets/img/estruturas/pantano.png"
+#define PATH_ESTRUTURA_LAGO             "assets/img/estruturas/lago.png"
+#define PATH_ESTRUTURA_CERRADO          "assets/img/estruturas/cerrado.png"
+#define PATH_CAIXA_TEXTO                "assets/img/estruturas/caixa_de_texto.png"
+
+/* Animais */
+#define PATH_ANIMAL_ONCA                "assets/img/animais/onca.png"
+#define PATH_ANIMAL_JACARE              "assets/img/animais/jacare.png"
+#define PATH_ANIMAL_BOTO                "assets/img/animais/boto.png"
+#define PATH_ANIMAL_LOBO                "assets/img/animais/lobo_guara.png"
+
+/* Caçadores */
+#define PATH_CACADOR_NORMAL             "assets/img/cacador/cacador.png"
+#define PATH_CACADOR_BOSS               "assets/img/cacador/boss_cacador.png"
+
+/* Jogador - Movimento */
+#define PATH_JOGADOR_CIMA_0             "assets/img/Heroi/rear_0.png"
+#define PATH_JOGADOR_CIMA_1             "assets/img/Heroi/rear_1.png"
+#define PATH_JOGADOR_BAIXO_0            "assets/img/Heroi/front_0.png"
+#define PATH_JOGADOR_BAIXO_1            "assets/img/Heroi/front_1.png"
+#define PATH_JOGADOR_DIR_0              "assets/img/heroi/player_right_0.png"
+#define PATH_JOGADOR_DIR_1              "assets/img/heroi/player_right_1.png"
+#define PATH_JOGADOR_ESQ_0              "assets/img/heroi/player_left_0.png"
+#define PATH_JOGADOR_ESQ_1              "assets/img/heroi/player_left_1.png"
+
+/* Jogador - Idle */
+#define PATH_JOGADOR_IDLE_BAIXO         "assets/img/Heroi/idle_down.png"
+#define PATH_JOGADOR_IDLE_CIMA          "assets/img/Heroi/idle_up.png"
+#define PATH_JOGADOR_IDLE_DIR           "assets/img/Heroi/idle_right.png"
+#define PATH_JOGADOR_IDLE_ESQ           "assets/img/Heroi/idle_left.png"
+
+/* === ESCALAS DE SPRITES === */
+#define ESCALA_ANIMAL                   0.03f
+#define ESCALA_CACADOR                  0.05f
+
+/* === POSIÇÕES INICIAIS === */
+/* Animais */
+#define POS_INICIAL_ONCA_X              150.0f
+#define POS_INICIAL_ONCA_Y              100.0f
+
+#define POS_INICIAL_JACARE_X            400.0f
+#define POS_INICIAL_JACARE_Y            500.0f
+
+#define POS_INICIAL_BOTO_X              1000.0f
+#define POS_INICIAL_BOTO_Y              150.0f
+
+#define POS_INICIAL_LOBO_X              1000.0f
+#define POS_INICIAL_LOBO_Y              600.0f
+
+/* Caçadores */
+#define POS_INICIAL_CACADOR1_X          200.0f
+#define POS_INICIAL_CACADOR1_Y          200.0f
+
+#define POS_INICIAL_CACADOR2_X          300.0f
+#define POS_INICIAL_CACADOR2_Y          600.0f
+
+#define POS_INICIAL_CACADOR3_X          900.0f
+#define POS_INICIAL_CACADOR3_Y          100.0f
+
+#define POS_INICIAL_CACADOR4_X          1100.0f
+#define POS_INICIAL_CACADOR4_Y          500.0f
+
+/* Boss */
+#define POS_INICIAL_BOSS_X              640.0f
+#define POS_INICIAL_BOSS_Y              360.0f
+
+/* === NOMES DAS ENTIDADES === */
+#define NOME_ANIMAL_ONCA                "onca"
+#define NOME_ANIMAL_JACARE              "Jacare"
+#define NOME_ANIMAL_BOTO                "Boto"
+#define NOME_ANIMAL_LOBO                "Lobo guara"
+
+#define NOME_CACADOR_SELVA              "Cacador da Selva"
+#define NOME_CACADOR_PANTANO            "Cacador do Pantano"
+#define NOME_CACADOR_LAGO               "Cacador do Lago"
+#define NOME_CACADOR_CERRADO            "Cacador do Cerrado"
+#define NOME_CACADOR_CHEFE              "Cacador Chefe"
+
+/* === TIPOS DE ANIMAIS === */
+#define TIPO_CARNIVORO                  "Carnivoro"
+#define TIPO_ONIVORO                    "Onivoro"
+
+/* === BESTIÁRIO === */
+#define MAX_ESPECIES_BESTIARIO          4
+
+#endif // CONFIG_JOGO_H

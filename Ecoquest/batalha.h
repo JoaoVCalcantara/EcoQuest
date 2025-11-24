@@ -6,18 +6,19 @@
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>
+#include "entidades.h"
 
-#include "entidades.h"  // ← ADICIONAR ESTA LINHA
-
-// Forward declarations - apenas para tipos que não foram incluídos
+// Forward declarations
 typedef struct Bestiario Bestiario;
 typedef struct Cacador Cacador;
 
-// Estruturas
+// Agora vida separada de alimentação
 typedef struct {
-    int experiencia;
-    int nivel_alimentacao;
-    int nivel;
+    int experiencia;            // Progresso de estudo
+    int nivel_alimentacao;      // Nível de alimentação (0–100) usado para domar
+    int nivel;                  // (se já usado por você)
+    int vida_atual;             // Vida atual independente da alimentação
+    int vida_maxima;            // Vida máxima
     bool alimentado;
     bool domado;
     bool estudado;
@@ -35,6 +36,13 @@ typedef struct {
 } RecursosBatalha;
 
 typedef struct {
+    const char* nome_entidade;
+    float entidade_x;
+    float entidade_y;
+    float entidade_escala;
+} ConfigSpriteEntidade;
+
+typedef struct {
     const char* nome_animal;
     float jogador_x;
     float jogador_y;
@@ -48,27 +56,64 @@ typedef struct {
     float cacador_escala;
 } ConfigSpriteCacador;
 
-// Funções principais - Batalha com Animais
+// NOVA: Enum para tipo de batalha
+typedef enum {
+    BATALHA_ANIMAL,
+    BATALHA_CACADOR
+} TipoBatalha;
+
+// NOVA: Estrutura unificada de oponente
+typedef struct {
+    TipoBatalha tipo;
+    
+    // Dados comuns
+    const char* nome;
+    int vida_atual;
+    int vida_maxima;
+    
+    // Ponteiros para dados específicos
+    Animal* animal;
+    Cacador* cacador;
+    
+    // Configuração visual
+    ALLEGRO_BITMAP* sprite;
+    const char* caminho_fundo;
+    ConfigSpriteEntidade config_sprite;
+} OponenteBatalha;
+
+// Funções principais - Animais (mantidas para compatibilidade)
 void desenhar_menu_batalha(ALLEGRO_FONT* fonte, int opcao, ALLEGRO_DISPLAY* display, Animal* animal, RecursosBatalha* recursos);
 void iniciar_batalha(ALLEGRO_FONT* fonte, Animal* animal, ALLEGRO_EVENT_QUEUE* event_queue, ALLEGRO_DISPLAY* display);
 void iniciar_batalha_com_bestiario(ALLEGRO_FONT* fonte, Animal* animal, ALLEGRO_EVENT_QUEUE* event_queue, ALLEGRO_DISPLAY* display, Bestiario* bestiario);
 
-// Funções principais - Batalha com Caçadores
-void desenhar_menu_batalha_cacador(ALLEGRO_FONT* fonte, int opcao, ALLEGRO_DISPLAY* display, 
-                                    Cacador* cacador, entidade* jogador, RecursosBatalha* recursos,
-                                    int vida_jogador, bool turno_jogador);
+// Funções principais - Caçadores (mantidas para compatibilidade)
+void desenhar_menu_batalha_cacador(ALLEGRO_FONT* fonte, int opcao, ALLEGRO_DISPLAY* display,
+                                   Cacador* cacador, entidade* jogador, RecursosBatalha* recursos,
+                                   int vida_jogador, bool turno_jogador);
+void iniciar_batalha_cacador_visual(ALLEGRO_FONT* fonte, Cacador* cacador,
+                                    ALLEGRO_EVENT_QUEUE* event_queue,
+                                    ALLEGRO_DISPLAY* display, entidade* jogador);
 
-void iniciar_batalha_cacador_visual(ALLEGRO_FONT* fonte, Cacador* cacador, 
-                                     ALLEGRO_EVENT_QUEUE* event_queue, 
-                                     ALLEGRO_DISPLAY* display, entidade* jogador);
+// NOVAS: Funções unificadas
+OponenteBatalha* criar_oponente_animal(Animal* animal);
+OponenteBatalha* criar_oponente_cacador(Cacador* cacador);
+void destruir_oponente_batalha(OponenteBatalha* oponente);
 
-// Funções auxiliares
-RecursosBatalha* carregar_recursos_batalha(const char* caminho_fundo, const char* caminho_caixa_texto, 
+void desenhar_batalha_unificada(ALLEGRO_FONT* fonte, int opcao, ALLEGRO_DISPLAY* display,
+                               OponenteBatalha* oponente, entidade* jogador,
+                               RecursosBatalha* recursos, int vida_jogador, bool turno_jogador);
+                               
+void iniciar_batalha_unificada(ALLEGRO_FONT* fonte, OponenteBatalha* oponente,
+                              ALLEGRO_EVENT_QUEUE* event_queue, ALLEGRO_DISPLAY* display,
+                              entidade* jogador, Bestiario* bestiario);
+
+// Recursos
+RecursosBatalha* carregar_recursos_batalha(const char* caminho_fundo, const char* caminho_caixa_texto,
                                            const char* caminho_sprite_animal, const char* caminho_sprite_jogador);
-
-RecursosBatalha* carregar_recursos_batalha_cacador(const char* caminho_fundo, const char* caminho_caixa_texto, 
-                                                     const char* caminho_sprite_cacador, const char* caminho_sprite_jogador);
-
+RecursosBatalha* carregar_recursos_batalha_cacador(const char* caminho_fundo, const char* caminho_caixa_texto,
+                                                   const char* caminho_sprite_cacador, const char* caminho_sprite_jogador);
+RecursosBatalha* carregar_recursos_batalha_unificada(const char* caminho_fundo, const char* caminho_caixa_texto,
+                                                     const char* caminho_sprite_oponente, const char* caminho_sprite_jogador);
 void destruir_recursos_batalha(RecursosBatalha* recursos);
 
 #endif

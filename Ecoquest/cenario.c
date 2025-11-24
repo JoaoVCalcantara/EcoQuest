@@ -1,6 +1,7 @@
 #include "entidades.h"
 #include "cenario.h"
 #include "allegro_init.h"
+#include "config_jogo.h"  // ADICIONAR
 
 float camera_x = 0.0f;
 float camera_y = 0.0f;
@@ -23,8 +24,9 @@ void atualizar_camera(const entidade* jogador, float* camera_x_ptr, float* camer
 }
 
 JogoCenas verificar_area_atual(const entidade* jogador) {
-    if (jogador->x < 640.0f) {
-        if (jogador->y < 360.0f) {
+    // SUBSTITUIR 640.0f e 360.0f por constantes
+    if (jogador->x < LIMITE_HORIZONTAL_MAPA) {
+        if (jogador->y < LIMITE_VERTICAL_MAPA) {
             return CENARIO1;
         }
         else {
@@ -32,7 +34,7 @@ JogoCenas verificar_area_atual(const entidade* jogador) {
         }
     }
     else {
-        if (jogador->y < 360.0f) {
+        if (jogador->y < LIMITE_VERTICAL_MAPA) {
             return CENARIO3;
         }
         else {
@@ -57,7 +59,6 @@ JogoCenas cenarios(JogoCenas atual, const AllegroContext* ctx, const entidade* j
 
     al_clear_to_color(ctx->CoresFundo[atual]);
 
-    // Desenha o mapa com zoom aplicado
     al_draw_scaled_bitmap(
         ctx->mapa,
         camera_x,

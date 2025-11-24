@@ -1,5 +1,6 @@
 ﻿#include "entidades.h"
 #include "cenario.h"
+#include "config_jogo.h"  // ADICIONAR
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/keyboard.h>
 #include <math.h>
@@ -7,8 +8,8 @@
 void iniciar_entidade(entidade* p, float width, float height) {
     p->x = 0.0f;
     p->y = 0.0f;
-    p->raio = PLAYER_RADIUS;
-    p->velocidade = PLAYER_SPEED;
+    p->raio = RAIO_JOGADOR;           // SUBSTITUIR PLAYER_RADIUS
+    p->velocidade = VELOCIDADE_JOGADOR; // SUBSTITUIR PLAYER_SPEED
 
     p->sprite_cima = NULL;
     p->sprite_baixo = NULL;
@@ -121,50 +122,38 @@ void limitar_jogador_com_progresso(entidade* jogador, float largura_mapa, float 
     if (jogador->x > largura_mapa - jogador->raio) jogador->x = largura_mapa - jogador->raio;
     if (jogador->y > altura_mapa - jogador->raio) jogador->y = altura_mapa - jogador->raio;
     
-    // === PROGRESSÃO LINEAR: CENARIO1 → CENARIO2 → CENARIO3 → CENARIO4 ===
-    
-    // 1. Bloqueia CENARIO2, CENARIO3 e CENARIO4 se CENARIO1 não foi completado
+    // SUBSTITUIR valores hardcoded por constantes
     if (!progresso->cenario1_completo) {
-        // Bloqueia movimento para CENARIO2 (baixo-esquerda)
-        if (jogador->y > 360.0f - jogador->raio && jogador->x < 640.0f) {
-            jogador->y = 360.0f - jogador->raio;
+        if (jogador->y > LIMITE_VERTICAL_MAPA - jogador->raio && jogador->x < LIMITE_HORIZONTAL_MAPA) {
+            jogador->y = LIMITE_VERTICAL_MAPA - jogador->raio;
         }
         
-        // Bloqueia movimento para CENARIO3 (cima-direita)
-        if (jogador->x > 640.0f - jogador->raio && jogador->y < 360.0f) {
-            jogador->x = 640.0f - jogador->raio;
+        if (jogador->x > LIMITE_HORIZONTAL_MAPA - jogador->raio && jogador->y < LIMITE_VERTICAL_MAPA) {
+            jogador->x = LIMITE_HORIZONTAL_MAPA - jogador->raio;
         }
         
-        // Bloqueia movimento para CENARIO4 (baixo-direita)
-        if (jogador->x > 640.0f - jogador->raio && jogador->y > 360.0f) {
-            jogador->x = 640.0f - jogador->raio;
+        if (jogador->x > LIMITE_HORIZONTAL_MAPA - jogador->raio && jogador->y > LIMITE_VERTICAL_MAPA) {
+            jogador->x = LIMITE_HORIZONTAL_MAPA - jogador->raio;
         }
     }
     
-    // 2. Bloqueia CENARIO3 e CENARIO4 se CENARIO2 não foi completado
     else if (!progresso->cenario2_completo) {
-        // Bloqueia movimento para CENARIO3 (cima-direita)
-        if (jogador->x > 640.0f - jogador->raio && jogador->y < 360.0f) {
-            jogador->x = 640.0f - jogador->raio;
+        if (jogador->x > LIMITE_HORIZONTAL_MAPA - jogador->raio && jogador->y < LIMITE_VERTICAL_MAPA) {
+            jogador->x = LIMITE_HORIZONTAL_MAPA - jogador->raio;
         }
         
-        // Bloqueia movimento para CENARIO4 (baixo-direita)
-        if (jogador->x > 640.0f - jogador->raio && jogador->y > 360.0f) {
-            jogador->x = 640.0f - jogador->raio;
+        if (jogador->x > LIMITE_HORIZONTAL_MAPA - jogador->raio && jogador->y > LIMITE_VERTICAL_MAPA) {
+            jogador->x = LIMITE_HORIZONTAL_MAPA - jogador->raio;
         }
     }
     
-    // 3. Bloqueia CENARIO4 se CENARIO3 não foi completado
     else if (!progresso->cenario3_completo) {
-        // CORREÇÃO: Bloquear baseado na posição anterior
-        // Se está no CENARIO3 (x > 640 e y < 360) e tenta descer
-        if (jogador->x > 640.0f && jogador->y > 360.0f - jogador->raio && jogador->y < 360.0f + 50.0f) {
-            jogador->y = 360.0f - jogador->raio;
+        if (jogador->x > LIMITE_HORIZONTAL_MAPA && jogador->y > LIMITE_VERTICAL_MAPA - jogador->raio && jogador->y < LIMITE_VERTICAL_MAPA + 50.0f) {
+            jogador->y = LIMITE_VERTICAL_MAPA - jogador->raio;
         }
         
-        // Se está no CENARIO2 (x < 640 e y > 360) e tenta ir para direita
-        if (jogador->y > 360.0f && jogador->x > 640.0f - jogador->raio && jogador->x < 640.0f + 50.0f) {
-            jogador->x = 640.0f - jogador->raio;
+        if (jogador->y > LIMITE_VERTICAL_MAPA && jogador->x > LIMITE_HORIZONTAL_MAPA - jogador->raio && jogador->x < LIMITE_HORIZONTAL_MAPA + 50.0f) {
+            jogador->x = LIMITE_HORIZONTAL_MAPA - jogador->raio;
         }
     }
 }
