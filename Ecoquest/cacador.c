@@ -65,6 +65,14 @@ static void limitar_posicao_cacador(float* x, float* y, float raio,
     if (*y > max_y - raio) *y = max_y - raio;
 }
 
+static void limitar_posicao_cacador_global(float* x, float* y, float raio,
+    float largura, float altura, JogoCenas cenario) {
+
+    if (*x < raio) *x = raio;
+    if (*y < raio) *y = raio;
+    if (*x > largura - raio) *x = largura - raio;
+    if (*y > altura - raio) *y = altura - raio;
+}
 // Função para evitar que o animal fuja para as bordas
 static void evitar_bordas_animal(float animal_x, float animal_y, float* fuga_x, float* fuga_y,
     float largura_mapa, float altura_mapa, JogoCenas cenario) {
@@ -468,7 +476,7 @@ void atualizar_cacador_chefe(CacadorChefe* chefe, entidade* jogador,
         chefe->base.y += (dy / distancia) * vel;
     }
 
-    limitar_posicao_cacador(&chefe->base.x, &chefe->base.y, chefe->base.raio,
+    limitar_posicao_cacador_global(&chefe->base.x, &chefe->base.y, chefe->base.raio,
         largura_mapa, altura_mapa, chefe->base.cenario);
 }
 

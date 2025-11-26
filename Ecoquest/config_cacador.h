@@ -20,11 +20,11 @@
 
 /* Velocidades */
 #define VELOCIDADE_PATRULHA             0.7f    // Velocidade durante patrulha
-#define VELOCIDADE_PERSEGUICAO          1.4f    // Velocidade ao perseguir animal
-#define VELOCIDADE_PERSEGUICAO_BOSS     1.5f    // Velocidade do boss
+#define VELOCIDADE_PERSEGUICAO          1.2f    // Velocidade ao perseguir animal
+#define VELOCIDADE_PERSEGUICAO_BOSS     1.4f    // Velocidade do boss
 
 /* Margem de Segurança para Fuga do Animal */
-#define MARGEM_SEGURANCA_BORDA          70.0f   // Distância da borda para animal evitar
+#define MARGEM_SEGURANCA_BORDA          100.0f   // Distância da borda para animal evitar
 #define PESO_FUGA_CENTRO                0.75f   // Peso da direção ao centro (0.0-1.0)
 
 /* Distâncias Mínimas */
@@ -49,9 +49,9 @@
 #define DEFESA_BASE_BOSS                15      // Defesa do boss
 
 /* Raios Físicos */
-#define RAIO_CACADOR                    10.0f   // Raio físico do caçador
+#define RAIO_CACADOR                    13.0f   // Raio físico do caçador
 
 /* Multiplicadores de Comportamento */
-#define MULTIPLICADOR_FUGA_ANIMAL       1.3f    // Multiplicador de velocidade do animal em fuga
+#define MULTIPLICADOR_FUGA_ANIMAL       1.6f    // Multiplicador de velocidade do animal em fuga
 
 #endif // CONFIG_CACADOR_H

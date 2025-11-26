@@ -98,7 +98,7 @@ void desenhar_jogador(const entidade* p, ALLEGRO_COLOR cor) {
                 p->y,
                 camera_x,
                 camera_y,
-                0.06f,
+                ESCALA_SPRITE_JOGADOR,
                 ZOOM_FACTOR
             );
             return;

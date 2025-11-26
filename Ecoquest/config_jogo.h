@@ -8,7 +8,7 @@
 #define ALTURA_TELA                     720
 #define LARGURA_MAPA                    1280.0f
 #define ALTURA_MAPA                     720.0f
-#define FPS_JOGO                        60
+#define FPS_JOGO                        144
 #define ZOOM_FACTOR                     3.5f
 
 /* === DIVISÕES DO MAPA (4 Cenários) === */
@@ -40,8 +40,8 @@
 #define CENARIO4_MAX_Y                  720.0f
 
 /* === JOGADOR === */
-#define RAIO_JOGADOR                    8.0f
-#define VELOCIDADE_JOGADOR              1.4f
+#define RAIO_JOGADOR                    12.0f
+#define VELOCIDADE_JOGADOR              1.7f
 #define VIDA_MAXIMA_JOGADOR             100
 
 /* Animação do Jogador */
@@ -49,7 +49,7 @@
 #define TEMPO_FRAME_IDLE                1.0f
 
 /* === ANIMAIS (BOTS) === */
-#define RAIO_ANIMAL                     8.0f
+#define RAIO_ANIMAL                     10.0f
 #define VELOCIDADE_ANIMAL               0.6f
 #define VIDA_MAXIMA_ANIMAL              100
 #define VELOCIDADE_FUGA_MULTIPLICADOR   1.3f
@@ -157,13 +157,14 @@
 #define PATH_JOGADOR_IDLE_ESQ           "assets/img/Heroi/idle_left.png"
 
 /* === ESCALAS DE SPRITES === */
-#define ESCALA_ANIMAL                   0.03f
+#define ESCALA_ANIMAL                   0.04f
 #define ESCALA_CACADOR                  0.05f
+#define ESCALA_SPRITE_JOGADOR          0.06f
 
 /* === POSIÇÕES INICIAIS === */
 /* Animais */
-#define POS_INICIAL_ONCA_X              150.0f
-#define POS_INICIAL_ONCA_Y              100.0f
+#define POS_INICIAL_ONCA_X              300.0f
+#define POS_INICIAL_ONCA_Y              200.0f
 
 #define POS_INICIAL_JACARE_X            400.0f
 #define POS_INICIAL_JACARE_Y            500.0f
@@ -209,5 +210,26 @@
 
 /* === BESTIÁRIO === */
 #define MAX_ESPECIES_BESTIARIO          4
+
+/* === PROXIMIDADES E DISTÂNCIAS === */
+#define DISTANCIA_VERIFICACAO_BLOQUEIO  20.0f   // Distância para verificar bloqueio de áreas
+#define TOLERANCIA_ELIPSE_BLOQUEIO      20.0f   // Tolerância adicional para elipse do Cenário 3
+
+/* === CORES DE DESENHO (RGB) === */
+/* Cores de entidades no mapa */
+#define COR_ANIMAL_DESENHO_R            255
+#define COR_ANIMAL_DESENHO_G            50
+#define COR_ANIMAL_DESENHO_B            50
+
+#define COR_CACADOR_DESENHO_R           150
+#define COR_CACADOR_DESENHO_G           0
+#define COR_CACADOR_DESENHO_B           0
+
+#define COR_BOSS_DESENHO_R              200
+#define COR_BOSS_DESENHO_G              0
+#define COR_BOSS_DESENHO_B              200
+
+/* === POSIÇÕES DE TEXTO LABEL BOSS === */
+#define OFFSET_LABEL_BOSS_Y             15.0f
 
 #endif // CONFIG_JOGO_H

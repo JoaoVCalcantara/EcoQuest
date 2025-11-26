@@ -14,39 +14,8 @@
 #include "config_ui.h"         // NOVO: Configurações de UI
 #include "config_cacador.h"
 
-typedef struct {
-    const char* nome;
-    float escala;
-    float pos_x;
-    float pos_y;
-} ConfigAnimal;
-
-// Configurações unificadas para todos os oponentes (animais e caçadores)
-static const ConfigSpriteEntidade configs_entidades[] = {
-    // Animais
-    {NOME_ANIMAL_LOBO, 250.0f, 325.0f, 0.25f},
-    {"lobo guara", 250.0f, 325.0f, 0.25f},
-    {NOME_ANIMAL_JACARE, 275.0f, 150.0f, 0.25f},
-    {NOME_ANIMAL_BOTO, 280.0f, 320.0f, 0.25f},
-    {NOME_ANIMAL_ONCA, 250.0f, 325.0f, 0.25f},
-    
-    // Caçadores
-    {NOME_CACADOR_SELVA, 250.0f, 325.0f, 0.25f},
-    {NOME_CACADOR_PANTANO, 275.0f, 150.0f, 0.25f},
-    {NOME_CACADOR_LAGO, 280.0f, 320.0f, 0.25f},
-    {NOME_CACADOR_CERRADO, 250.0f, 200.0f, 0.25f},
-    {NOME_CACADOR_CHEFE, 250.0f, 325.0f, 0.3f}
-};
-
-static const ConfigSpriteJogador configs_jogador[] = {
-    {NOME_ANIMAL_LOBO, 100.0f, 150.0f, 0.5f},
-    {"lobo guara", 100.0f, 150.0f, 0.5f},
-    {NOME_ANIMAL_JACARE, 125.0f, 150.0f, 0.5f},
-    {NOME_ANIMAL_BOTO, 175.0f, 175.0f, 0.5f},
-    {NOME_ANIMAL_ONCA, 175.0f, 175.0f, 0.5f}
-};
-
-// Frases de estudo permanecem iguais
+/* ==== Conteúdo reinserido: frases e funções de popup/lookup de frases ==== */
+/* Frases de estudo */
 static const char* frases_lobo_guara[] = {
     "Pernas Longas e Esguias - Adaptacao Evolutiva: A caracteristica mais marcante do lobo-guara, suas pernas longas e finas, eh uma adaptacao crucial para a locomocao no capim alto do Cerrado e em areas abertas. Essa estrutura permite que ele enxergue acima da vegetacao rasteira e persiga suas presas de forma eficiente nesse tipo de terreno. Essa caracteristica o diferencia dos lobos e raposas de florestas mais densas.",
     "Dieta Onivora (Especializacao em Frutos) - Adaptacao Evolutiva: Diferente da maioria dos grandes canideos, que sao predominantemente carnivoros, o lobo-guara desenvolveu uma dieta onivora, com grande consumo de frutos (chegando a 90% da dieta em certas epocas). Essa dieta e uma resposta a disponibilidade sazonal de recursos no Cerrado. Papel Ecologico: Essa evolucao alimentar fez dele um dispersor de sementes vital para o bioma, especialmente da lobeira (Solanum lycocarpum), estabelecendo uma relacao de mutualismo.",
@@ -76,33 +45,40 @@ static const char* frases_boto[] = {
 static const char* frases_onca[] = {
     "Mandibula e Forca de Mordida Excepcionais: Esta e talvez a sua caracteristica evolutiva mais distintiva. A onca-pintada desenvolveu uma cabeca grande e robusta, com musculos mandibulares e dentes caninos extremamente fortes, permitindo-lhe ter uma das mordidas mais potentes entre todos os felinos. Vantagem Evolutiva: Essa forca permite a onca abater presas grandes e, crucialmente, perfurar cranios de mamiferos ou cascos de repites (como tartarugas e jacares), um metodo de caca raro entre felinos, que geralmente matam por estrangulamento.",
     "Constituicao Fisica Musculosa e Membros Curtos: Em contraste com a estrutura mais esguia de guepardos ou leopardos, a onca-pintada tem um corpo atarracado e musculoso, com membros curtos e macicos. Vantagem Evolutiva: Essa estrutura fisica nao e para velocidade em corridas longas, mas sim para forca, agilidade em curtas distancias e a capacidade de nadar e escalar arvores, permitindo-lhe emboscar presas em ambientes densos e proximos a agua.",
-    "Padrao de Pelagem (Rosetas): Sua pelagem de cor amarelo-dourada a castanho-avermelhada e coberta por rosetas complexas (manchas circulares com pontos pretos dentro). Vantagem Evolutiva: Este padrao fornece uma camuflagem excelente na vegetacao densa e na luz filtrada de florestas e pantanos, facilitando a caca por emboscada.",
+    "Padrao de Pelagem (Rosetas): Sua pelagem de cor amarelo-dourada a castanho-avermelhada e coberta por rosetas complexas (manchas circulares com pontos pretos dentro). Vantagem Evolutiva: Este padrao fornece uma camuflagem excellente na vegetacao densa e na luz filtrada de florestas e pantanos, facilitando a caca por emboscada.",
     "Habilidades Aquaticas: Diferente da maioria dos felinos que evitam a agua, a onca-pintada e uma excelente nadadora, uma adaptacao vital para a vida em biomas com muitos corpos d'agua, como a Amazonia e o Pantanal, onde pode cacar presas aquaticas e semi-aquaticas."
 };
 
+/* Função que retorna array de frases e total com normalização de nome */
 static const char** obter_frases_animal(const char* nome_animal, int* total_frases) {
     if (!nome_animal || !total_frases) return NULL;
+
     char nome_lower[64];
     snprintf(nome_lower, sizeof(nome_lower), "%s", nome_animal);
-    for (int i = 0; nome_lower[i]; i++)
+    for (int i = 0; nome_lower[i]; i++) {
         if (nome_lower[i] >= 'A' && nome_lower[i] <= 'Z') nome_lower[i] += ('a' - 'A');
+    }
 
     char nome_normalizado[64];
     int j = 0;
-    for (int i = 0; nome_lower[i] && j < 63; i++)
+    for (int i = 0; nome_lower[i] && j < (int)sizeof(nome_normalizado) - 1; i++) {
         nome_normalizado[j++] = (nome_lower[i] == ' ') ? '_' : nome_lower[i];
+    }
     nome_normalizado[j] = '\0';
 
-    if (strcmp(nome_normalizado, "lobo_guara") == 0) {
+    if (strcmp(nome_normalizado, "lobo_guara") == 0 || strcmp(nome_lower, "lobo guara") == 0) {
         *total_frases = (int)(sizeof(frases_lobo_guara) / sizeof(frases_lobo_guara[0]));
         return frases_lobo_guara;
-    } else if (strcmp(nome_lower, "jacare") == 0) {
+    }
+    else if (strcmp(nome_lower, "jacare") == 0 || strcmp(nome_normalizado, "jacare") == 0) {
         *total_frases = (int)(sizeof(frases_jacare) / sizeof(frases_jacare[0]));
         return frases_jacare;
-    } else if (strcmp(nome_lower, "boto") == 0) {
+    }
+    else if (strcmp(nome_lower, "boto") == 0 || strcmp(nome_normalizado, "boto") == 0) {
         *total_frases = (int)(sizeof(frases_boto) / sizeof(frases_boto[0]));
         return frases_boto;
-    } else if (strcmp(nome_lower, "onca") == 0) {
+    }
+    else if (strcmp(nome_lower, "onca") == 0 || strcmp(nome_normalizado, "onca") == 0 || strcmp(nome_lower, "onca-pintada") == 0) {
         *total_frases = (int)(sizeof(frases_onca) / sizeof(frases_onca[0]));
         return frases_onca;
     }
@@ -111,10 +87,11 @@ static const char** obter_frases_animal(const char* nome_animal, int* total_fras
     return NULL;
 }
 
+/* Popup que exibe texto longo e espera ENTER/SPACE/ESC ou fechar display */
 static void mostrar_popup_estudo(ALLEGRO_FONT* fonte, ALLEGRO_DISPLAY* display, ALLEGRO_EVENT_QUEUE* event_queue, const char* texto) {
     if (!display || !texto) return;
     int largura = al_get_display_width(display);
-    int altura  = al_get_display_height(display);
+    int altura = al_get_display_height(display);
 
     float box_w = largura * 0.75f;
     float box_h = altura * 0.65f;
@@ -128,7 +105,7 @@ static void mostrar_popup_estudo(ALLEGRO_FONT* fonte, ALLEGRO_DISPLAY* display, 
     float text_x = box_x + 20;
     float text_y = box_y + 50;
     float max_width = box_w - 40;
-    float line_height = al_get_font_line_height(fonte) + 4;
+    float line_height = (fonte ? al_get_font_line_height(fonte) : 12.0f) + 4;
 
     al_clear_to_color(al_map_rgb(COR_FUNDO_PRETO_R, COR_FUNDO_PRETO_G, COR_FUNDO_PRETO_B));
     al_draw_filled_rectangle(0, 0, (float)largura, (float)altura, al_map_rgba(COR_FUNDO_PRETO_R, COR_FUNDO_PRETO_G, COR_FUNDO_PRETO_B, 180));
@@ -156,7 +133,8 @@ static void mostrar_popup_estudo(ALLEGRO_FONT* fonte, ALLEGRO_DISPLAY* display, 
         if (linha_atual[0] == '\0') {
             strncpy(teste, palavra, sizeof(teste) - 1);
             teste[sizeof(teste) - 1] = '\0';
-        } else {
+        }
+        else {
             snprintf(teste, sizeof(teste), "%s %s", linha_atual, palavra);
         }
 
@@ -166,7 +144,8 @@ static void mostrar_popup_estudo(ALLEGRO_FONT* fonte, ALLEGRO_DISPLAY* display, 
             text_y += line_height;
             strncpy(linha_atual, palavra, sizeof(linha_atual) - 1);
             linha_atual[sizeof(linha_atual) - 1] = '\0';
-        } else {
+        }
+        else {
             strncpy(linha_atual, teste, sizeof(linha_atual) - 1);
             linha_atual[sizeof(linha_atual) - 1] = '\0';
         }
@@ -189,70 +168,124 @@ static void mostrar_popup_estudo(ALLEGRO_FONT* fonte, ALLEGRO_DISPLAY* display, 
                     ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
                     esperando = false;
                 }
-            } else if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
+            }
+            else if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
                 esperando = false;
             }
         }
-    } else {
+    }
+    else {
         al_rest(3.0);
     }
 }
 
-// NOVA: Função unificada para obter configuração de sprite
+
+/* NOVA: Função unificada para obter configuração de sprite (usa macros em config_ui.h) */
 static ConfigSpriteEntidade obter_config_entidade(const char* nome) {
-    ConfigSpriteEntidade padrao = { "desconhecido", 250.0f, 280.0f, 0.25f };
+    ConfigSpriteEntidade padrao = { "desconhecido", 280.0f, 250.0f, 0.25f };
     if (!nome) return padrao;
 
-    char nome_lower[64];
-    snprintf(nome_lower, sizeof(nome_lower), "%s", nome);
-    for (int i = 0; nome_lower[i]; i++)
-        if (nome_lower[i] >= 'A' && nome_lower[i] <= 'Z') nome_lower[i] += ('a' - 'A');
-
-    char nome_normalizado[64];
-    int j = 0;
-    for (int i = 0; nome_lower[i] && j < 63; i++)
-        nome_normalizado[j++] = (nome_lower[i] == ' ') ? '_' : nome_lower[i];
-    nome_normalizado[j] = '\0';
-
-    for (size_t i = 0; i < sizeof(configs_entidades) / sizeof(ConfigSpriteEntidade); i++) {
-        char config_nome_lower[64];
-        snprintf(config_nome_lower, sizeof(config_nome_lower), "%s", configs_entidades[i].nome_entidade);
-        for (int k = 0; config_nome_lower[k]; k++)
-            if (config_nome_lower[k] >= 'A' && config_nome_lower[k] <= 'Z') config_nome_lower[k] += ('a' - 'A');
-            
-        if (strcmp(config_nome_lower, nome_normalizado) == 0 ||
-            strcmp(config_nome_lower, nome_lower) == 0) {
-            return configs_entidades[i];
-        }
+    /* compara com macros de nomes existentes (assume que NOME_* estão definidos) */
+    if (strcmp(nome, NOME_ANIMAL_ONCA) == 0) {
+        ConfigSpriteEntidade r = { NOME_ANIMAL_ONCA, ENT_ONCA_X, ENT_ONCA_Y, ENT_ONCA_ESCALA }; return r;
     }
+    if (strcmp(nome, NOME_ANIMAL_JACARE) == 0) {
+        ConfigSpriteEntidade r = { NOME_ANIMAL_JACARE, ENT_JACARE_X, ENT_JACARE_Y, ENT_JACARE_ESCALA }; return r;
+    }
+    if (strcmp(nome, NOME_ANIMAL_BOTO) == 0) {
+        ConfigSpriteEntidade r = { NOME_ANIMAL_BOTO, ENT_BOTO_X, ENT_BOTO_Y, ENT_BOTO_ESCALA }; return r;
+    }
+    if (strcmp(nome, NOME_ANIMAL_LOBO) == 0) {
+        ConfigSpriteEntidade r = { NOME_ANIMAL_LOBO, ENT_LOBO_X, ENT_LOBO_Y, ENT_LOBO_ESCALA }; return r;
+    }
+    /* lidar com possível literal alternativo "lobo guara" */
+    if (strcmp(nome, "lobo guara") == 0) {
+        ConfigSpriteEntidade r = { "lobo guara", ENT_LOBO_X, ENT_LOBO_Y, ENT_LOBO_ESCALA }; return r;
+    }
+
+    /* Caçadores (assume NOME_CACADOR_* macros existem) */
+    if (strcmp(nome, NOME_CACADOR_SELVA) == 0) {
+        ConfigSpriteEntidade r = { NOME_CACADOR_SELVA, ENT_CACADOR_SELVA_X, ENT_CACADOR_SELVA_Y, ENT_CACADOR_SELVA_ESCALA }; return r;
+    }
+    if (strcmp(nome, NOME_CACADOR_PANTANO) == 0) {
+        ConfigSpriteEntidade r = { NOME_CACADOR_PANTANO, ENT_CACADOR_PANTANO_X, ENT_CACADOR_PANTANO_Y, ENT_CACADOR_PANTANO_ESCALA }; return r;
+    }
+    if (strcmp(nome, NOME_CACADOR_LAGO) == 0) {
+        ConfigSpriteEntidade r = { NOME_CACADOR_LAGO, ENT_CACADOR_LAGO_X, ENT_CACADOR_LAGO_Y, ENT_CACADOR_LAGO_ESCALA }; return r;
+    }
+    if (strcmp(nome, NOME_CACADOR_CERRADO) == 0) {
+        ConfigSpriteEntidade r = { NOME_CACADOR_CERRADO, ENT_CACADOR_CERRADO_X, ENT_CACADOR_CERRADO_Y, ENT_CACADOR_CERRADO_ESCALA }; return r;
+    }
+    if (strcmp(nome, NOME_CACADOR_CHEFE) == 0) {
+        ConfigSpriteEntidade r = { NOME_CACADOR_CHEFE, ENT_CACADOR_CHEFE_X, ENT_CACADOR_CHEFE_Y, ENT_CACADOR_CHEFE_ESCALA }; return r;
+    }
+
+    /* Fallback: retorna padrao */
     return padrao;
 }
 
+/* NOVA: obter configuração do jogador para a tela de batalha
+   - Se o nome corresponder a um caçador, usa JOGADOR_CACADOR_* macros
+   - Se o nome corresponder a um animal, usa JOGADOR_* macros
+   - Se os valores X/Y forem <= 0 usa os ratios (BATALHA_JOGADOR_*) */
 static ConfigSpriteJogador obter_config_sprite_jogador(const char* nome_animal) {
-    ConfigSpriteJogador padrao = { "desconhecido", 100.0f, 350.0f, 0.5f };
+    ConfigSpriteJogador padrao = { "desconhecido", 0.0f, 0.0f, BATALHA_JOGADOR_ESCALA };
     if (!nome_animal) return padrao;
 
-    char nome_lower[64];
-    snprintf(nome_lower, sizeof(nome_lower), "%s", nome_animal);
-    for (int i = 0; nome_lower[i]; i++)
-        if (nome_lower[i] >= 'A' && nome_lower[i] <= 'Z') nome_lower[i] += ('a' - 'A');
-
-    char nome_normalizado[64];
-    int j = 0;
-    for (int i = 0; nome_lower[i] && j < 63; i++)
-        nome_normalizado[j++] = (nome_lower[i] == ' ') ? '_' : nome_lower[i];
-    nome_normalizado[j] = '\0';
-
-    for (size_t i = 0; i < sizeof(configs_jogador) / sizeof(ConfigSpriteJogador); i++) {
-        if (strcmp(configs_jogador[i].nome_animal, nome_normalizado) == 0 ||
-            strcmp(configs_jogador[i].nome_animal, nome_lower) == 0) {
-            return configs_jogador[i];
-        }
+    /* Caçadores */
+    if (strcmp(nome_animal, NOME_CACADOR_SELVA) == 0) {
+        ConfigSpriteJogador r = { NOME_CACADOR_SELVA, JOGADOR_CACADOR_SELVA_X, JOGADOR_CACADOR_SELVA_Y, JOGADOR_CACADOR_SELVA_ESCALA };
+        return r;
     }
-    return padrao;
+    if (strcmp(nome_animal, NOME_CACADOR_PANTANO) == 0) {
+        ConfigSpriteJogador r = { NOME_CACADOR_PANTANO, JOGADOR_CACADOR_PANTANO_X, JOGADOR_CACADOR_PANTANO_Y, JOGADOR_CACADOR_PANTANO_ESCALA };
+        return r;
+    }
+    if (strcmp(nome_animal, NOME_CACADOR_LAGO) == 0) {
+        ConfigSpriteJogador r = { NOME_CACADOR_LAGO, JOGADOR_CACADOR_LAGO_X, JOGADOR_CACADOR_LAGO_Y, JOGADOR_CACADOR_LAGO_ESCALA };
+        return r;
+    }
+    if (strcmp(nome_animal, NOME_CACADOR_CERRADO) == 0) {
+        ConfigSpriteJogador r = { NOME_CACADOR_CERRADO, JOGADOR_CACADOR_CERRADO_X, JOGADOR_CACADOR_CERRADO_Y, JOGADOR_CACADOR_CERRADO_ESCALA };
+        return r;
+    }
+    if (strcmp(nome_animal, NOME_CACADOR_CHEFE) == 0) {
+        ConfigSpriteJogador r = { NOME_CACADOR_CHEFE, JOGADOR_CACADOR_CHEFE_X, JOGADOR_CACADOR_CHEFE_Y, JOGADOR_CACADOR_CHEFE_ESCALA };
+        return r;
+    }
+
+    /* Animais */
+    if (strcmp(nome_animal, NOME_ANIMAL_ONCA) == 0) {
+        ConfigSpriteJogador r = { NOME_ANIMAL_ONCA, JOGADOR_ONCA_X, JOGADOR_ONCA_Y, JOGADOR_ONCA_ESCALA };
+        return r;
+    }
+    if (strcmp(nome_animal, NOME_ANIMAL_JACARE) == 0) {
+        ConfigSpriteJogador r = { NOME_ANIMAL_JACARE, JOGADOR_JACARE_X, JOGADOR_JACARE_Y, JOGADOR_JACARE_ESCALA };
+        return r;
+    }
+    if (strcmp(nome_animal, NOME_ANIMAL_BOTO) == 0) {
+        ConfigSpriteJogador r = { NOME_ANIMAL_BOTO, JOGADOR_BOTO_X, JOGADOR_BOTO_Y, JOGADOR_BOTO_ESCALA };
+        return r;
+    }
+    if (strcmp(nome_animal, NOME_ANIMAL_LOBO) == 0) {
+        ConfigSpriteJogador r = { NOME_ANIMAL_LOBO, JOGADOR_LOBO_X, JOGADOR_LOBO_Y, JOGADOR_LOBO_ESCALA };
+        return r;
+    }
+    if (strcmp(nome_animal, "lobo guara") == 0 || strcmp(nome_animal, "lobo_guara") == 0) {
+        ConfigSpriteJogador r = { "lobo guara", JOGADOR_LOBO_GUARA_X, JOGADOR_LOBO_GUARA_Y, JOGADOR_LOBO_GUARA_ESCALA };
+        return r;
+    }
+
+    /* Fallback: usa ratios e escala padrão */
+    ConfigSpriteJogador fallback = { nome_animal, -1.0f, -1.0f, BATALHA_JOGADOR_ESCALA };
+    return fallback;
 }
 
-// ========== FUNÇÕES DE CRIAÇÃO DE OPONENTES ==========
+/* (o restante do arquivo permanece inalterado; funções que chamam as novas
+   obter_config_* continuam funcionando — por exemplo: criar_oponente_* e
+   desenhar_batalha_unificada.) */
+
+/* ========== FUNÇÕES DE CRIAÇÃO DE OPONENTES ========== */
 
 OponenteBatalha* criar_oponente_animal(Animal* animal) {
     if (!animal) return NULL;
@@ -296,7 +329,7 @@ void destruir_oponente_batalha(OponenteBatalha* oponente) {
     if (oponente) free(oponente);
 }
 
-// ========== DESENHO UNIFICADO ==========
+/* ========== DESENHO UNIFICADO ========== */
 
 void desenhar_batalha_unificada(ALLEGRO_FONT* fonte, int opcao, ALLEGRO_DISPLAY* display,
                                OponenteBatalha* oponente, entidade* jogador,
@@ -315,17 +348,32 @@ void desenhar_batalha_unificada(ALLEGRO_FONT* fonte, int opcao, ALLEGRO_DISPLAY*
             0, 0, (float)largura, (float)altura, 0);
     }
 
-    // Jogador (lado esquerdo)
+    // Jogador (lado esquerdo) - usa o padrão de ConfigSpriteJogador se disponível
     bool tem_jogador = false;
     float jogador_x = 0.0f, jogador_y = 0.0f, pj_w = 0.0f, pj_h = 0.0f;
     if (recursos && recursos->sprite_jogador) {
         float jw = (float)al_get_bitmap_width(recursos->sprite_jogador);
         float jh = (float)al_get_bitmap_height(recursos->sprite_jogador);
-        float escala_jog = 0.5f;
+
+        // Tenta obter configuração específica do oponente (se houver)
+        ConfigSpriteJogador conf_jog = obter_config_sprite_jogador(oponente ? oponente->nome : NULL);
+
+        // escala: prioridade -> configuração específica -> macro padrão
+        float escala_jog = (conf_jog.jogador_escala > 0.0f) ? conf_jog.jogador_escala : BATALHA_JOGADOR_ESCALA;
+
         pj_w = jw * escala_jog;
         pj_h = jh * escala_jog;
-        jogador_x = (largura * 0.25f) - pj_w / 2.0f;
-        jogador_y = (altura  * 0.55f) - pj_h / 2.0f;
+
+        // posição: se houver valores explícitos na config do jogador (pixels), usa-os,
+        // caso contrário usa ratios definidos em config_ui.h
+        if (conf_jog.jogador_x > 0.0f || conf_jog.jogador_y > 0.0f) {
+            jogador_x = conf_jog.jogador_x - pj_w / 2.0f;
+            jogador_y = conf_jog.jogador_y - pj_h / 2.0f;
+        } else {
+            jogador_x = (largura * BATALHA_JOGADOR_X_RATIO) - pj_w / 2.0f;
+            jogador_y = (altura  * BATALHA_JOGADOR_Y_RATIO) - pj_h / 2.0f;
+        }
+
         tem_jogador = true;
         al_draw_scaled_bitmap(recursos->sprite_jogador, 0, 0, jw, jh,
                               jogador_x, jogador_y, pj_w, pj_h, 0);
@@ -559,7 +607,7 @@ void iniciar_batalha_unificada(ALLEGRO_FONT* fonte, OponenteBatalha* oponente,
                 case ALLEGRO_KEY_ENTER:
                 case ALLEGRO_KEY_SPACE:
                     if (opcao == 0) {
-                        oponente->animal->nivel_alimentacao += 15;
+                        oponente->animal->nivel_alimentacao += 100;
                         if (oponente->animal->nivel_alimentacao >= 100) {
                             oponente->animal->nivel_alimentacao = 100;
                             oponente->animal->alimentado = true;

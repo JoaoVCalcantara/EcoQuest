@@ -75,7 +75,7 @@ int inicializar_allegro(AllegroContext* ctx) {
         ctx->regioes[3] = al_create_sub_bitmap(ctx->mapa, ctx->metadelargura, ctx->metadealtura, ctx->metadelargura, ctx->metadealtura);
     }
 
-    ctx->font = NULL;  // Sem fonte por enquanto
+    ctx->font = al_create_builtin_font();  // Sem fonte por enquanto
 
     // Cria a fila de eventos
     ctx->event_queue = al_create_event_queue();

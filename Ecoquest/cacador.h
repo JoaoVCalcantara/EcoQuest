@@ -126,6 +126,7 @@ void desenhar_menu_batalha_cacador(ALLEGRO_FONT* fonte, int opcao, ALLEGRO_DISPL
                                     Cacador* cacador, entidade* jogador, RecursosBatalha* recursos,
                                     int vida_jogador, bool turno_jogador);
 
+
 // ========== FUNÇÕES DE COLISÃO ==========
 
 bool verificar_colisao_cacador_jogador(entidade* jogador, const Cacador* cacador);
