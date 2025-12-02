@@ -76,6 +76,13 @@ typedef struct Cacador {
     float cooldown_dano;
     float tempo_dano_interval;
     int dano_por_contato;
+
+    // Rastreio do alvo: últimas posições observadas (útlima, penúltima)
+    float ultimo_animal_x;
+    float ultimo_animal_y;
+    float penultimo_animal_x;
+    float penultimo_animal_y;
+    int contador_posicao_animal; // 0..2 - controla histórico
 } Cacador;
 
 // Caçador chefe (boss final)
@@ -145,5 +152,8 @@ bool verificar_liberacao_boss(int cacadores_derrotados);
 // ========== LIMPEZA ==========
 
 void destruir_cacador(Cacador* cacador);
+
+// Adicionado: função pública para registrar posição conhecida do alvo
+void cacador_registrar_posicao(Cacador* cacador, float x, float y);
 
 #endif // CACADOR_H

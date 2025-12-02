@@ -1,4 +1,7 @@
-﻿#include <stdio.h>
+﻿#define _CRT_SECURE_NO_WARNINGS
+
+
+#include <stdio.h>
 #include <stdbool.h>
 #include <time.h>
 #include <math.h>
@@ -15,6 +18,9 @@
 #include "config_jogo.h"       // NOVO: Configurações do jogo
 #include "config_ui.h"         // NOVO: Configurações de UI
 #include "config_cacador.h"    // JÁ EXISTENTE
+
+
+
 
 // Mensagens de cooldown – precisam estar no escopo de todo o main para serem
 // visíveis tanto durante a atualização quanto na renderização.
@@ -165,6 +171,7 @@ int main() {
         destruir_allegro(&ctx);
         return 0;
     }
+
 
     if (ctx.font && ctx.display && ctx.event_queue) {
         mostrar_tutorial(ctx.font, ctx.display, ctx.event_queue);
@@ -342,12 +349,12 @@ int main() {
                         // Se o caçador correspondente estiver ativo e não derrotado, atualiza com lógica de interação.
                         // Caso contrário (cacador derrotado ou inativo), o animal continua a atualizar seu comportamento normal.
                         if (i < TOTAL_CACADORES && cacadores[i].ativo && !cacadores[i].derrotado && cacadores[i].cenario == cena_logic) {
-                            atualizar_bot_com_cacador(&bots[i], &cacadores[i], delta_time, LARGURA_MAPA, ALTURA_MAPA);
+                            atualizar_bot_com_cacador(&bots[i], &cacadores[i], LARGURA_MAPA, ALTURA_MAPA, delta_time);
                         }
                         else {
                             // Função que atualiza o comportamento padrão do bot sem depender do caçador.
                             // Presume-se que exista `atualizar_bot` em inimigo.c/h; mantém movimento/patrulha do animal.
-                            atualizar_bot(&bots[i], delta_time, LARGURA_MAPA, ALTURA_MAPA);
+                            atualizar_bot(&bots[i], LARGURA_MAPA, ALTURA_MAPA, delta_time);
                         }
                     }
                 }

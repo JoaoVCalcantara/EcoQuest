@@ -11,25 +11,25 @@
 /* Dano e Combate */
 #define DANO_POR_CONTATO_PADRAO         15      // Dano causado ao animal por contato
 #define DANO_POR_CONTATO_BOSS           20      // Dano do boss
-#define RAIO_COLISAO_CACADOR_ANIMAL     15.0f   // Raio extra para detecção de colisão
+#define RAIO_COLISAO_CACADOR_ANIMAL     13.0f   // Raio extra para detecção de colisão
 
 /* Detecção e Perseguição */
-#define RAIO_DETECCAO_PADRAO            100.0f  // Raio de detecção do animal
-#define RAIO_ABANDONO_PADRAO            150.0f  // Raio para abandonar perseguição (2x detecção)
+#define RAIO_DETECCAO_PADRAO            25.0f  // Raio de detecção do animal
+#define RAIO_ABANDONO_PADRAO            50.0f  // Raio para abandonar perseguição (2x detecção)
 #define RAIO_DETECCAO_BOSS              200.0f  // Raio de detecção do boss
 
 /* Velocidades */
 #define VELOCIDADE_PATRULHA             0.7f    // Velocidade durante patrulha
-#define VELOCIDADE_PERSEGUICAO          1.2f    // Velocidade ao perseguir animal
+#define VELOCIDADE_PERSEGUICAO          1.3f    // Velocidade ao perseguir animal
 #define VELOCIDADE_PERSEGUICAO_BOSS     1.4f    // Velocidade do boss
 
 /* Margem de Segurança para Fuga do Animal */
 #define MARGEM_SEGURANCA_BORDA          100.0f   // Distância da borda para animal evitar
-#define PESO_FUGA_CENTRO                0.75f   // Peso da direção ao centro (0.0-1.0)
+#define PESO_FUGA_CENTRO                0.30f   // Peso da direção ao centro (0.0-1.0)
 
 /* Distâncias Mínimas */
 #define DISTANCIA_MINIMA_PERSEGUICAO    15.0f   // Distância mínima para parar de perseguir
-#define DISTANCIA_OBJETIVO_PATRULHA     5.0f    // Distância para considerar chegada ao ponto
+#define DISTANCIA_OBJETIVO_PATRULHA     10.0f    // Distância para considerar chegada ao ponto
 
 /* Margem de Patrulha */
 #define MARGEM_PATRULHA                 50.0f   // Margem das bordas para pontos de patrulha
@@ -52,6 +52,6 @@
 #define RAIO_CACADOR                    13.0f   // Raio físico do caçador
 
 /* Multiplicadores de Comportamento */
-#define MULTIPLICADOR_FUGA_ANIMAL       1.6f    // Multiplicador de velocidade do animal em fuga
+#define MULTIPLICADOR_FUGA_ANIMAL       1.8f    // Multiplicador de velocidade do animal em fuga
 
 #endif // CONFIG_CACADOR_H

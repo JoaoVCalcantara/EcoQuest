@@ -13,6 +13,15 @@ extern void marcar_reinicio_jogo();
 
 // ========== FUNÇÕES AUXILIARES ==========
 
+static void registrar_posicao_alvo(Cacador* cacador, float x, float y) {
+    if (!cacador) return;
+    cacador->penultimo_animal_x = cacador->ultimo_animal_x;
+    cacador->penultimo_animal_y = cacador->ultimo_animal_y;
+    cacador->ultimo_animal_x = x;
+    cacador->ultimo_animal_y = y;
+    if (cacador->contador_posicao_animal < 2) cacador->contador_posicao_animal++;
+}
+
 static void sincronizar_dados_cacador(Cacador* cacador) {
     cacador->vida = cacador->dados_batalha.vida_atual;
     cacador->vida_maxima = cacador->dados_batalha.vida_maxima;
@@ -67,6 +76,8 @@ static void limitar_posicao_cacador(float* x, float* y, float raio,
 
 static void limitar_posicao_cacador_global(float* x, float* y, float raio,
     float largura, float altura, JogoCenas cenario) {
+
+    (void)cenario; // parâmetro presente para compatibilidade de assinatura, evita warning de variável não utilizada
 
     if (*x < raio) *x = raio;
     if (*y < raio) *y = raio;
@@ -178,6 +189,13 @@ void iniciar_cacador(Cacador* cacador, float x, float y, const char* nome,
         cacador->sprite_cacador = criar_sprite(sprite_path);
         cacador->usar_sprite = (cacador->sprite_cacador && cacador->sprite_cacador->carregado);
     }
+
+    // Inicializa histórico de posições do alvo
+    cacador->ultimo_animal_x = 0.0f;
+    cacador->ultimo_animal_y = 0.0f;
+    cacador->penultimo_animal_x = 0.0f;
+    cacador->penultimo_animal_y = 0.0f;
+    cacador->contador_posicao_animal = 0;
 }
 
 void iniciar_cacador_com_alvo(Cacador* cacador, float x, float y,
@@ -245,6 +263,10 @@ void aplicar_dano_cacador_em_animal(Cacador* cacador, Bot* bot, float delta_time
     if (!verificar_colisao_cacador_animal(cacador, bot)) {
         return;  // CORREÇÃO: Não reseta cooldown, apenas retorna
     }
+
+    // --- GLOBALIZAÇÃO DO RASTREIO: registra posição sempre que o caçador encosta no animal ---
+    registrar_posicao_alvo(cacador, bot->x, bot->y);
+    // -------------------------------------------------------------------------------
 
     // Só aplica dano se o cooldown permitir
     if (cacador->cooldown_dano <= 0.0f) {
@@ -327,10 +349,10 @@ void cacador_patrulhar(Cacador* cacador, float delta_time,
         cacador->tempo_espera += delta_time;
 
         // Tempo de espera aleatório
-        float tempo_espera_aleatorio = TEMPO_ESPERA_PATRULHA * 0.75f + 
+        float tempo_espera_aleatoria = TEMPO_ESPERA_PATRULHA * 0.75f + 
             ((float)rand() / RAND_MAX) * TEMPO_ESPERA_PATRULHA;
 
-        if (cacador->tempo_espera >= tempo_espera_aleatorio) {
+        if (cacador->tempo_espera >= tempo_espera_aleatoria) {
             float min_x = 0.0f, max_x = largura_mapa;
             float min_y = 0.0f, max_y = altura_mapa;
 
@@ -400,6 +422,7 @@ void atualizar_cacador(Cacador* cacador, float animal_x, float animal_y,
     }
 
     Bot* alvo = cacador->alvo;
+    // Fix: simplifica expressão evitando operador vírgula inútil (corrige warning)
     bool alvo_valido = (alvo && alvo->ativo && (cacador->cenario == (JogoCenas)alvo->cenario));
 
     if (!alvo_valido) {
@@ -407,11 +430,21 @@ void atualizar_cacador(Cacador* cacador, float animal_x, float animal_y,
         return;
     }
 
+    // atualiza coordenadas reais do animal (pode ser usadas para registro)
     animal_x = alvo->x;
     animal_y = alvo->y;
     animal_ativo = alvo->ativo;
 
     bool animal_detectado = animal_ativo && verificar_deteccao_animal(cacador, animal_x, animal_y);
+
+    // Se detectou o animal neste frame, atualiza histórico (penúltima <- última; última <- atual)
+    if (animal_detectado) {
+        cacador->penultimo_animal_x = cacador->ultimo_animal_x;
+        cacador->penultimo_animal_y = cacador->ultimo_animal_y;
+        cacador->ultimo_animal_x = animal_x;
+        cacador->ultimo_animal_y = animal_y;
+        cacador->contador_posicao_animal = (cacador->contador_posicao_animal < 2) ? (cacador->contador_posicao_animal + 1) : 2;
+    }
 
     switch (cacador->estado) {
     case CACADOR_PATRULHANDO:
@@ -431,6 +464,52 @@ void atualizar_cacador(Cacador* cacador, float animal_x, float animal_y,
         float dy = animal_y - cacador->y;
         float distancia = sqrtf(dx * dx + dy * dy);
 
+        // Se animal não detectado, usar última posição conhecida como alvo
+        if (!animal_detectado) {
+            if (cacador->contador_posicao_animal > 0) {
+                // usa última posição conhecida
+                float target_x = cacador->ultimo_animal_x;
+                float target_y = cacador->ultimo_animal_y;
+                float dx2 = target_x - cacador->x;
+                float dy2 = target_y - cacador->y;
+                float dist2 = sqrtf(dx2 * dx2 + dy2 * dy2);
+
+                // se muito longe da última posição conhecida, considera abandonar
+                if (dist2 > cacador->raio_abandono) {
+                    cacador->estado = CACADOR_PATRULHANDO;
+                    cacador->cooldown_dano = 0.0f;
+                    break;
+                }
+
+                // segue até a última posição conhecida
+                if (dist2 > DISTANCIA_MINIMA_PERSEGUICAO) {
+                    float vel = cacador->velocidade_perseguicao * delta_time * 60.0f;
+                    cacador->x += (dx2 / dist2) * vel;
+                    cacador->y += (dy2 / dist2) * vel;
+                    limitar_posicao_cacador(&cacador->x, &cacador->y, cacador->raio,
+                        largura_mapa, altura_mapa, cacador->cenario);
+                } else {
+                    // alcançou a última posição conhecida -> tentar ir para penúltima se existir
+                    if (cacador->contador_posicao_animal >= 2) {
+                        cacador->ultimo_animal_x = cacador->penultimo_animal_x;
+                        cacador->ultimo_animal_y = cacador->penultimo_animal_y;
+                        cacador->contador_posicao_animal = 1;
+                    } else {
+                        // não há mais histórico, abandona
+                        cacador->estado = CACADOR_PATRULHANDO;
+                        cacador->cooldown_dano = 0.0f;
+                    }
+                }
+                break; // já processado perseguição usando histórico
+            } else {
+                // sem histórico, abandona imediatamente
+                cacador->estado = CACADOR_PATRULHANDO;
+                cacador->cooldown_dano = 0.0f;
+                break;
+            }
+        }
+
+        // Se aqui, animal_detectado == true -> comportamento normal de perseguição
         if (!animal_ativo || distancia > cacador->raio_abandono) {
             cacador->estado = CACADOR_PATRULHANDO;
             cacador->cooldown_dano = 0.0f;
@@ -579,4 +658,9 @@ void destruir_cacador(Cacador* cacador) {
         destruir_sprite(cacador->sprite_cacador);
         cacador->sprite_cacador = NULL;
     }
+}
+
+// Implementação pública que usa o helper estático já existente
+void cacador_registrar_posicao(Cacador* cacador, float x, float y) {
+    registrar_posicao_alvo(cacador, x, y);
 }

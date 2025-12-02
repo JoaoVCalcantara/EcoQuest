@@ -1,4 +1,6 @@
-﻿#include "inimigo.h"
+﻿#define _CRT_SECURE_NO_WARNINGS
+
+#include "inimigo.h"
 #include "cenario.h"
 #include "sprites.h"
 #include "entidades.h"
@@ -9,8 +11,17 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
-// ========== FUNÇÕES AUXILIARES ==========
+/* Parada ocasional: parâmetros ajustáveis aqui */
+static const int    PARAR_CHANCE_PORCENT = 40;          // % de chance ao escolher nova direção de ficar parado
+static const float PARAR_DURACAO_MIN = 1.0f;       // segundos mínimo parado
+static const float PARAR_DURACAO_VAR = 2.0f;       // variação adicionada (0..PARAR_DURACAO_VAR)
+
+/* Limiar para considerar "parado" (em pixels por frame equivalente) */
+static const float STOPPED_THRESHOLD = 1.0f;
+
+/* ========== FUNÇÕES AUXILIARES ========== */
 
 static bool posicao_valida(const Bot* bot, float x, float y) {
     if (bot->area_restrita.tipo == AREA_NENHUMA) return true;
@@ -144,18 +155,22 @@ static void calcular_direcao_fuga_segura(Bot* bot, float cacador_x, float cacado
         break;
     }
 
+    /* direção básica: fugir do caçador */
     float dx = bot->x - cacador_x;
     float dy = bot->y - cacador_y;
     float distancia = sqrtf(dx * dx + dy * dy);
-
     if (distancia > 0.1f) {
         *fuga_x = dx / distancia;
         *fuga_y = dy / distancia;
+    } else {
+        /* fallback aleatório se sobrepostos */
+        float ang = ((float)rand() / RAND_MAX) * 6.283185f;
+        *fuga_x = cosf(ang);
+        *fuga_y = sinf(ang);
     }
 
-    // Calcular centro do cenário (ou centro da área restrita se aplicável)
+    /* centro alvo (cenário ou área restrita) */
     float centro_x, centro_y;
-    
     if (bot->area_restrita.tipo == AREA_ELIPTICA) {
         centro_x = bot->area_restrita.centro_elipse_x;
         centro_y = bot->area_restrita.centro_elipse_y;
@@ -167,39 +182,91 @@ static void calcular_direcao_fuga_segura(Bot* bot, float cacador_x, float cacado
         centro_y = (min_y + max_y) / 2.0f;
     }
 
-    // Verificar proximidade com bordas
+    /* vetor do boto para o centro (direção interna) */
+    float dx_centro = centro_x - bot->x;
+    float dy_centro = centro_y - bot->y;
+    float dist_centro = sqrtf(dx_centro * dx_centro + dy_centro * dy_centro);
+    float centro_dir_x = 0.0f, centro_dir_y = 0.0f;
+    if (dist_centro > 0.001f) {
+        centro_dir_x = dx_centro / dist_centro;
+        centro_dir_y = dy_centro / dist_centro;
+    }
+
+    /* (restante inalterado) */
+    if (bot->area_restrita.tipo == AREA_ELIPTICA) {
+        float a = bot->area_restrita.raio_horizontal;
+        float b = bot->area_restrita.raio_vertical;
+        if (a > EPSILON_ELIPSE && b > EPSILON_ELIPSE) {
+            float dx_e = bot->x - bot->area_restrita.centro_elipse_x;
+            float dy_e = bot->y - bot->area_restrita.centro_elipse_y;
+            float termo = (dx_e * dx_e) / (a * a) + (dy_e * dy_e) / (b * b);
+
+            float peso_centro = PESO_FUGA_CENTRO;
+            if (termo > ELIPSE_PERTO_BORDA) peso_centro = fminf(0.95f, PESO_FUGA_CENTRO + 0.20f);
+
+            if (dist_centro < 1.2f) {
+                float tx = -centro_dir_y;
+                float ty =  centro_dir_x;
+                float s = 0.4f + ((float)rand() / RAND_MAX) * 0.4f;
+                *fuga_x = centro_dir_x * (1.0f - s) + tx * s;
+                *fuga_y = centro_dir_y * (1.0f - s) + ty * s;
+            }
+            else {
+                *fuga_x = (*fuga_x * (1.0f - peso_centro)) + (centro_dir_x * peso_centro);
+                *fuga_y = (*fuga_y * (1.0f - peso_centro)) + (centro_dir_y * peso_centro);
+            }
+
+            float mag = sqrtf((*fuga_x) * (*fuga_x) + (*fuga_y) * (*fuga_y));
+            if (mag > 0.001f) {
+                *fuga_x /= mag;
+                *fuga_y /= mag;
+            } else {
+                if (dist_centro > 0.001f) {
+                    *fuga_x = centro_dir_x;
+                    *fuga_y = centro_dir_y;
+                } else {
+                    float ang = ((float)rand() / RAND_MAX) * 6.283185f;
+                    *fuga_x = cosf(ang);
+                    *fuga_y = sinf(ang);
+                }
+            }
+
+            float passo_teste = bot->velocidade * bot->fuga_velocidade_multiplicador * 0.6f;
+            float teste_x = bot->x + (*fuga_x) * passo_teste;
+            float teste_y = bot->y + (*fuga_y) * passo_teste;
+            if (!posicao_valida(bot, teste_x, teste_y)) {
+                float tang_x = -(*fuga_y);
+                float tang_y =  (*fuga_x);
+                float try1_x = bot->x + tang_x * passo_teste * 0.6f;
+                float try1_y = bot->y + tang_y * passo_teste * 0.6f;
+                float try2_x = bot->x - tang_x * passo_teste * 0.6f;
+                float try2_y = bot->y - tang_y * passo_teste * 0.6f;
+                if (posicao_valida(bot, try1_x, try1_y)) {
+                    *fuga_x = tang_x; *fuga_y = tang_y;
+                } else if (posicao_valida(bot, try2_x, try2_y)) {
+                    *fuga_x = -tang_x; *fuga_y = -tang_y;
+                } else if (dist_centro > 0.001f) {
+                    *fuga_x = centro_dir_x + (((float)rand() / RAND_MAX) - 0.5f) * 0.2f;
+                    *fuga_y = centro_dir_y + (((float)rand() / RAND_MAX) - 0.5f) * 0.2f;
+                    float mm = sqrtf((*fuga_x)*(*fuga_x) + (*fuga_y)*(*fuga_y));
+                    if (mm > 0.001f) { *fuga_x /= mm; *fuga_y /= mm; }
+                }
+            }
+
+            return;
+        }
+    }
+
     bool perto_borda_esquerda = bot->x < (min_x + MARGEM_SEGURANCA_BORDA);
     bool perto_borda_direita = bot->x > (max_x - MARGEM_SEGURANCA_BORDA);
     bool perto_borda_cima = bot->y < (min_y + MARGEM_SEGURANCA_BORDA);
     bool perto_borda_baixo = bot->y > (max_y - MARGEM_SEGURANCA_BORDA);
 
-    // CORREÇÃO PARA ELIPSE: verificar se está perto da borda da elipse
-    if (bot->area_restrita.tipo == AREA_ELIPTICA) {
-        float dx_elipse = bot->x - bot->area_restrita.centro_elipse_x;
-        float dy_elipse = bot->y - bot->area_restrita.centro_elipse_y;
-        float a = bot->area_restrita.raio_horizontal;
-        float b = bot->area_restrita.raio_vertical;
-        
-        float termo_x = (dx_elipse * dx_elipse) / (a * a);
-        float termo_y = (dy_elipse * dy_elipse) / (b * b);
-        
-        // Se está perto da borda da elipse
-        if (termo_x + termo_y > ELIPSE_PERTO_BORDA) {
-            perto_borda_esquerda = true;
-        }
-    }
-
-    // Se está perto de alguma borda, ajustar direção para o centro
     if (perto_borda_esquerda || perto_borda_direita || perto_borda_cima || perto_borda_baixo) {
-        float dx_centro = centro_x - bot->x;
-        float dy_centro = centro_y - bot->y;
-        float dist_centro = sqrtf(dx_centro * dx_centro + dy_centro * dy_centro);
-        
         if (dist_centro > 0.1f) {
             *fuga_x = (*fuga_x * (1.0f - PESO_FUGA_CENTRO)) + ((dx_centro / dist_centro) * PESO_FUGA_CENTRO);
             *fuga_y = (*fuga_y * (1.0f - PESO_FUGA_CENTRO)) + ((dy_centro / dist_centro) * PESO_FUGA_CENTRO);
-            
-            // Normalizar
+
             float mag = sqrtf((*fuga_x) * (*fuga_x) + (*fuga_y) * (*fuga_y));
             if (mag > 0.1f) {
                 *fuga_x /= mag;
@@ -222,7 +289,7 @@ void iniciar_bot(Bot* bot, float x, float y, const char* nome, const char* tipo,
     bot->direcao_x = cosf(angulo_inicial);
     bot->direcao_y = sinf(angulo_inicial);
     
-    // Tempo de mudança inicial aleatório
+    // Tempo de mudança inicial aleatória
     bot->tempo_mudanca = TEMPO_MUDANCA_MIN + ((float)rand() / RAND_MAX) * TEMPO_MUDANCA_VARIACAO;
     
     bot->ativo = true;
@@ -254,7 +321,11 @@ void iniciar_bot(Bot* bot, float x, float y, const char* nome, const char* tipo,
     bot->animal_data.vida_atual = VIDA_MAXIMA_ANIMAL;
 
     bot->vida_visual_maxima = VIDA_VISUAL_MAXIMA_ANIMAL;
-    bot->vida_visual_atual = VIDA_VISUAL_MAXIMA_ANIMAL;
+    bot->vida_visual_atual = VIDA_MAXIMA_ANIMAL;
+
+    // Inicializa estado de parada ocasional
+    bot->parado = false;
+    bot->parado_timer = 0.0f;
 }
 
 void iniciar_bot_com_sprite(Bot* bot, float x, float y, const char* nome, const char* tipo, int cenario, const char* caminho_sprite) {
@@ -299,6 +370,9 @@ void iniciar_bot_com_sprite_e_fundo(Bot* bot, float x, float y, const char* nome
 }
 
 static void garantir_direcao_valida(Bot* bot) {
+    // não força direção enquanto o bot estiver parado
+    if (bot->parado) return;
+
     float mag = fabsf(bot->direcao_x) + fabsf(bot->direcao_y);
     if (mag < 0.001f) {
         float ang = ((float)rand() / RAND_MAX) * 6.283185f;
@@ -308,8 +382,25 @@ static void garantir_direcao_valida(Bot* bot) {
     }
 }
 
-void atualizar_bot(Bot* bot, float delta_time, float largura_mapa, float altura_mapa) {
+/* Ajustada assinatura para corresponder ao header: (largura_mapa, altura_mapa, delta_time) */
+void atualizar_bot(Bot* bot, float largura_mapa, float altura_mapa, float delta_time) {
     if (!bot->ativo) return;
+
+    /* DEBUG: log reduzido para o BOTO */
+    if (bot->animal_data.nome && strcmp(bot->animal_data.nome, NOME_ANIMAL_BOTO) == 0) {
+        static int _dbg_counter = 0;
+        _dbg_counter++;
+        if (_dbg_counter % 60 == 0) { /* a cada ~60 frames */
+            float dx = bot->x - bot->area_restrita.centro_elipse_x;
+            float dy = bot->y - bot->area_restrita.centro_elipse_y;
+            float a = bot->area_restrita.raio_horizontal;
+            float b = bot->area_restrita.raio_vertical;
+            float termo = 0.0f;
+            if (a > 0.0f && b > 0.0f) termo = (dx*dx)/(a*a) + (dy*dy)/(b*b);
+            printf("[DBG BOTO] x=%.2f y=%.2f dir=(%.2f,%.2f) tempo_mud=%.2f termo_elipse=%.3f fugindo=%d vel=%.3f\n",
+                bot->x, bot->y, bot->direcao_x, bot->direcao_y, bot->tempo_mudanca, termo, bot->fugindo ? 1 : 0, bot->velocidade);
+        }
+    }
 
     if (bot->cooldown_colisao > 0.0f) {
         bot->cooldown_colisao -= delta_time;
@@ -321,6 +412,22 @@ void atualizar_bot(Bot* bot, float delta_time, float largura_mapa, float altura_
         if (bot->fuga_timer <= 0.0f) {
             bot->fugindo = false;
             garantir_direcao_valida(bot);
+        }
+    }
+
+    // Se está parado, decrementar timer e manter inerte
+    if (bot->parado) {
+        bot->parado_timer -= delta_time;
+        if (bot->parado_timer > 0.0f) {
+            // permanece parado neste tick
+            return;
+        } else {
+            // sair do estado parado: escolhe nova direção aleatória e reinicia tempo_mudanca
+            bot->parado = false;
+            float ang = ((float)rand() / RAND_MAX) * 6.283185f;
+            bot->direcao_x = cosf(ang);
+            bot->direcao_y = sinf(ang);
+            bot->tempo_mudanca = TEMPO_MUDANCA_MIN + ((float)rand() / RAND_MAX) * TEMPO_MUDANCA_VARIACAO;
         }
     }
 
@@ -371,6 +478,19 @@ void atualizar_bot(Bot* bot, float delta_time, float largura_mapa, float altura_
             }
         }
 
+        // chance de ficar parado em vez de escolher direção
+        float chance = (float)(rand() % 100);
+        if (chance < PARAR_CHANCE_PORCENT) {
+            bot->parado = true;
+            bot->parado_timer = PARAR_DURACAO_MIN + ((float)rand() / RAND_MAX) * PARAR_DURACAO_VAR;
+            bot->direcao_x = 0.0f;
+            bot->direcao_y = 0.0f;
+            // garante que não vai tentar trocar direção por um tempo (uso parado_timer)
+            // devolve tempo_mudanca para um valor razoável após o parado terminar
+            bot->tempo_mudanca = bot->parado_timer;
+            return;
+        }
+
         bot->direcao_x = cosf(melhor_angulo);
         bot->direcao_y = sinf(melhor_angulo);
         bot->tempo_mudanca = TEMPO_MUDANCA_MIN + ((float)rand() / RAND_MAX) * TEMPO_MUDANCA_VARIACAO;
@@ -378,9 +498,11 @@ void atualizar_bot(Bot* bot, float delta_time, float largura_mapa, float altura_
 
     garantir_direcao_valida(bot);
 
+    /* Se aqui, movimento normal */
     float velocidade = bot->velocidade * (bot->fugindo ? bot->fuga_velocidade_multiplicador : 1.0f);
-    float novo_x = bot->x + bot->direcao_x * velocidade * delta_time * 60.0f;
-    float novo_y = bot->y + bot->direcao_y * velocidade * delta_time * 60.0f;
+    float passo = velocidade * delta_time * 60.0f;
+    float novo_x = bot->x + bot->direcao_x * passo;
+    float novo_y = bot->y + bot->direcao_y * passo;
 
     float margem = bot->raio + 5.0f;
     bool borda = false;
@@ -413,7 +535,44 @@ void atualizar_bot(Bot* bot, float delta_time, float largura_mapa, float altura_
             bot->x = novo_x;
             bot->y = novo_y;
         } else {
-            bot->tempo_mudanca = TEMPO_MUDANCA_NOVA_DIRECAO;
+            // tentativa de escapar: primeiro tenta mover perpendicularmente (duas direções)
+            bool moved = false;
+            float perp_x = -bot->direcao_y;
+            float perp_y =  bot->direcao_x;
+            for (int s = 0; s < 2 && !moved; s++) {
+                float sinal = (s == 0) ? 1.0f : -1.0f;
+                float tx = bot->x + perp_x * sinal * passo * 0.8f;
+                float ty = bot->y + perp_y * sinal * passo * 0.8f;
+                if (posicao_valida(bot, tx, ty)) {
+                    bot->x = tx;
+                    bot->y = ty;
+                    bot->direcao_x = perp_x * sinal;
+                    bot->direcao_y = perp_y * sinal;
+                    moved = true;
+                    break;
+                }
+            }
+
+            // se não conseguiu, tenta reduzir o passo progressivamente
+            if (!moved) {
+                float factor = 0.5f;
+                for (int k = 0; k < 4 && !moved; k++) {
+                    float tx = bot->x + bot->direcao_x * passo * factor;
+                    float ty = bot->y + bot->direcao_y * passo * factor;
+                    if (posicao_valida(bot, tx, ty)) {
+                        bot->x = tx;
+                        bot->y = ty;
+                        moved = true;
+                        break;
+                    }
+                    factor *= 0.5f;
+                }
+            }
+
+            // somente se todas as tentativas falharem, marca nova direção (evita reset contínuo)
+            if (!moved) {
+                bot->tempo_mudanca = TEMPO_MUDANCA_NOVA_DIRECAO;
+            }
         }
     } else {
         bot->x = novo_x;
@@ -424,9 +583,15 @@ void atualizar_bot(Bot* bot, float delta_time, float largura_mapa, float altura_
     corrigir_posicao_borda(bot, largura_mapa, altura_mapa);
 }
 
-void atualizar_bot_com_cacador(Bot* bot, Cacador* cacador, float delta_time, float largura_mapa, float altura_mapa) {
+/* Ajustada assinatura para corresponder ao header: (largura_mapa, altura_mapa, delta_time) */
+void atualizar_bot_com_cacador(Bot* bot, Cacador* cacador, float largura_mapa, float altura_mapa, float delta_time) {
     if (!bot->ativo) return;
 
+    // guarda posição anterior para detectar se o animal "parou"
+    float prev_x = bot->x;
+    float prev_y = bot->y;
+
+    /* DEBUG: encaminha também para atualização normal (mostra logs ali) */
     if (!cacador || !cacador->ativo || cacador->derrotado) {
         if (fabsf(bot->direcao_x) < 0.001f && fabsf(bot->direcao_y) < 0.001f) {
             float ang = ((float)rand() / RAND_MAX) * 6.283185f;
@@ -434,7 +599,7 @@ void atualizar_bot_com_cacador(Bot* bot, Cacador* cacador, float delta_time, flo
             bot->direcao_y = sinf(ang);
             bot->tempo_mudanca = TEMPO_MUDANCA_MIN;
         }
-        atualizar_bot(bot, delta_time, largura_mapa, altura_mapa);
+        atualizar_bot(bot, largura_mapa, altura_mapa, delta_time);
         return;
     }
 
@@ -460,23 +625,81 @@ void atualizar_bot_com_cacador(Bot* bot, Cacador* cacador, float delta_time, flo
                 bot->y = novo_y;
             }
             else {
-                float perpendicular_x = -fuga_y;
-                float perpendicular_y =  fuga_x;
+                bool moved = false;
 
-                float teste_x = bot->x + perpendicular_x * 0.8f * velocidade_fuga * delta_time * 60.0f;
-                float teste_y = bot->y + perpendicular_y * 0.8f * velocidade_fuga * delta_time * 60.0f;
+                // 1) Tentar usar reflexão da direção de fuga contra a normal da elipse (se elíptica)
+                if (bot->area_restrita.tipo == AREA_ELIPTICA) {
+                    float cx = bot->area_restrita.centro_elipse_x;
+                    float cy = bot->area_restrita.centro_elipse_y;
+                    float a = bot->area_restrita.raio_horizontal;
+                    float b = bot->area_restrita.raio_vertical;
 
-                if (posicao_valida(bot, teste_x, teste_y)) {
-                    bot->x = teste_x;
-                    bot->y = teste_y;
-                } else {
-                    teste_x = bot->x - perpendicular_x * 0.8f * velocidade_fuga * delta_time * 60.0f;
-                    teste_y = bot->y - perpendicular_y * 0.8f * velocidade_fuga * delta_time * 60.0f;
-
-                    if (posicao_valida(bot, teste_x, teste_y)) {
-                        bot->x = teste_x;
-                        bot->y = teste_y;
+                    if (a > EPSILON_ELIPSE && b > EPSILON_ELIPSE) {
+                        // normal da elipse no ponto (aprox) n = ( (x-cx)/a^2, (y-cy)/b^2 )
+                        float nx = (bot->x - cx) / (a * a);
+                        float ny = (bot->y - cy) / (b * b);
+                        float nmag = sqrtf(nx * nx + ny * ny);
+                        if (nmag > 1e-6f) {
+                            nx /= nmag; ny /= nmag;
+                            // refletir vetor fuga em relação à normal: r = v - 2*(v·n)*n
+                            float dot = fuga_x * nx + fuga_y * ny;
+                            float rx = fuga_x - 2.0f * dot * nx;
+                            float ry = fuga_y - 2.0f * dot * ny;
+                            float rmag = sqrtf(rx * rx + ry * ry);
+                            if (rmag > 1e-6f) {
+                                rx /= rmag; ry /= rmag;
+                                float tx = bot->x + rx * 0.8f * velocidade_fuga * delta_time * 60.0f;
+                                float ty = bot->y + ry * 0.8f * velocidade_fuga * delta_time * 60.0f;
+                                if (posicao_valida(bot, tx, ty)) {
+                                    bot->x = tx;
+                                    bot->y = ty;
+                                    bot->direcao_x = rx;
+                                    bot->direcao_y = ry;
+                                    moved = true;
+                                }
+                            }
+                        }
                     }
+                }
+
+                // 2) Tentar mover perpendicularmente (duas direções), caso reflexão falhe
+                if (!moved) {
+                    float perpendicular_x = -fuga_y;
+                    float perpendicular_y =  fuga_x;
+                    for (int s = 0; s < 2 && !moved; s++) {
+                        float sinal = (s == 0) ? 1.0f : -1.0f;
+                        float teste_x = bot->x + perpendicular_x * sinal * 0.8f * velocidade_fuga * delta_time * 60.0f;
+                        float teste_y = bot->y + perpendicular_y * sinal * 0.8f * velocidade_fuga * delta_time * 60.0f;
+                        if (posicao_valida(bot, teste_x, teste_y)) {
+                            bot->x = teste_x;
+                            bot->y = teste_y;
+                            bot->direcao_x = perpendicular_x * sinal;
+                            bot->direcao_y = perpendicular_y * sinal;
+                            moved = true;
+                            break;
+                        }
+                    }
+                }
+
+                // 3) Se ainda não conseguiu, reduzir o passo progressivamente na direção original de fuga
+                if (!moved) {
+                    float factor = 0.5f;
+                    for (int k = 0; k < 4 && !moved; k++) {
+                        float tx = bot->x + fuga_x * velocidade_fuga * delta_time * 60.0f * factor;
+                        float ty = bot->y + fuga_y * velocidade_fuga * delta_time * 60.0f * factor;
+                        if (posicao_valida(bot, tx, ty)) {
+                            bot->x = tx;
+                            bot->y = ty;
+                            moved = true;
+                            break;
+                        }
+                        factor *= 0.5f;
+                    }
+                }
+
+                // 4) fallback: marcar nova direção (evita reset contínuo do tempo de mudança)
+                if (!moved) {
+                    bot->tempo_mudanca = TEMPO_MUDANCA_NOVA_DIRECAO;
                 }
             }
         } else {
@@ -484,14 +707,36 @@ void atualizar_bot_com_cacador(Bot* bot, Cacador* cacador, float delta_time, flo
             bot->y = novo_y;
         }
 
+        // atualiza direção e evita trocar de direção imediatamente (mantém fuga)
         bot->direcao_x = fuga_x;
         bot->direcao_y = fuga_y;
-        bot->tempo_mudanca = 1.0f;
+        // não forçar tempo_mudanca grande aqui — deixamos fuga_timer controlar a duração da fuga
+        // bot->tempo_mudanca = 1.0f;
 
         corrigir_posicao_area_restrita(bot);
     }
     else {
-        atualizar_bot(bot, delta_time, largura_mapa, altura_mapa);
+        // chamada atualizada para nova ordem de parâmetros
+        atualizar_bot(bot, largura_mapa, altura_mapa, delta_time);
+    }
+
+    // Detecta se o animal praticamente não se moveu neste tick (ou seja "parou")
+    {
+        float dxm = bot->x - prev_x;
+        float dym = bot->y - prev_y;
+        float moved = sqrtf(dxm * dxm + dym * dym);
+
+        if (!bot->fugindo && moved < STOPPED_THRESHOLD && cacador) {
+            /* evita registrar repetidamente a mesma coordenada sem necessidade:
+               registra se o caçador não tiver histórico ou se a última posição
+               conhecida for suficientemente diferente */
+            float last_dx = cacador->ultimo_animal_x - bot->x;
+            float last_dy = cacador->ultimo_animal_y - bot->y;
+            if (cacador->contador_posicao_animal == 0 ||
+                fabsf(last_dx) > 0.5f || fabsf(last_dy) > 0.5f) {
+                cacador_registrar_posicao(cacador, bot->x, bot->y);
+            }
+        }
     }
 
     corrigir_posicao_borda(bot, largura_mapa, altura_mapa);

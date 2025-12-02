@@ -3,121 +3,75 @@
 
 /* === CONFIGURAÇÕES DE UI / BATALHA === */
 
-/* === CONFIGURAÇÕES DE UI / BATALHA === */
-
-/* Fallback relativo do jogador na tela de batalha (0.0 - 1.0) */
-#define BATALHA_JOGADOR_X_RATIO    0.0f
-#define BATALHA_JOGADOR_Y_RATIO    0.0f
-
-/* Escala padrão do sprite do jogador na tela de batalha (fallback) */
-#define BATALHA_JOGADOR_ESCALA     0.30f
-
 /* Caixa de texto - escala e offset padrão (pixels) */
 #define BATALHA_CAIXA_ESCALA       0.30f
 #define BATALHA_CAIXA_OFFSET_Y     10.0f
 #define BATALHA_CAIXA_MIN_MARGIN_X 10.0f
 #define BATALHA_CAIXA_MIN_MARGIN_Y 5.0f
 
-/* === PADRÃO DE POSICIONAMENTO E ESCALA (ANIMAIS / CAÇADORES / JOGADOR) === */
-/* Valores em pixels para facilitar ajuste visual na tela de batalha. */
+/* === POSICIONAMENTO POR CENÁRIO DE BATALHA === */
+/* Cada cenário define 3 setores fixos: JOGADOR, ANIMAL e CAÇADOR */
 
-/* --- Animais (ConfigSpriteEntidade) --- */
-/* Onça */
-#define ENT_ONCA_X                  250.0f
-#define ENT_ONCA_Y                  325.0f
-#define ENT_ONCA_ESCALA             0.25f
+/* --- CENÁRIO: SELVA --- */
+#define SELVA_JOGADOR_X            350.0f
+#define SELVA_JOGADOR_Y	           425.0f
+#define SELVA_JOGADOR_ESCALA       0.45f
 
-/* Jacaré */
-#define ENT_JACARE_X                385.0f
-#define ENT_JACARE_Y                175.0f
-#define ENT_JACARE_ESCALA           0.25f
+#define SELVA_ANIMAL_X             380.0f
+#define SELVA_ANIMAL_Y             425.0f
+#define SELVA_ANIMAL_ESCALA        0.25f
 
-/* Boto */
-#define ENT_BOTO_X                  280.0f
-#define ENT_BOTO_Y                  320.0f
-#define ENT_BOTO_ESCALA             0.25f
+#define SELVA_CACADOR_X            885.0f
+#define SELVA_CACADOR_Y            445.0f
+#define SELVA_CACADOR_ESCALA       0.30f
 
-/* Lobo (inclui "lobo guara") */
-#define ENT_LOBO_X                  250.0f
-#define ENT_LOBO_Y                  325.0f
-#define ENT_LOBO_ESCALA             0.25f
+/* --- CENÁRIO: PANTANO --- */
+#define PANTANO_JOGADOR_X          150.0f
+#define PANTANO_JOGADOR_Y          200.0f
+#define PANTANO_JOGADOR_ESCALA     0.45f
 
-/* --- Caçadores (ConfigSpriteEntidade) --- */
-/* Caçador Selva */
-#define ENT_CACADOR_SELVA_X         250.0f
-#define ENT_CACADOR_SELVA_Y         300.0f
-#define ENT_CACADOR_SELVA_ESCALA    0.25f
+#define PANTANO_ANIMAL_X           400.0f
+#define PANTANO_ANIMAL_Y           400.0f
+#define PANTANO_ANIMAL_ESCALA      0.25f
 
-/* Caçador Pantano */
-#define ENT_CACADOR_PANTANO_X       255.0f
-#define ENT_CACADOR_PANTANO_Y       125.0f
-#define ENT_CACADOR_PANTANO_ESCALA  0.25f
+#define PANTANO_CACADOR_X          400.0f
+#define PANTANO_CACADOR_Y          400.0f
+#define PANTANO_CACADOR_ESCALA     0.30f
 
-/* Caçador Lago */
-#define ENT_CACADOR_LAGO_X          280.0f
-#define ENT_CACADOR_LAGO_Y          320.0f
-#define ENT_CACADOR_LAGO_ESCALA     0.25f
+/* --- CENÁRIO: LAGO --- */
+#define LAGO_JOGADOR_X             175.0f
+#define LAGO_JOGADOR_Y             175.0f
+#define LAGO_JOGADOR_ESCALA        0.45f
 
-/* Caçador Cerrado */
-#define ENT_CACADOR_CERRADO_X       250.0f
-#define ENT_CACADOR_CERRADO_Y       200.0f
-#define ENT_CACADOR_CERRADO_ESCALA  0.25f
+#define LAGO_ANIMAL_X              280.0f
+#define LAGO_ANIMAL_Y              320.0f
+#define LAGO_ANIMAL_ESCALA         0.25f
 
-/* Caçador Chefe */
-#define ENT_CACADOR_CHEFE_X         250.0f
-#define ENT_CACADOR_CHEFE_Y         325.0f
-#define ENT_CACADOR_CHEFE_ESCALA    0.30f
+#define LAGO_CACADOR_X             280.0f
+#define LAGO_CACADOR_Y             320.0f
+#define LAGO_CACADOR_ESCALA        0.30f
 
-/* === Posição/escala do JOGADOR por animal (ConfigSpriteJogador) === */
-/* Se o valor de X/Y for <= 0 o código usará os ratios de BATALHA_JOGADOR_* */
-/* Valores migrados de batalha.c (configs_jogador) */
+/* --- CENÁRIO: CERRADO --- */
+#define CERRADO_JOGADOR_X          150.0f
+#define CERRADO_JOGADOR_Y          200.0f
+#define CERRADO_JOGADOR_ESCALA     0.45f
 
-#define JOGADOR_ONCA_X              380.0f
-#define JOGADOR_ONCA_Y              425.0f
-#define JOGADOR_ONCA_ESCALA         0.50f
+#define CERRADO_ANIMAL_X           250.0f
+#define CERRADO_ANIMAL_Y           325.0f
+#define CERRADO_ANIMAL_ESCALA      0.25f
 
-#define JOGADOR_JACARE_X            400.0f
-#define JOGADOR_JACARE_Y            400.0f
-#define JOGADOR_JACARE_ESCALA       0.50f
+#define CERRADO_CACADOR_X          250.0f
+#define CERRADO_CACADOR_Y          325.0f
+#define CERRADO_CACADOR_ESCALA     0.30f
 
-#define JOGADOR_BOTO_X              175.0f
-#define JOGADOR_BOTO_Y              175.0f
-#define JOGADOR_BOTO_ESCALA         0.50f
+/* --- CENÁRIO: BOSS (Caçador Chefe) --- */
+#define BOSS_JOGADOR_X             200.0f
+#define BOSS_JOGADOR_Y             170.0f
+#define BOSS_JOGADOR_ESCALA        0.45f
 
-#define JOGADOR_LOBO_X              150.0f
-#define JOGADOR_LOBO_Y              200.0f
-#define JOGADOR_LOBO_ESCALA         0.50f
-
-#define JOGADOR_LOBO_GUARA_X        100.0f
-#define JOGADOR_LOBO_GUARA_Y        150.0f
-#define JOGADOR_LOBO_GUARA_ESCALA   0.50f
-
-/* === Posição/escala do JOGADOR por CAÇADOR (NOVO) ===
-   Permite ajustar X/Y/escala do jogador especificamente quando enfrenta
-   um caçador — valores em pixels. Se algum for <= 0 usa os ratios. */
-#define JOGADOR_CACADOR_SELVA_X         380.0f
-#define JOGADOR_CACADOR_SELVA_Y         450.0f
-#define JOGADOR_CACADOR_SELVA_ESCALA    0.40f
-
-#define JOGADOR_CACADOR_PANTANO_X       400.0f
-#define JOGADOR_CACADOR_PANTANO_Y       430.0f
-#define JOGADOR_CACADOR_PANTANO_ESCALA  0.40f
-
-#define JOGADOR_CACADOR_LAGO_X          170.0f
-#define JOGADOR_CACADOR_LAGO_Y          180.0f
-#define JOGADOR_CACADOR_LAGO_ESCALA     0.40f
-
-#define JOGADOR_CACADOR_CERRADO_X       160.0f
-#define JOGADOR_CACADOR_CERRADO_Y       150.0f
-#define JOGADOR_CACADOR_CERRADO_ESCALA  0.40f
-
-#define JOGADOR_CACADOR_CHEFE_X         200.0f
-#define JOGADOR_CACADOR_CHEFE_Y         170.0f
-#define JOGADOR_CACADOR_CHEFE_ESCALA    0.45f
-
-
-
-/* === MENSAGENS, POSIÇÕES E CORES (mantidos) === */
+#define BOSS_CACADOR_X             250.0f
+#define BOSS_CACADOR_Y             325.0f
+#define BOSS_CACADOR_ESCALA        0.35f
 
 /* === MENSAGENS DO JOGO === */
 /* Áreas Bloqueadas */

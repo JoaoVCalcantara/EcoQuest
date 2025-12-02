@@ -10,8 +10,8 @@
 #include "bestiario.h"
 #include "cacador.h"
 #include "entidades.h"
-#include "config_jogo.h"       // NOVO: Configurações do jogo
-#include "config_ui.h"         // NOVO: Configurações de UI
+#include "config_jogo.h"
+#include "config_ui.h"
 #include "config_cacador.h"
 
 /* ==== Conteúdo reinserido: frases e funções de popup/lookup de frases ==== */
@@ -179,111 +179,95 @@ static void mostrar_popup_estudo(ALLEGRO_FONT* fonte, ALLEGRO_DISPLAY* display, 
     }
 }
 
-
-/* NOVA: Função unificada para obter configuração de sprite (usa macros em config_ui.h) */
-static ConfigSpriteEntidade obter_config_entidade(const char* nome) {
-    ConfigSpriteEntidade padrao = { "desconhecido", 280.0f, 250.0f, 0.25f };
-    if (!nome) return padrao;
-
-    /* compara com macros de nomes existentes (assume que NOME_* estão definidos) */
-    if (strcmp(nome, NOME_ANIMAL_ONCA) == 0) {
-        ConfigSpriteEntidade r = { NOME_ANIMAL_ONCA, ENT_ONCA_X, ENT_ONCA_Y, ENT_ONCA_ESCALA }; return r;
-    }
-    if (strcmp(nome, NOME_ANIMAL_JACARE) == 0) {
-        ConfigSpriteEntidade r = { NOME_ANIMAL_JACARE, ENT_JACARE_X, ENT_JACARE_Y, ENT_JACARE_ESCALA }; return r;
-    }
-    if (strcmp(nome, NOME_ANIMAL_BOTO) == 0) {
-        ConfigSpriteEntidade r = { NOME_ANIMAL_BOTO, ENT_BOTO_X, ENT_BOTO_Y, ENT_BOTO_ESCALA }; return r;
-    }
-    if (strcmp(nome, NOME_ANIMAL_LOBO) == 0) {
-        ConfigSpriteEntidade r = { NOME_ANIMAL_LOBO, ENT_LOBO_X, ENT_LOBO_Y, ENT_LOBO_ESCALA }; return r;
-    }
-    /* lidar com possível literal alternativo "lobo guara" */
-    if (strcmp(nome, "lobo guara") == 0) {
-        ConfigSpriteEntidade r = { "lobo guara", ENT_LOBO_X, ENT_LOBO_Y, ENT_LOBO_ESCALA }; return r;
-    }
-
-    /* Caçadores (assume NOME_CACADOR_* macros existem) */
-    if (strcmp(nome, NOME_CACADOR_SELVA) == 0) {
-        ConfigSpriteEntidade r = { NOME_CACADOR_SELVA, ENT_CACADOR_SELVA_X, ENT_CACADOR_SELVA_Y, ENT_CACADOR_SELVA_ESCALA }; return r;
-    }
-    if (strcmp(nome, NOME_CACADOR_PANTANO) == 0) {
-        ConfigSpriteEntidade r = { NOME_CACADOR_PANTANO, ENT_CACADOR_PANTANO_X, ENT_CACADOR_PANTANO_Y, ENT_CACADOR_PANTANO_ESCALA }; return r;
-    }
-    if (strcmp(nome, NOME_CACADOR_LAGO) == 0) {
-        ConfigSpriteEntidade r = { NOME_CACADOR_LAGO, ENT_CACADOR_LAGO_X, ENT_CACADOR_LAGO_Y, ENT_CACADOR_LAGO_ESCALA }; return r;
-    }
-    if (strcmp(nome, NOME_CACADOR_CERRADO) == 0) {
-        ConfigSpriteEntidade r = { NOME_CACADOR_CERRADO, ENT_CACADOR_CERRADO_X, ENT_CACADOR_CERRADO_Y, ENT_CACADOR_CERRADO_ESCALA }; return r;
-    }
-    if (strcmp(nome, NOME_CACADOR_CHEFE) == 0) {
-        ConfigSpriteEntidade r = { NOME_CACADOR_CHEFE, ENT_CACADOR_CHEFE_X, ENT_CACADOR_CHEFE_Y, ENT_CACADOR_CHEFE_ESCALA }; return r;
-    }
-
-    /* Fallback: retorna padrao */
-    return padrao;
+/* NOVA: Detecta o cenário de batalha baseado no fundo usado */
+static JogoCenas detectar_cenario_por_fundo(const char* caminho_fundo) {
+    if (!caminho_fundo) return CENARIO1;
+    
+    if (strstr(caminho_fundo, "selva") || strstr(caminho_fundo, "SELVA")) return CENARIO1;
+    if (strstr(caminho_fundo, "pantano") || strstr(caminho_fundo, "PANTANO")) return CENARIO2;
+    if (strstr(caminho_fundo, "lago") || strstr(caminho_fundo, "LAGO")) return CENARIO3;
+    if (strstr(caminho_fundo, "cerrado") || strstr(caminho_fundo, "CERRADO")) return CENARIO4;
+    
+    return CENARIO1; // fallback
 }
 
-/* NOVA: obter configuração do jogador para a tela de batalha
-   - Se o nome corresponder a um caçador, usa JOGADOR_CACADOR_* macros
-   - Se o nome corresponder a um animal, usa JOGADOR_* macros
-   - Se os valores X/Y forem <= 0 usa os ratios (BATALHA_JOGADOR_*) */
-static ConfigSpriteJogador obter_config_sprite_jogador(const char* nome_animal) {
-    ConfigSpriteJogador padrao = { "desconhecido", 0.0f, 0.0f, BATALHA_JOGADOR_ESCALA };
-    if (!nome_animal) return padrao;
-
-    /* Caçadores */
-    if (strcmp(nome_animal, NOME_CACADOR_SELVA) == 0) {
-        ConfigSpriteJogador r = { NOME_CACADOR_SELVA, JOGADOR_CACADOR_SELVA_X, JOGADOR_CACADOR_SELVA_Y, JOGADOR_CACADOR_SELVA_ESCALA };
-        return r;
+/* NOVA: Obter configuração por cenário */
+static void obter_config_por_cenario(JogoCenas cenario, 
+                                     float* jogador_x, float* jogador_y, float* jogador_escala,
+                                     float* oponente_x, float* oponente_y, float* oponente_escala,
+                                     bool eh_cacador) {
+    switch (cenario) {
+    case CENARIO1: // SELVA
+        *jogador_x = SELVA_JOGADOR_X;
+        *jogador_y = SELVA_JOGADOR_Y;
+        *jogador_escala = SELVA_JOGADOR_ESCALA;
+        if (eh_cacador) {
+            *oponente_x = SELVA_CACADOR_X;
+            *oponente_y = SELVA_CACADOR_Y;
+            *oponente_escala = SELVA_CACADOR_ESCALA;
+        } else {
+            *oponente_x = SELVA_ANIMAL_X;
+            *oponente_y = SELVA_ANIMAL_Y;
+            *oponente_escala = SELVA_ANIMAL_ESCALA;
+        }
+        break;
+        
+    case CENARIO2: // PANTANO
+        *jogador_x = PANTANO_JOGADOR_X;
+        *jogador_y = PANTANO_JOGADOR_Y;
+        *jogador_escala = PANTANO_JOGADOR_ESCALA;
+        if (eh_cacador) {
+            *oponente_x = PANTANO_CACADOR_X;
+            *oponente_y = PANTANO_CACADOR_Y;
+            *oponente_escala = PANTANO_CACADOR_ESCALA;
+        } else {
+            *oponente_x = PANTANO_ANIMAL_X;
+            *oponente_y = PANTANO_ANIMAL_Y;
+            *oponente_escala = PANTANO_ANIMAL_ESCALA;
+        }
+        break;
+        
+    case CENARIO3: // LAGO
+        *jogador_x = LAGO_JOGADOR_X;
+        *jogador_y = LAGO_JOGADOR_Y;
+        *jogador_escala = LAGO_JOGADOR_ESCALA;
+        if (eh_cacador) {
+            *oponente_x = LAGO_CACADOR_X;
+            *oponente_y = LAGO_CACADOR_Y;
+            *oponente_escala = LAGO_CACADOR_ESCALA;
+        } else {
+            *oponente_x = LAGO_ANIMAL_X;
+            *oponente_y = LAGO_ANIMAL_Y;
+            *oponente_escala = LAGO_ANIMAL_ESCALA;
+        }
+        break;
+        
+    case CENARIO4: // CERRADO
+        *jogador_x = CERRADO_JOGADOR_X;
+        *jogador_y = CERRADO_JOGADOR_Y;
+        *jogador_escala = CERRADO_JOGADOR_ESCALA;
+        if (eh_cacador) {
+            *oponente_x = CERRADO_CACADOR_X;
+            *oponente_y = CERRADO_CACADOR_Y;
+            *oponente_escala = CERRADO_CACADOR_ESCALA;
+        } else {
+            *oponente_x = CERRADO_ANIMAL_X;
+            *oponente_y = CERRADO_ANIMAL_Y;
+            *oponente_escala = CERRADO_ANIMAL_ESCALA;
+        }
+        break;
+        
+    default:
+        // Fallback para SELVA
+        *jogador_x = SELVA_JOGADOR_X;
+        *jogador_y = SELVA_JOGADOR_Y;
+        *jogador_escala = SELVA_JOGADOR_ESCALA;
+        *oponente_x = eh_cacador ? SELVA_CACADOR_X : SELVA_ANIMAL_X;
+        *oponente_y = eh_cacador ? SELVA_CACADOR_Y : SELVA_ANIMAL_Y;
+        *oponente_escala = eh_cacador ? SELVA_CACADOR_ESCALA : SELVA_ANIMAL_ESCALA;
+        break;
     }
-    if (strcmp(nome_animal, NOME_CACADOR_PANTANO) == 0) {
-        ConfigSpriteJogador r = { NOME_CACADOR_PANTANO, JOGADOR_CACADOR_PANTANO_X, JOGADOR_CACADOR_PANTANO_Y, JOGADOR_CACADOR_PANTANO_ESCALA };
-        return r;
-    }
-    if (strcmp(nome_animal, NOME_CACADOR_LAGO) == 0) {
-        ConfigSpriteJogador r = { NOME_CACADOR_LAGO, JOGADOR_CACADOR_LAGO_X, JOGADOR_CACADOR_LAGO_Y, JOGADOR_CACADOR_LAGO_ESCALA };
-        return r;
-    }
-    if (strcmp(nome_animal, NOME_CACADOR_CERRADO) == 0) {
-        ConfigSpriteJogador r = { NOME_CACADOR_CERRADO, JOGADOR_CACADOR_CERRADO_X, JOGADOR_CACADOR_CERRADO_Y, JOGADOR_CACADOR_CERRADO_ESCALA };
-        return r;
-    }
-    if (strcmp(nome_animal, NOME_CACADOR_CHEFE) == 0) {
-        ConfigSpriteJogador r = { NOME_CACADOR_CHEFE, JOGADOR_CACADOR_CHEFE_X, JOGADOR_CACADOR_CHEFE_Y, JOGADOR_CACADOR_CHEFE_ESCALA };
-        return r;
-    }
-
-    /* Animais */
-    if (strcmp(nome_animal, NOME_ANIMAL_ONCA) == 0) {
-        ConfigSpriteJogador r = { NOME_ANIMAL_ONCA, JOGADOR_ONCA_X, JOGADOR_ONCA_Y, JOGADOR_ONCA_ESCALA };
-        return r;
-    }
-    if (strcmp(nome_animal, NOME_ANIMAL_JACARE) == 0) {
-        ConfigSpriteJogador r = { NOME_ANIMAL_JACARE, JOGADOR_JACARE_X, JOGADOR_JACARE_Y, JOGADOR_JACARE_ESCALA };
-        return r;
-    }
-    if (strcmp(nome_animal, NOME_ANIMAL_BOTO) == 0) {
-        ConfigSpriteJogador r = { NOME_ANIMAL_BOTO, JOGADOR_BOTO_X, JOGADOR_BOTO_Y, JOGADOR_BOTO_ESCALA };
-        return r;
-    }
-    if (strcmp(nome_animal, NOME_ANIMAL_LOBO) == 0) {
-        ConfigSpriteJogador r = { NOME_ANIMAL_LOBO, JOGADOR_LOBO_X, JOGADOR_LOBO_Y, JOGADOR_LOBO_ESCALA };
-        return r;
-    }
-    if (strcmp(nome_animal, "lobo guara") == 0 || strcmp(nome_animal, "lobo_guara") == 0) {
-        ConfigSpriteJogador r = { "lobo guara", JOGADOR_LOBO_GUARA_X, JOGADOR_LOBO_GUARA_Y, JOGADOR_LOBO_GUARA_ESCALA };
-        return r;
-    }
-
-    /* Fallback: usa ratios e escala padrão */
-    ConfigSpriteJogador fallback = { nome_animal, -1.0f, -1.0f, BATALHA_JOGADOR_ESCALA };
-    return fallback;
 }
-
-/* (o restante do arquivo permanece inalterado; funções que chamam as novas
-   obter_config_* continuam funcionando — por exemplo: criar_oponente_* e
-   desenhar_batalha_unificada.) */
 
 /* ========== FUNÇÕES DE CRIAÇÃO DE OPONENTES ========== */
 
@@ -301,7 +285,12 @@ OponenteBatalha* criar_oponente_animal(Animal* animal) {
     oponente->cacador = NULL;
     oponente->sprite = NULL;
     oponente->caminho_fundo = animal->caminho_fundo_batalha;
-    oponente->config_sprite = obter_config_entidade(animal->nome);
+    
+    // Config sprite básica (será sobrescrita pelas configs por cenário)
+    oponente->config_sprite.nome_entidade = animal->nome;
+    oponente->config_sprite.entidade_x = 0.0f;
+    oponente->config_sprite.entidade_y = 0.0f;
+    oponente->config_sprite.entidade_escala = 0.25f;
     
     return oponente;
 }
@@ -320,7 +309,12 @@ OponenteBatalha* criar_oponente_cacador(Cacador* cacador) {
     oponente->cacador = cacador;
     oponente->sprite = NULL;
     oponente->caminho_fundo = cacador->dados_batalha.caminho_fundo_batalha;
-    oponente->config_sprite = obter_config_entidade(cacador->nome);
+    
+    // Config sprite básica (será sobrescrita pelas configs por cenário)
+    oponente->config_sprite.nome_entidade = cacador->nome;
+    oponente->config_sprite.entidade_x = 0.0f;
+    oponente->config_sprite.entidade_y = 0.0f;
+    oponente->config_sprite.entidade_escala = 0.30f;
     
     return oponente;
 }
@@ -348,40 +342,39 @@ void desenhar_batalha_unificada(ALLEGRO_FONT* fonte, int opcao, ALLEGRO_DISPLAY*
             0, 0, (float)largura, (float)altura, 0);
     }
 
-    // Jogador (lado esquerdo) - usa o padrão de ConfigSpriteJogador se disponível
+    // Detecta cenário e obtém posições
+    JogoCenas cenario = detectar_cenario_por_fundo(oponente->caminho_fundo);
+    bool eh_cacador = (oponente->tipo == BATALHA_CACADOR);
+    
+    float jogador_x_cfg, jogador_y_cfg, jogador_escala_cfg;
+    float oponente_x_cfg, oponente_y_cfg, oponente_escala_cfg;
+    
+    obter_config_por_cenario(cenario, 
+                            &jogador_x_cfg, &jogador_y_cfg, &jogador_escala_cfg,
+                            &oponente_x_cfg, &oponente_y_cfg, &oponente_escala_cfg,
+                            eh_cacador);
+
+    // Desenhar jogador com posição do cenário
     bool tem_jogador = false;
-    float jogador_x = 0.0f, jogador_y = 0.0f, pj_w = 0.0f, pj_h = 0.0f;
+    float pj_w = 0.0f, pj_h = 0.0f;
     if (recursos && recursos->sprite_jogador) {
         float jw = (float)al_get_bitmap_width(recursos->sprite_jogador);
         float jh = (float)al_get_bitmap_height(recursos->sprite_jogador);
 
-        // Tenta obter configuração específica do oponente (se houver)
-        ConfigSpriteJogador conf_jog = obter_config_sprite_jogador(oponente ? oponente->nome : NULL);
+        pj_w = jw * jogador_escala_cfg;
+        pj_h = jh * jogador_escala_cfg;
 
-        // escala: prioridade -> configuração específica -> macro padrão
-        float escala_jog = (conf_jog.jogador_escala > 0.0f) ? conf_jog.jogador_escala : BATALHA_JOGADOR_ESCALA;
-
-        pj_w = jw * escala_jog;
-        pj_h = jh * escala_jog;
-
-        // posição: se houver valores explícitos na config do jogador (pixels), usa-os,
-        // caso contrário usa ratios definidos em config_ui.h
-        if (conf_jog.jogador_x > 0.0f || conf_jog.jogador_y > 0.0f) {
-            jogador_x = conf_jog.jogador_x - pj_w / 2.0f;
-            jogador_y = conf_jog.jogador_y - pj_h / 2.0f;
-        } else {
-            jogador_x = (largura * BATALHA_JOGADOR_X_RATIO) - pj_w / 2.0f;
-            jogador_y = (altura  * BATALHA_JOGADOR_Y_RATIO) - pj_h / 2.0f;
-        }
+        float jogador_x = jogador_x_cfg - pj_w / 2.0f;
+        float jogador_y = jogador_y_cfg - pj_h / 2.0f;
 
         tem_jogador = true;
         al_draw_scaled_bitmap(recursos->sprite_jogador, 0, 0, jw, jh,
                               jogador_x, jogador_y, pj_w, pj_h, 0);
     }
 
-    // Oponente (lado direito)
+    // Desenhar oponente com posição do cenário
     bool tem_oponente = false;
-    float op_x = 0.0f, op_y = 0.0f, op_w = 0.0f, op_h = 0.0f;
+    float op_w = 0.0f, op_h = 0.0f;
     ALLEGRO_BITMAP* sprite_oponente = NULL;
     
     if (oponente->tipo == BATALHA_ANIMAL && recursos && recursos->sprite_animal) {
@@ -390,14 +383,17 @@ void desenhar_batalha_unificada(ALLEGRO_FONT* fonte, int opcao, ALLEGRO_DISPLAY*
         sprite_oponente = recursos->sprite_cacador;
     }
     
+    float op_x = 0.0f, op_y = 0.0f;
     if (sprite_oponente) {
-        ConfigSpriteEntidade conf = oponente->config_sprite;
         float ow = (float)al_get_bitmap_width(sprite_oponente);
         float oh = (float)al_get_bitmap_height(sprite_oponente);
-        op_w = ow * conf.entidade_escala;
-        op_h = oh * conf.entidade_escala;
-        op_x = (largura - op_w) / 2.0f + conf.entidade_x;
-        op_y = conf.entidade_y;
+        
+        op_w = ow * oponente_escala_cfg;
+        op_h = oh * oponente_escala_cfg;
+        
+        op_x = oponente_x_cfg - op_w / 2.0f;
+        op_y = oponente_y_cfg - op_h / 2.0f;
+        
         tem_oponente = true;
         al_draw_scaled_bitmap(sprite_oponente, 0, 0, ow, oh,
                               op_x, op_y, op_w, op_h, 0);
@@ -465,9 +461,9 @@ void desenhar_batalha_unificada(ALLEGRO_FONT* fonte, int opcao, ALLEGRO_DISPLAY*
         if (vida_j < 0) vida_j = 0;
         if (vida_j > 100) vida_j = 100;
         float p = (float)vida_j / 100.0f;
-        float center_x = jogador_x + pj_w / 2.0f;
+        float center_x = jogador_x_cfg;
         float bx = center_x - bar_w / 2.0f;
-        float by = jogador_y - bar_h - bar_gap;
+        float by = jogador_y_cfg - pj_h / 2.0f - bar_h - bar_gap;
         al_draw_filled_rectangle(bx, by, bx + bar_w, by + bar_h, al_map_rgb(50, 50, 50));
         al_draw_filled_rectangle(bx, by, bx + bar_w * p, by + bar_h, al_map_rgb(COR_VIDA_ALTA_R, COR_VIDA_ALTA_G, COR_VIDA_ALTA_B));
         al_draw_rectangle(bx, by, bx + bar_w, by + bar_h, al_map_rgb(COR_TEXTO_BRANCO_R, COR_TEXTO_BRANCO_G, COR_TEXTO_BRANCO_B), 1.0f);
@@ -485,15 +481,17 @@ void desenhar_batalha_unificada(ALLEGRO_FONT* fonte, int opcao, ALLEGRO_DISPLAY*
     if (recursos && recursos->caixa_texto) {
         float bw = (float)al_get_bitmap_width(recursos->caixa_texto);
         float bh = (float)al_get_bitmap_height(recursos->caixa_texto);
-        float escala_box = 0.3f;
+        float escala_box = BATALHA_CAIXA_ESCALA;
         caixa_w = bw * escala_box;
         caixa_h = bh * escala_box;
         if (tem_oponente) {
             caixa_x = op_x + op_w / 2.0f - caixa_w / 2.0f;
-            caixa_y = op_y + op_h + 10.0f;
-            if (caixa_x < 0) caixa_x = 0;
-            if (caixa_x + caixa_w > largura) caixa_x = largura - caixa_w;
-            if (caixa_y + caixa_h > altura - 5.0f) caixa_y = altura - caixa_h - 5.0f;
+            caixa_y = op_y + op_h + BATALHA_CAIXA_OFFSET_Y;
+            if (caixa_x < BATALHA_CAIXA_MIN_MARGIN_X) caixa_x = BATALHA_CAIXA_MIN_MARGIN_X;
+            if (caixa_x + caixa_w > largura - BATALHA_CAIXA_MIN_MARGIN_X) 
+                caixa_x = largura - caixa_w - BATALHA_CAIXA_MIN_MARGIN_X;
+            if (caixa_y + caixa_h > altura - BATALHA_CAIXA_MIN_MARGIN_Y) 
+                caixa_y = altura - caixa_h - BATALHA_CAIXA_MIN_MARGIN_Y;
         }
         al_draw_scaled_bitmap(recursos->caixa_texto, 0, 0, bw, bh,
                               caixa_x, caixa_y, caixa_w, caixa_h, 0);

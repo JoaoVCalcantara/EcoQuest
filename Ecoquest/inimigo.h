@@ -49,6 +49,10 @@ typedef struct {
     const char* caminho_sprite_batalha;
 
     AreaRestrita area_restrita;
+
+    // NOVO: parada ocasional -> o bot pode "parar" por um tempo (rastreio/realismo)
+    bool parado;
+    float parado_timer;
 } Bot;
 
 // Forward declarations (definições completas estão em cacador.h)

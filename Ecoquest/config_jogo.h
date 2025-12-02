@@ -52,7 +52,7 @@
 #define RAIO_ANIMAL                     10.0f
 #define VELOCIDADE_ANIMAL               0.6f
 #define VIDA_MAXIMA_ANIMAL              100
-#define VELOCIDADE_FUGA_MULTIPLICADOR   1.3f
+#define VELOCIDADE_FUGA_MULTIPLICADOR   1.7f
 
 /* Tempo de mudança de direção */
 #define TEMPO_MUDANCA_MIN               1.5f
@@ -74,6 +74,7 @@
 #define TENTATIVAS_DIRECAO_ALEATORIA    3
 
 /* Peso de score de direção */
+#define SCORE_DIRECAO_VALIDA            1.0f
 #define SCORE_DIRECAO_VALIDA            1.0f
 
 /* === ELIPSE DO LAGO (BOTO) === */
