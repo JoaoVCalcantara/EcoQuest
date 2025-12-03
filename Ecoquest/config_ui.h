@@ -17,8 +17,8 @@
 #define SELVA_JOGADOR_Y	           425.0f
 #define SELVA_JOGADOR_ESCALA       0.45f
 
-#define SELVA_ANIMAL_X             380.0f
-#define SELVA_ANIMAL_Y             425.0f
+#define SELVA_ANIMAL_X             885.0f
+#define SELVA_ANIMAL_Y             445.0f
 #define SELVA_ANIMAL_ESCALA        0.25f
 
 #define SELVA_CACADOR_X            885.0f
@@ -26,43 +26,50 @@
 #define SELVA_CACADOR_ESCALA       0.30f
 
 /* --- CENÁRIO: PANTANO --- */
-#define PANTANO_JOGADOR_X          150.0f
-#define PANTANO_JOGADOR_Y          200.0f
+#define PANTANO_JOGADOR_X          290.0f
+#define PANTANO_JOGADOR_Y          400.0f
 #define PANTANO_JOGADOR_ESCALA     0.45f
 
-#define PANTANO_ANIMAL_X           400.0f
-#define PANTANO_ANIMAL_Y           400.0f
-#define PANTANO_ANIMAL_ESCALA      0.25f
+#define PANTANO_ANIMAL_X           1010.0f
+#define PANTANO_ANIMAL_Y           350.0f
+#define PANTANO_ANIMAL_ESCALA      0.2f
 
-#define PANTANO_CACADOR_X          400.0f
-#define PANTANO_CACADOR_Y          400.0f
-#define PANTANO_CACADOR_ESCALA     0.30f
+#define PANTANO_CACADOR_X          900.0f
+#define PANTANO_CACADOR_Y          350.0f
+#define PANTANO_CACADOR_ESCALA     0.2f
 
 /* --- CENÁRIO: LAGO --- */
-#define LAGO_JOGADOR_X             175.0f
-#define LAGO_JOGADOR_Y             175.0f
-#define LAGO_JOGADOR_ESCALA        0.45f
+#define LAGO_JOGADOR_X             320.0f
+#define LAGO_JOGADOR_Y             500.0f
+#define LAGO_JOGADOR_ESCALA        0.5f
 
-#define LAGO_ANIMAL_X              280.0f
-#define LAGO_ANIMAL_Y              320.0f
+#define LAGO_ANIMAL_X              960.0f
+#define LAGO_ANIMAL_Y              490.0f
 #define LAGO_ANIMAL_ESCALA         0.25f
 
-#define LAGO_CACADOR_X             280.0f
-#define LAGO_CACADOR_Y             320.0f
+#define LAGO_CACADOR_X             960.0f
+#define LAGO_CACADOR_Y             490.0f
 #define LAGO_CACADOR_ESCALA        0.30f
 
 /* --- CENÁRIO: CERRADO --- */
-#define CERRADO_JOGADOR_X          150.0f
-#define CERRADO_JOGADOR_Y          200.0f
+#define CERRADO_JOGADOR_X          340.0f
+#define CERRADO_JOGADOR_Y          560.0f
 #define CERRADO_JOGADOR_ESCALA     0.45f
 
-#define CERRADO_ANIMAL_X           250.0f
-#define CERRADO_ANIMAL_Y           325.0f
+#define CERRADO_ANIMAL_X           940.0f
+#define CERRADO_ANIMAL_Y           470.0f
 #define CERRADO_ANIMAL_ESCALA      0.25f
 
-#define CERRADO_CACADOR_X          250.0f
-#define CERRADO_CACADOR_Y          325.0f
+#define CERRADO_CACADOR_X          940.0f
+#define CERRADO_CACADOR_Y          470.0f
 #define CERRADO_CACADOR_ESCALA     0.30f
+
+/* === AJUSTES ESPECÍFICOS POR ANIMAL === */
+/* Mico-leão-dourado: diminuir 50px na altura */
+#define MICO_OFFSET_Y              50.0f
+
+/* Harpia: aumentar escala */
+#define HARPIA_ESCALA_EXTRA        0.10f  /* Adicional à escala base do cenário */
 
 /* --- CENÁRIO: BOSS (Caçador Chefe) --- */
 #define BOSS_JOGADOR_X             200.0f
@@ -92,13 +99,20 @@
 #define MSG_VOCE_DERROTADO              "VOCE FOI DERROTADO!"
 #define MSG_ANIMAL_CAPTURADO            "Um animal foi capturado!"
 
+/* NOVAS: Mensagens de Progressão por Cenário */
+#define MSG_AREA_BLOQUEADA_1_NOVA       "AREA BLOQUEADA - Estude pelo menos 1 animal na Selva primeiro!"
+#define MSG_AREA_BLOQUEADA_2_NOVA       "AREA BLOQUEADA - Estude pelo menos 1 animal no Pantano primeiro!"
+#define MSG_AREA_BLOQUEADA_3_NOVA       "AREA BLOQUEADA - Estude pelo menos 1 animal no Lago primeiro!"
+#define MSG_DERROTE_TODOS_CACADORES     "Derrote TODOS os cacadores do cenario para estudar!"
+#define MSG_BOSS_REQUISITOS             "Boss: Estude TODOS os animais e derrote TODOS os cacadores!"
+
 /* Mensagens de Interação */
 #define MSG_PRESSIONE_ENTER             "Pressione ENTER"
 #define MSG_PRESSIONE_ENTER_REINICIAR   "Pressione ENTER para reiniciar"
 #define MSG_PRESSIONE_ENTER_CONTINUAR   "Pressione ENTER para continuar"
 
 /* Formato de Contador */
-#define FMT_CACADORES_DERROTADOS        "Cacadores Derrotados: %d/4"
+#define FMT_CACADORES_DERROTADOS        "Cacadores Derrotados: %d/8"
 
 /* === POSIÇÕES DE TEXTO NA TELA === */
 /* Coordenadas Centrais */

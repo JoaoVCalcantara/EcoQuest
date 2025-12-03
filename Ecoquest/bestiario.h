@@ -41,6 +41,10 @@ typedef struct {
     const char* biomarcador_de;
 } InformacoesEcologicas;
 
+// Forward declarations
+typedef struct Bestiario Bestiario;
+typedef struct Cacador Cacador;
+
 // Entrada simplificada do bestiário
 typedef struct {
     Animal* animal_ref;
@@ -50,9 +54,10 @@ typedef struct {
 
 // Bestiário simplificado
 struct Bestiario {
-    EntradaBestiario entradas[4];  // Apenas 4 animais fixos
+    EntradaBestiario entradas[11];  // 10 animais + 1 humano
     int total_especies;
     int especies_desbloqueadas;
+    bool humano_desbloqueado;
 };
 
 // Funções principais simplificadas
@@ -71,5 +76,13 @@ InformacoesEcologicas criar_info_ecologica_lobo_guara(void);
 InformacoesEcologicas criar_info_ecologica_jacare(void);
 InformacoesEcologicas criar_info_ecologica_boto(void);
 InformacoesEcologicas criar_info_ecologica_onca(void);
+InformacoesEcologicas criar_info_ecologica_harpia(void);
+InformacoesEcologicas criar_info_ecologica_mico(void);
+InformacoesEcologicas criar_info_ecologica_capivara(void);
+InformacoesEcologicas criar_info_ecologica_pirarucu(void);
+InformacoesEcologicas criar_info_ecologica_tamandua(void);
+InformacoesEcologicas criar_info_ecologica_humano(void);
+
+void desbloquear_humano_bestiario(Bestiario* bestiario);
 
 #endif

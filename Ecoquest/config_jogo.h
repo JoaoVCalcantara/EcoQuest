@@ -63,7 +63,7 @@
 #define TEMPO_MUDANCA_NOVA_DIRECAO      0.1f
 
 /* Raio de fuga e detecção */
-#define RAIO_FUGA_ANIMAL                180.0f
+#define RAIO_FUGA_ANIMAL                120.0f
 #define DISTANCIA_TESTE_DIRECAO         50.0f
 #define MARGEM_BORDA_ANIMAL             30.0f
 
@@ -99,9 +99,9 @@
 #define EMPURRAO_JOGADOR_BOSS           30.0f
 
 /* === PROGRESSÃO DO JOGO === */
-#define CACADORES_PARA_BOSS             4
-#define TOTAL_ANIMAIS                   4
-#define TOTAL_CACADORES                 4
+#define CACADORES_PARA_BOSS             8
+#define TOTAL_ANIMAIS                   9
+#define TOTAL_CACADORES                 8
 
 /* === CORES DE VIDA (RGB) === */
 /* Vida Alta (> 60%) */
@@ -136,6 +136,11 @@
 #define PATH_ANIMAL_JACARE              "assets/img/animais/jacare.png"
 #define PATH_ANIMAL_BOTO                "assets/img/animais/boto.png"
 #define PATH_ANIMAL_LOBO                "assets/img/animais/lobo_guara.png"
+#define PATH_ANIMAL_HARPIA              "assets/img/animais/harpia.png"
+#define PATH_ANIMAL_MICO                "assets/img/animais/mico-leao_dourado.png"
+#define PATH_ANIMAL_CAPIVARA            "assets/img/animais/capivara.png"
+#define PATH_ANIMAL_PIRARUCU            "assets/img/animais/pirarucu.png"
+#define PATH_ANIMAL_TAMANDUA            "assets/img/animais/tamandua_bandeira.png"
 
 /* Caçadores */
 #define PATH_CACADOR_NORMAL             "assets/img/cacador/cacador.png"
@@ -153,7 +158,8 @@
 
 /* Jogador - Idle */
 #define PATH_JOGADOR_IDLE_BAIXO         "assets/img/Heroi/idle_down.png"
-#define PATH_JOGADOR_IDLE_CIMA          "assets/img/Heroi/idle_up.png"
+// #define PATH_JOGADOR_IDLE_CIMA          "assets/img/Heroi/idle_up.png"  // Arquivo não existe - fallback usa rear_0.png
+#define PATH_JOGADOR_IDLE_CIMA          "assets/img/Heroi/rear_0.png"  // Usando frame do movimento como idle
 #define PATH_JOGADOR_IDLE_DIR           "assets/img/Heroi/idle_right.png"
 #define PATH_JOGADOR_IDLE_ESQ           "assets/img/Heroi/idle_left.png"
 
@@ -176,6 +182,26 @@
 #define POS_INICIAL_LOBO_X              1000.0f
 #define POS_INICIAL_LOBO_Y              600.0f
 
+/* Novos Animais */
+/* SELVA - 2 novos */
+#define POS_INICIAL_HARPIA_X            250.0f
+#define POS_INICIAL_HARPIA_Y            100.0f
+
+#define POS_INICIAL_MICO_X              450.0f
+#define POS_INICIAL_MICO_Y              250.0f
+
+/* PANTANO - 1 novo */
+#define POS_INICIAL_CAPIVARA_X          250.0f
+#define POS_INICIAL_CAPIVARA_Y          550.0f
+
+/* LAGO - 1 novo */
+#define POS_INICIAL_PIRARUCU_X          920.0f  // CORRIGIDO: posição dentro da elipse (centro: 950, 205)
+#define POS_INICIAL_PIRARUCU_Y          180.0f  // CORRIGIDO: posição válida dentro da área permitida
+
+/* CERRADO - 1 novo */
+#define POS_INICIAL_TAMANDUA_X          900.0f
+#define POS_INICIAL_TAMANDUA_Y          500.0f
+
 /* Caçadores */
 #define POS_INICIAL_CACADOR1_X          200.0f
 #define POS_INICIAL_CACADOR1_Y          200.0f
@@ -189,6 +215,19 @@
 #define POS_INICIAL_CACADOR4_X          1100.0f
 #define POS_INICIAL_CACADOR4_Y          500.0f
 
+/* Novos Caçadores */
+#define POS_INICIAL_CACADOR5_X          150.0f
+#define POS_INICIAL_CACADOR5_Y          300.0f
+
+#define POS_INICIAL_CACADOR6_X          500.0f
+#define POS_INICIAL_CACADOR6_Y          450.0f
+
+#define POS_INICIAL_CACADOR7_X          750.0f
+#define POS_INICIAL_CACADOR7_Y          250.0f
+
+#define POS_INICIAL_CACADOR8_X          950.0f
+#define POS_INICIAL_CACADOR8_Y          550.0f
+
 /* Boss */
 #define POS_INICIAL_BOSS_X              640.0f
 #define POS_INICIAL_BOSS_Y              360.0f
@@ -198,19 +237,30 @@
 #define NOME_ANIMAL_JACARE              "Jacare"
 #define NOME_ANIMAL_BOTO                "Boto"
 #define NOME_ANIMAL_LOBO                "Lobo guara"
+#define NOME_ANIMAL_HARPIA              "Harpia"
+#define NOME_ANIMAL_MICO                "Mico-leao dourado"
+#define NOME_ANIMAL_CAPIVARA            "Capivara"
+#define NOME_ANIMAL_PIRARUCU            "Pirarucu"
+#define NOME_ANIMAL_TAMANDUA            "Tamandua-bandeira"
 
 #define NOME_CACADOR_SELVA              "Cacador da Selva"
 #define NOME_CACADOR_PANTANO            "Cacador do Pantano"
 #define NOME_CACADOR_LAGO               "Cacador do Lago"
 #define NOME_CACADOR_CERRADO            "Cacador do Cerrado"
 #define NOME_CACADOR_CHEFE              "Cacador Chefe"
+#define NOME_CACADOR_SELVA2             "Cacador da Selva 2"
+#define NOME_CACADOR_PANTANO2           "Cacador do Pantano 2"
+#define NOME_CACADOR_LAGO2              "Cacador do Lago 2"
+#define NOME_CACADOR_CERRADO2           "Cacador do Cerrado 2"
 
 /* === TIPOS DE ANIMAIS === */
 #define TIPO_CARNIVORO                  "Carnivoro"
 #define TIPO_ONIVORO                    "Onivoro"
+#define TIPO_HERBIVORO                  "Herbivoro"
+#define TIPO_INSETIVORO                 "Insetivoro"
 
 /* === BESTIÁRIO === */
-#define MAX_ESPECIES_BESTIARIO          4
+#define MAX_ESPECIES_BESTIARIO          10  // 10 animais + 1 humano
 
 /* === PROXIMIDADES E DISTÂNCIAS === */
 #define DISTANCIA_VERIFICACAO_BLOQUEIO  20.0f   // Distância para verificar bloqueio de áreas

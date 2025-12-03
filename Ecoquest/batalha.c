@@ -49,6 +49,55 @@ static const char* frases_onca[] = {
     "Habilidades Aquaticas: Diferente da maioria dos felinos que evitam a agua, a onca-pintada e uma excelente nadadora, uma adaptacao vital para a vida em biomas com muitos corpos d'agua, como a Amazonia e o Pantanal, onde pode cacar presas aquaticas e semi-aquaticas."
 };
 
+static const char* frases_harpia[] = {
+    "Visao Excepcional - Adaptacao Evolutiva: A harpia possui uma das visoes mais aguçadas do reino animal, com olhos grandes adaptados para enxergar presas a grandes distancias mesmo em florestas densas. Pode detectar um macaco a mais de 200 metros de distancia.",
+    "Garras Poderosas - Adaptacao Evolutiva: Suas garras podem medir ate 12 cm, do tamanho das garras de um urso-pardo, tornando-a capaz de capturar presas grandes como preguiças e macacos. Essa forca permite perfurar o cranio das presas instantaneamente.",
+    "Voo Agil em Floresta Densa - Adaptacao Evolutiva: Apesar do tamanho (envergadura de ate 2 metros), a harpia desenvolveu asas curtas e largas que permitem manobrabilidade excepcional entre arvores, uma adaptacao crucial para caçar no dossel da Amazonia.",
+    "Caçadora de Dossel - Papel Ecologico: Como predadora de topo do dossel amazonico, a harpia controla populacoes de primatas e preguiças, sendo essencial para o equilibrio ecologico da floresta tropical.",
+    "Nidificação e Cuidado Parental - Adaptacao Evolutiva: Constroi ninhos enormes (ate 1.5m de diametro) no topo das arvores mais altas e cuida de apenas um filhote por vez durante ate 2 anos, garantindo alta taxa de sobrevivencia."
+};
+
+static const char* frases_mico[] = {
+    "Pelagem Dourada Vibrante - Adaptacao Evolutiva: A coloracao laranja-dourada brilhante nao e apenas estetica; ela pode ter evoluido como sinalizacao social em seu habitat de Mata Atlantica, facilitando a coesao do grupo em meio a vegetacao densa.",
+    "Dieta Onivora Especializada - Adaptacao Evolutiva: Alimenta-se de frutas, insetos, pequenos vertebrados e seiva de arvores. Essa dieta variada permite sobrevivencia em ambientes fragmentados da Mata Atlantica, adaptando-se a diferentes recursos sazonais.",
+    "Unhas em Forma de Garra - Adaptacao Evolutiva: Diferente de outros primatas, possui unhas em forma de garra que permitem escalar troncos verticais e extrair insetos da casca das arvores, uma especializacao alimentar importante.",
+    "Comunicacao Vocal Complexa - Adaptacao Evolutiva: Desenvolveu um sistema de vocalizacoes sofisticado para manter contato com o grupo em meio a floresta densa, incluindo chamados de alarme especificos para diferentes tipos de predadores.",
+    "Especie Bandeira da Conservacao - Papel Ecologico: Como especie carismatica e endemica da Mata Atlantica, o mico-leao-dourado tornou-se simbolo da conservacao brasileira, ajudando a proteger habitats inteiros."
+};
+
+static const char* frases_capivara[] = {
+    "Maior Roedor do Mundo - Adaptacao Evolutiva: Com ate 65 kg, a capivara evoluiu um tamanho corporal que a torna menos vulneravel a predadores pequenos, mantendo ainda a flexibilidade de herbivoro semi-aquatico.",
+    "Adaptacoes Aquaticas - Adaptacao Evolutiva: Membranas interdigitais (como patos) facilitam a natacao, olhos e narinas no topo da cabeça permitem ficar submersa observando predadores, e pode prender a respiracao por ate 5 minutos.",
+    "Herbivoria Especifica - Adaptacao Evolutiva: Seus dentes crescem continuamente (como todos roedores), adaptacao essencial para sua dieta de gramineas duras que desgastariam dentes normais rapidamente.",
+    "Comportamento Social Complexo - Adaptacao Evolutiva: Vivem em grupos hierarquicos de ate 20 individuos, uma estrategia anti-predacao crucial em ambientes abertos como pantanos, onde a vigilancia coletiva aumenta chances de sobrevivencia.",
+    "Engenheira de Ecossistemas - Papel Ecologico: Ao pastar grandes quantidades de vegetacao aquatica e terrestre, a capivara modifica o habitat para outras especies, sendo considerada 'engenheira de ecossistemas' em areas alagadas."
+};
+
+static const char* frases_tubarao[] = {
+    "Tolerancia a Agua Doce - Adaptacao Evolutiva: Unico tubarao capaz de viver tanto em agua salgada quanto doce, o tubarao-touro desenvolveu rins e glandulas especiais que regulam concentracao de sal no corpo, permitindo navegar rios da Amazonia.",
+    "Mandibulas Poderosas - Adaptacao Evolutiva: Possui uma das mordidas mais fortes entre tubaroes, adaptacao para capturar presas grandes e variedades em ambientes diversos (oceano, estuarios, rios), maximizando oportunidades alimentares.",
+    "Agressividade e Territorialidade - Adaptacao Evolutiva: Sua reputacao de agressividade pode ser uma estrategia evolutiva para defender territorios ricos em recursos tanto marinhos quanto fluviais, onde a competicao e intensa.",
+    "Reproducao Vivipara - Adaptacao Evolutiva: As femeas dao a luz filhotes vivos (viviparidade), e frequentemente usam estuarios e rios como 'berçarios' onde filhotes tem menos predadores, aumentando sobrevivencia da prole.",
+    "Predador Oportunista de Topo - Papel Ecologico: Como predador generalista que transita entre ambientes marinhos e dulcicolas, o tubarao-touro conecta cadeias alimentares de diferentes ecossistemas, regulando populacoes de presas em multiplos habitats."
+};
+
+static const char* frases_tamandua[] = {
+    "Lingua Longa e Pegajosa - Adaptacao Evolutiva: Sua lingua pode se estender ate 60 cm, coberta por saliva pegajosa, adaptacao perfeita para capturar formigas e cupins dentro de tuneis estreitos, sua dieta exclusiva.",
+    "Ausencia de Dentes - Adaptacao Evolutiva: Evoluiu sem dentes porque sua dieta de insetos moles nao exige mastigacao; o estomago muscular (como moela de ave) tritura o alimento, uma economia energetica evolutiva significativa.",
+    "Garras Poderosas - Adaptacao Evolutiva: Garras dianteiras enormes servem para escavar cupinzeiros/formigueiros duros e tambem para defesa contra predadores como onças. Essa multifuncionalidade aumentou sua sobrevivencia.",
+    "Baixo Metabolismo - Adaptacao Evolutiva: Tem uma das taxas metabolicas mais baixas entre mamiferos, adaptacao ao Cerrado onde recursos podem ser escassos; economiza energia movendo-se lentamente e dormindo ate 16 horas/dia.",
+    "Dispersor de Sementes Involuntario - Papel Ecologico: Ao escavar cupinzeiros, revolve solo e espalha sementes que estavam enterradas, contribuindo indiretamente para regeneracao de vegetacao do Cerrado."
+};
+
+static const char* frases_pirarucu[] = {
+    "Maior Peixe de Escamas de Agua Doce - Adaptacao Evolutiva: Pode atingir ate 3 metros e pesar 200 kg, tamanho que evoluiu como vantagem competitiva na Amazonia, permitindo-lhe dominar outros peixes e escapar de predadores menores.",
+    "Respiracao Aerea Obligatoria - Adaptacao Evolutiva: Desenvolveu a capacidade de respirar ar atmosferico diretamente (atraves de uma bexiga natatoria modificada), adaptacao crucial para sobreviver em aguas pobres em oxigenio da varzea amazonica durante a seca.",
+    "Lingua Ossea (Dentes na Lingua) - Adaptacao Evolutiva: Possui uma placa ossea na lingua com pequenos dentes que, junto com dentes no ceu da boca, tritura presas como peixes e crustaceos, uma especializacao alimentar unica.",
+    "Cuidado Parental (Macho) - Adaptacao Evolutiva: Os machos protegem agressivamente ninhos e filhotes durante os primeiros meses, um comportamento raro entre peixes que aumenta dramaticamente a sobrevivencia da prole em ambientes com muitos predadores.",
+    "Escamas Enormes (Armadura Natural) - Adaptacao Evolutiva: Suas escamas podem atingir 6 cm e sao extremamente duras, funcionando como armadura contra predadores como piranhas e jacares jovens, e historicamente usadas por indigenas como lixas e utensílios.",
+    "Predador de Topo Aquatico - Papel Ecologico: Como um dos maiores peixes da Amazonia, o pirarucu regula populacoes de peixes menores, sendo essencial para o equilibrio dos ecossistemas aquaticos da regiao."
+};
+
 /* Função que retorna array de frases e total com normalização de nome */
 static const char** obter_frases_animal(const char* nome_animal, int* total_frases) {
     if (!nome_animal || !total_frases) return NULL;
@@ -81,6 +130,30 @@ static const char** obter_frases_animal(const char* nome_animal, int* total_fras
     else if (strcmp(nome_lower, "onca") == 0 || strcmp(nome_normalizado, "onca") == 0 || strcmp(nome_lower, "onca-pintada") == 0) {
         *total_frases = (int)(sizeof(frases_onca) / sizeof(frases_onca[0]));
         return frases_onca;
+    }
+    else if (strcmp(nome_lower, "harpia") == 0) {
+        *total_frases = (int)(sizeof(frases_harpia) / sizeof(frases_harpia[0]));
+        return frases_harpia;
+    }
+    else if (strcmp(nome_lower, "mico-leao dourado") == 0 || strcmp(nome_normalizado, "mico-leao_dourado") == 0) {
+        *total_frases = (int)(sizeof(frases_mico) / sizeof(frases_mico[0]));
+        return frases_mico;
+    }
+    else if (strcmp(nome_lower, "capivara") == 0) {
+        *total_frases = (int)(sizeof(frases_capivara) / sizeof(frases_capivara[0]));
+        return frases_capivara;
+    }
+    else if (strcmp(nome_lower, "tubarao touro") == 0 || strcmp(nome_normalizado, "tubarao_touro") == 0) {
+        *total_frases = (int)(sizeof(frases_tubarao) / sizeof(frases_tubarao[0]));
+        return frases_tubarao;
+    }
+    else if (strcmp(nome_lower, "tamandua-bandeira") == 0 || strcmp(nome_normalizado, "tamandua-bandeira") == 0 || strcmp(nome_normalizado, "tamandua_bandeira") == 0) {
+        *total_frases = (int)(sizeof(frases_tamandua) / sizeof(frases_tamandua[0]));
+        return frases_tamandua;
+    }
+    else if (strcmp(nome_lower, "pirarucu") == 0) {
+        *total_frases = (int)(sizeof(frases_pirarucu) / sizeof(frases_pirarucu[0]));
+        return frases_pirarucu;
     }
 
     *total_frases = 0;
@@ -325,6 +398,29 @@ void destruir_oponente_batalha(OponenteBatalha* oponente) {
 
 /* ========== DESENHO UNIFICADO ========== */
 
+static void aplicar_ajustes_animal_especifico(const char* nome_animal,
+    float* oponente_y,
+    float* oponente_escala) {
+    if (!nome_animal) return;
+
+    char nome_lower[64];
+    snprintf(nome_lower, sizeof(nome_lower), "%s", nome_animal);
+    for (int i = 0; nome_lower[i]; i++) {
+        if (nome_lower[i] >= 'A' && nome_lower[i] <= 'Z')
+            nome_lower[i] += ('a' - 'A');
+    }
+
+    // Mico-leão-dourado: diminuir 50px na altura (aumentar Y)
+    if (strstr(nome_lower, "mico") != NULL) {
+        *oponente_y += MICO_OFFSET_Y;
+    }
+
+    // Harpia: aumentar escala
+    if (strstr(nome_lower, "harpia") != NULL) {
+        *oponente_escala += HARPIA_ESCALA_EXTRA;
+    }
+}
+
 void desenhar_batalha_unificada(ALLEGRO_FONT* fonte, int opcao, ALLEGRO_DISPLAY* display,
                                OponenteBatalha* oponente, entidade* jogador,
                                RecursosBatalha* recursos, int vida_jogador, bool turno_jogador) {
@@ -353,6 +449,10 @@ void desenhar_batalha_unificada(ALLEGRO_FONT* fonte, int opcao, ALLEGRO_DISPLAY*
                             &jogador_x_cfg, &jogador_y_cfg, &jogador_escala_cfg,
                             &oponente_x_cfg, &oponente_y_cfg, &oponente_escala_cfg,
                             eh_cacador);
+
+    if (oponente->tipo == BATALHA_ANIMAL && oponente->nome) {
+    aplicar_ajustes_animal_especifico(oponente->nome, &oponente_y_cfg, &oponente_escala_cfg);
+}
 
     // Desenhar jogador com posição do cenário
     bool tem_jogador = false;
@@ -660,7 +760,7 @@ void iniciar_batalha_unificada(ALLEGRO_FONT* fonte, OponenteBatalha* oponente,
                 case ALLEGRO_KEY_SPACE:
                     switch (opcao) {
                     case 0: {
-                        int dano = 100 + (rand() % 10 - 5);
+                        int dano = 200 + (rand() % 10 - 5);
                         if (dano < 0) dano = 0;
                         oponente->cacador->vida -= dano;
                         oponente->vida_atual = oponente->cacador->vida;

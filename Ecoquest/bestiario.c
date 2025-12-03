@@ -64,6 +64,104 @@ InformacoesEcologicas criar_info_ecologica_onca(void) {
     return info;
 }
 
+InformacoesEcologicas criar_info_ecologica_harpia(void) {
+    InformacoesEcologicas info;
+    info.nome_cientifico = "Harpia harpyja";
+    info.nivel_trofico = NIVEL_CONSUMIDOR_QUATERNARIO;
+    info.posicao_cadeia = POSICAO_PREDADOR_TOPO;
+    info.fator_bioacumulacao = 7.2f;
+    info.dieta_principal = "Primatas, preguicas, aves";
+    info.papel_ecologico = "Predadora de topo do dossel amazonico";
+    info.status_conservacao = "Quase Ameacado (NT)";
+    info.especie_indicadora = true;
+    info.biomarcador_de = "Integridade da floresta primaria";
+    return info;
+}
+
+InformacoesEcologicas criar_info_ecologica_mico(void) {
+    InformacoesEcologicas info;
+    info.nome_cientifico = "Leontopithecus rosalia";
+    info.nivel_trofico = NIVEL_CONSUMIDOR_SECUNDARIO;
+    info.posicao_cadeia = POSICAO_ONIVORO;
+    info.fator_bioacumulacao = 3.0f;
+    info.dieta_principal = "Frutas, insetos, pequenos vertebrados";
+    info.papel_ecologico = "Dispersor de sementes da Mata Atlantica";
+    info.status_conservacao = "Em Perigo (EN)";
+    info.especie_indicadora = true;
+    info.biomarcador_de = "Saude da Mata Atlantica";
+    return info;
+}
+
+InformacoesEcologicas criar_info_ecologica_capivara(void) {
+    InformacoesEcologicas info;
+    info.nome_cientifico = "Hydrochoerus hydrochaeris";
+    info.nivel_trofico = NIVEL_CONSUMIDOR_PRIMARIO;
+    info.posicao_cadeia = POSICAO_HERBIVORO;
+    info.fator_bioacumulacao = 2.5f;
+    info.dieta_principal = "Gramineas, plantas aquaticas";
+    info.papel_ecologico = "Engenheira de ecossistemas aquaticos";
+    info.status_conservacao = "Pouco Preocupante (LC)";
+    info.especie_indicadora = true;
+    info.biomarcador_de = "Qualidade de areas alagadas";
+    return info;
+}
+
+InformacoesEcologicas criar_info_ecologica_tubarao(void) {
+    InformacoesEcologicas info;
+    info.nome_cientifico = "Carcharhinus leucas";
+    info.nivel_trofico = NIVEL_CONSUMIDOR_QUATERNARIO;
+    info.posicao_cadeia = POSICAO_PREDADOR_TOPO;
+    info.fator_bioacumulacao = 8.5f;
+    info.dieta_principal = "Peixes, mamiferos aquaticos, aves";
+    info.papel_ecologico = "Predador de topo aquatico dulcicola";
+    info.status_conservacao = "Quase Ameacado (NT)";
+    info.especie_indicadora = true;
+    info.biomarcador_de = "Contaminacao de ambientes aquaticos";
+    return info;
+}
+
+InformacoesEcologicas criar_info_ecologica_tamandua(void) {
+    InformacoesEcologicas info;
+    info.nome_cientifico = "Myrmecophaga tridactyla";
+    info.nivel_trofico = NIVEL_CONSUMIDOR_SECUNDARIO;
+    info.posicao_cadeia = POSICAO_PREDADOR_PEQUENO;
+    info.fator_bioacumulacao = 2.8f;
+    info.dieta_principal = "Formigas, cupins";
+    info.papel_ecologico = "Controlador de populacoes de insetos";
+    info.status_conservacao = "Vulneravel (VU)";
+    info.especie_indicadora = true;
+    info.biomarcador_de = "Saude do Cerrado";
+    return info;
+}
+
+InformacoesEcologicas criar_info_ecologica_humano(void) {
+    InformacoesEcologicas info;
+    info.nome_cientifico = "Homo sapiens";
+    info.nivel_trofico = NIVEL_CONSUMIDOR_QUATERNARIO;
+    info.posicao_cadeia = POSICAO_PREDADOR_TOPO;
+    info.fator_bioacumulacao = 9.5f;
+    info.dieta_principal = "Onivoro (ampla variedade)";
+    info.papel_ecologico = "Superpredador e modificador de ecossistemas";
+    info.status_conservacao = "Pouco Preocupante (LC) - Populacao estavel";
+    info.especie_indicadora = false;
+    info.biomarcador_de = "Impacto antropogenico";
+    return info;
+}
+
+InformacoesEcologicas criar_info_ecologica_pirarucu(void) {
+    InformacoesEcologicas info;
+    info.nome_cientifico = "Arapaima gigas";
+    info.nivel_trofico = NIVEL_CONSUMIDOR_TERCIARIO;
+    info.posicao_cadeia = POSICAO_PREDADOR_MEDIO;
+    info.fator_bioacumulacao = 5.5f;
+    info.dieta_principal = "Peixes, crustaceos, aves aquaticas";
+    info.papel_ecologico = "Predador de topo aquatico amazonico";
+    info.status_conservacao = "Dados Insuficientes (DD)";
+    info.especie_indicadora = true;
+    info.biomarcador_de = "Qualidade de aguas amazonicas";
+    return info;
+}
+
 // ========== FUNÇÕES AUXILIARES ==========
 
 const char* obter_nome_nivel_trofico(NivelTrofico nivel) {
@@ -102,12 +200,13 @@ Bestiario* criar_bestiario(void) {
     
     bestiario->total_especies = 0;
     bestiario->especies_desbloqueadas = 0;
+    bestiario->humano_desbloqueado = false;
     
     return bestiario;
 }
 
 void adicionar_especie_bestiario(Bestiario* bestiario, Animal* animal) {
-    if (!bestiario || !animal || bestiario->total_especies >= 4) return;
+    if (!bestiario || !animal || bestiario->total_especies >= 10) return;
 
     int idx = bestiario->total_especies;
     bestiario->entradas[idx].animal_ref = animal;
@@ -147,6 +246,24 @@ void adicionar_especie_bestiario(Bestiario* bestiario, Animal* animal) {
     else if (strcmp(nome_lower, "onca") == 0) {
         bestiario->entradas[idx].info_ecologica = criar_info_ecologica_onca();
     }
+    else if (strcmp(nome_lower, "harpia") == 0) {
+        bestiario->entradas[idx].info_ecologica = criar_info_ecologica_harpia();
+    }
+    else if (strcmp(nome_lower, "mico-leao dourado") == 0 || strcmp(nome_normalizado, "mico-leao_dourado") == 0) {
+        bestiario->entradas[idx].info_ecologica = criar_info_ecologica_mico();
+    }
+    else if (strcmp(nome_lower, "capivara") == 0) {
+        bestiario->entradas[idx].info_ecologica = criar_info_ecologica_capivara();
+    }
+    else if (strcmp(nome_lower, "tubarao touro") == 0 || strcmp(nome_normalizado, "tubarao_touro") == 0) {
+        bestiario->entradas[idx].info_ecologica = criar_info_ecologica_tubarao();
+    }
+    else if (strcmp(nome_lower, "tamandua-bandeira") == 0 || strcmp(nome_normalizado, "tamandua-bandeira") == 0 || strcmp(nome_normalizado, "tamandua_bandeira") == 0) {
+        bestiario->entradas[idx].info_ecologica = criar_info_ecologica_tamandua();
+    }
+    else if (strcmp(nome_lower, "pirarucu") == 0) {
+        bestiario->entradas[idx].info_ecologica = criar_info_ecologica_pirarucu();
+    }
 
     bestiario->total_especies++;
 }
@@ -172,7 +289,75 @@ void destruir_bestiario(Bestiario* bestiario) {
     }
 }
 
+void desbloquear_humano_bestiario(Bestiario* bestiario) {
+    if (!bestiario) return;
+    
+    if (!bestiario->humano_desbloqueado) {
+        bestiario->humano_desbloqueado = true;
+        printf("[BESTIARIO] Humano desbloqueado no bestiario!\n");
+    }
+}
+
 // ========== POPUP SIMPLIFICADO ==========
+
+// Função auxiliar para quebrar texto em linhas
+static void desenhar_texto_quebrado(ALLEGRO_FONT* fonte, ALLEGRO_COLOR cor, float x, float* y, 
+                                     float max_width, float line_height, const char* texto) {
+    if (!texto || !fonte) return;
+    
+    char buffer[512];
+    strncpy(buffer, texto, sizeof(buffer) - 1);
+    buffer[sizeof(buffer) - 1] = '\0';
+    
+    char linha_atual[256] = "";
+    char* palavra_ptr = buffer;
+    
+    while (*palavra_ptr) {
+        // Pula espaços iniciais
+        while (*palavra_ptr == ' ') palavra_ptr++;
+        if (!*palavra_ptr) break;
+        
+        // Encontra fim da palavra
+        char* fim_palavra = palavra_ptr;
+        while (*fim_palavra && *fim_palavra != ' ') fim_palavra++;
+        
+        size_t len_palavra = (size_t)(fim_palavra - palavra_ptr);
+        if (len_palavra > 200) len_palavra = 200;
+        
+        char palavra[256];
+        strncpy(palavra, palavra_ptr, len_palavra);
+        palavra[len_palavra] = '\0';
+        
+        // Testa se cabe na linha atual
+        char teste[512];
+        if (linha_atual[0] == '\0') {
+            strncpy(teste, palavra, sizeof(teste) - 1);
+            teste[sizeof(teste) - 1] = '\0';
+        } else {
+            snprintf(teste, sizeof(teste), "%s %s", linha_atual, palavra);
+        }
+        
+        float w = al_get_text_width(fonte, teste);
+        if (w > max_width && linha_atual[0] != '\0') {
+            // Desenha linha atual e começa nova
+            al_draw_text(fonte, cor, x, *y, ALLEGRO_ALIGN_LEFT, linha_atual);
+            *y += line_height;
+            strncpy(linha_atual, palavra, sizeof(linha_atual) - 1);
+            linha_atual[sizeof(linha_atual) - 1] = '\0';
+        } else {
+            strncpy(linha_atual, teste, sizeof(linha_atual) - 1);
+            linha_atual[sizeof(linha_atual) - 1] = '\0';
+        }
+        
+        palavra_ptr = fim_palavra;
+    }
+    
+    // Desenha última linha
+    if (linha_atual[0] != '\0') {
+        al_draw_text(fonte, cor, x, *y, ALLEGRO_ALIGN_LEFT, linha_atual);
+        *y += line_height;
+    }
+}
 
 void mostrar_bestiario_popup(Bestiario* bestiario, ALLEGRO_FONT* fonte, ALLEGRO_DISPLAY* display, ALLEGRO_EVENT_QUEUE* event_queue) {
     if (!bestiario || !display || !fonte) return;
@@ -196,77 +381,71 @@ void mostrar_bestiario_popup(Bestiario* bestiario, ALLEGRO_FONT* fonte, ALLEGRO_
     // Título
     al_draw_text(fonte, al_map_rgb(40, 20, 0), box_x + box_w / 2, box_y + 15, ALLEGRO_ALIGN_CENTRE, "=== BESTIARIO ECOLOGICO ===");
     
+    int total_para_exibir = bestiario->total_especies + (bestiario->humano_desbloqueado ? 1 : 0);
     char progresso[128];
-    snprintf(progresso, sizeof(progresso), "Especies Desbloqueadas: %d/%d", bestiario->especies_desbloqueadas, bestiario->total_especies);
+    snprintf(progresso, sizeof(progresso), "Especies Desbloqueadas: %d/%d", 
+             bestiario->especies_desbloqueadas + (bestiario->humano_desbloqueado ? 1 : 0), 
+             total_para_exibir);
     al_draw_text(fonte, al_map_rgb(60, 40, 10), box_x + box_w / 2, box_y + 40, ALLEGRO_ALIGN_CENTRE, progresso);
     
     // Lista de espécies em formato compacto
-    float y = box_y + 80;
-    float x = box_x + 30;
-    float line_height = 16;
+    float y = box_y + 75;
+    float x = box_x + 20;
+    float line_height = al_get_font_line_height(fonte) + 2;
+    float max_width = box_w - 40;
     
     for (int i = 0; i < bestiario->total_especies; i++) {
         EntradaBestiario* entrada = &bestiario->entradas[i];
         
+        // Verifica se ainda cabe na caixa
+        if (y > box_y + box_h - 50) break;
+        
         if (!entrada->desbloqueado) {
-            // Bloqueado
             al_draw_text(fonte, al_map_rgb(80, 80, 80), x, y, ALLEGRO_ALIGN_LEFT, "??? - BLOQUEADO");
-            y += line_height * 2;
+            y += line_height * 1.5f;
         } else {
-            // Desbloqueado - mostra informações
             InformacoesEcologicas* info = &entrada->info_ecologica;
             
             // Nome
             char linha[512];
             snprintf(linha, sizeof(linha), "%s (%s)", entrada->animal_ref->nome, info->nome_cientifico);
-            al_draw_text(fonte, al_map_rgb(0, 100, 0), x, y, ALLEGRO_ALIGN_LEFT, linha);
-            y += line_height;
+            desenhar_texto_quebrado(fonte, al_map_rgb(0, 100, 0), x, &y, max_width, line_height, linha);
             
             // Nível trófico
-            snprintf(linha, sizeof(linha), "  Nivel Trofico: %s (Nivel %d)", 
-                     obter_nome_nivel_trofico(info->nivel_trofico), info->nivel_trofico);
-            al_draw_text(fonte, al_map_rgb(50, 50, 50), x, y, ALLEGRO_ALIGN_LEFT, linha);
-            y += line_height;
-            
-            // Posição na cadeia
-            snprintf(linha, sizeof(linha), "  Posicao: %s", 
-                     obter_nome_posicao_cadeia(info->posicao_cadeia));
-            al_draw_text(fonte, al_map_rgb(50, 50, 50), x, y, ALLEGRO_ALIGN_LEFT, linha);
-            y += line_height;
-            
-            // Bioacumulação
-            ALLEGRO_COLOR cor_bio = info->fator_bioacumulacao > 7.0f ? 
-                                    al_map_rgb(200, 0, 0) : al_map_rgb(200, 100, 0);
-            snprintf(linha, sizeof(linha), "  Bioacumulacao: %.1f", info->fator_bioacumulacao);
-            al_draw_text(fonte, cor_bio, x, y, ALLEGRO_ALIGN_LEFT, linha);
-            y += line_height;
+            snprintf(linha, sizeof(linha), "  Nivel: %s", obter_nome_nivel_trofico(info->nivel_trofico));
+            desenhar_texto_quebrado(fonte, al_map_rgb(50, 50, 50), x, &y, max_width, line_height, linha);
             
             // Dieta
             snprintf(linha, sizeof(linha), "  Dieta: %s", info->dieta_principal);
-            al_draw_text(fonte, al_map_rgb(50, 50, 50), x, y, ALLEGRO_ALIGN_LEFT, linha);
-            y += line_height;
+            desenhar_texto_quebrado(fonte, al_map_rgb(50, 50, 50), x, &y, max_width, line_height, linha);
             
             // Papel ecológico
             snprintf(linha, sizeof(linha), "  Papel: %s", info->papel_ecologico);
-            al_draw_text(fonte, al_map_rgb(0, 100, 100), x, y, ALLEGRO_ALIGN_LEFT, linha);
-            y += line_height;
+            desenhar_texto_quebrado(fonte, al_map_rgb(0, 100, 100), x, &y, max_width, line_height, linha);
             
-            // Status de conservação
-            ALLEGRO_COLOR cor_status = strstr(info->status_conservacao, "Perigo") ? 
+            // Status
+            ALLEGRO_COLOR cor_status = strstr(info->status_conservacao, "Perigo") || strstr(info->status_conservacao, "Vulneravel") ? 
                                        al_map_rgb(200, 0, 0) : al_map_rgb(0, 150, 0);
             snprintf(linha, sizeof(linha), "  Status: %s", info->status_conservacao);
-            al_draw_text(fonte, cor_status, x, y, ALLEGRO_ALIGN_LEFT, linha);
-            y += line_height;
+            desenhar_texto_quebrado(fonte, cor_status, x, &y, max_width, line_height, linha);
             
-            // Bioindicador
-            if (info->especie_indicadora) {
-                snprintf(linha, sizeof(linha), "  Bioindicador de: %s", info->biomarcador_de);
-                al_draw_text(fonte, al_map_rgb(150, 100, 0), x, y, ALLEGRO_ALIGN_LEFT, linha);
-                y += line_height;
-            }
-            
-            y += line_height; // Espaço extra entre animais
+            y += line_height * 0.5f; // Espaço entre animais
         }
+    }
+    
+    // Humano (se desbloqueado)
+    if (bestiario->humano_desbloqueado && y < box_y + box_h - 50) {
+        InformacoesEcologicas info_humano = criar_info_ecologica_humano();
+        char linha[512];
+        
+        snprintf(linha, sizeof(linha), "Humano (%s)", info_humano.nome_cientifico);
+        desenhar_texto_quebrado(fonte, al_map_rgb(100, 0, 100), x, &y, max_width, line_height, linha);
+        
+        snprintf(linha, sizeof(linha), "  Nivel: %s", obter_nome_nivel_trofico(info_humano.nivel_trofico));
+        desenhar_texto_quebrado(fonte, al_map_rgb(50, 50, 50), x, &y, max_width, line_height, linha);
+        
+        snprintf(linha, sizeof(linha), "  Papel: %s", info_humano.papel_ecologico);
+        desenhar_texto_quebrado(fonte, al_map_rgb(0, 100, 100), x, &y, max_width, line_height, linha);
     }
     
     // Instrução

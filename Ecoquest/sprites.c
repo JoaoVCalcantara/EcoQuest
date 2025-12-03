@@ -296,7 +296,29 @@ SpriteAnimadoFrameAFrame* criar_sprite_animado_array(const char** caminhos_arqui
 }
 
 void atualizar_sprite_animado_frames(SpriteAnimadoFrameAFrame* sprite, float delta_time) {
-    if (!sprite || !sprite->carregado) return;
+    // Validação EXTREMAMENTE rigorosa
+    if (!sprite) {
+        fprintf(stderr, "[ERRO] atualizar_sprite_animado_frames: sprite NULL\n");
+        return;
+    }
+    
+    if (!sprite->carregado) {
+        fprintf(stderr, "[ERRO] atualizar_sprite_animado_frames: sprite não carregado (nome: %p)\n", (void*)sprite);
+        return;
+    }
+    
+    if (!sprite->frames) {
+        fprintf(stderr, "[ERRO] atualizar_sprite_animado_frames: array de frames NULL (nome: %p)\n", (void*)sprite);
+        return;
+    }
+    
+    // Validação adicional: verifica se frame_atual está dentro dos limites
+    if (sprite->frame_atual < 0 || sprite->frame_atual >= sprite->frames_total) {
+        fprintf(stderr, "[ERRO] atualizar_sprite_animado_frames: frame_atual inválido (%d/%d)\n", 
+                sprite->frame_atual, sprite->frames_total);
+        sprite->frame_atual = 0; // Reset para segurança
+        return;
+    }
 
     sprite->tempo_acumulado += delta_time;
 
@@ -339,10 +361,34 @@ void desenhar_sprite_animado_frames_camera(const SpriteAnimadoFrameAFrame* sprit
     float x, float y,
     float camera_x, float camera_y,
     float escala, float zoom) {
-    if (!sprite || !sprite->carregado) return;
+    // Validação EXTREMAMENTE rigorosa
+    if (!sprite) {
+        fprintf(stderr, "[ERRO] desenhar_sprite_animado_frames_camera: sprite NULL\n");
+        return;
+    }
+    
+    if (!sprite->carregado) {
+        fprintf(stderr, "[ERRO] desenhar_sprite_animado_frames_camera: sprite não carregado\n");
+        return;
+    }
+    
+    if (!sprite->frames) {
+        fprintf(stderr, "[ERRO] desenhar_sprite_animado_frames_camera: array de frames NULL\n");
+        return;
+    }
+    
+    // Validação do índice ANTES de acessar o array
+    if (sprite->frame_atual < 0 || sprite->frame_atual >= sprite->frames_total) {
+        fprintf(stderr, "[ERRO] desenhar_sprite_animado_frames_camera: frame_atual inválido (%d/%d)\n", 
+                sprite->frame_atual, sprite->frames_total);
+        return;
+    }
 
     ALLEGRO_BITMAP* frame_atual = sprite->frames[sprite->frame_atual];
-    if (!frame_atual) return;
+    if (!frame_atual) {
+        fprintf(stderr, "[ERRO] desenhar_sprite_animado_frames_camera: frame[%d] é NULL\n", sprite->frame_atual);
+        return;
+    }
 
     float largura = (float)al_get_bitmap_width(frame_atual);
     float altura = (float)al_get_bitmap_height(frame_atual);
@@ -375,19 +421,51 @@ void set_loop_animacao_frames(SpriteAnimadoFrameAFrame* sprite, bool loop) {
 }
 
 void destruir_sprite_animado_frames(SpriteAnimadoFrameAFrame* sprite) {
-    if (!sprite) return;
+    if (!sprite) {
+        fprintf(stderr, "[DEBUG] destruir_sprite_animado_frames: sprite já NULL\n");
+        return;
+    }
+
+    fprintf(stderr, "[DEBUG] destruir_sprite_animado_frames: destruindo sprite %p (carregado=%d, frames_total=%d)\n", 
+            (void*)sprite, sprite->carregado, sprite->frames_total);
 
     if (sprite->frames) {
         for (int i = 0; i < sprite->frames_total; i++) {
             if (sprite->frames[i]) {
+                fprintf(stderr, "[DEBUG] destruir_sprite_animado_frames: destruindo frame[%d]\n", i);
                 al_destroy_bitmap(sprite->frames[i]);
+                sprite->frames[i] = NULL;
             }
         }
         free(sprite->frames);
+        sprite->frames = NULL;
     }
+    
+    sprite->carregado = false;
     free(sprite);
 }
 
 bool sprite_animado_frames_valido(const SpriteAnimadoFrameAFrame* sprite) {
-    return sprite && sprite->carregado && sprite->frames;
+    if (!sprite) {
+        fprintf(stderr, "[DEBUG] sprite_animado_frames_valido: sprite NULL\n");
+        return false;
+    }
+    
+    if (!sprite->carregado) {
+        fprintf(stderr, "[DEBUG] sprite_animado_frames_valido: sprite não carregado\n");
+        return false;
+    }
+    
+    if (!sprite->frames) {
+        fprintf(stderr, "[DEBUG] sprite_animado_frames_valido: frames NULL\n");
+        return false;
+    }
+    
+    if (sprite->frames_total > 0 && !sprite->frames[0]) {
+        fprintf(stderr, "[DEBUG] sprite_animado_frames_valido: primeiro frame NULL\n");
+        return false;
+    }
+    
+    return true;
 }
+

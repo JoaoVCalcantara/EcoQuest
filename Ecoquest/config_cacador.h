@@ -14,13 +14,13 @@
 #define RAIO_COLISAO_CACADOR_ANIMAL     13.0f   // Raio extra para detecção de colisão
 
 /* Detecção e Perseguição */
-#define RAIO_DETECCAO_PADRAO            25.0f  // Raio de detecção do animal
-#define RAIO_ABANDONO_PADRAO            50.0f  // Raio para abandonar perseguição (2x detecção)
+#define RAIO_DETECCAO_PADRAO            75.0f  // Raio de detecção do animal
+#define RAIO_ABANDONO_PADRAO            100.0f  // Raio para abandonar perseguição (2x detecção)
 #define RAIO_DETECCAO_BOSS              200.0f  // Raio de detecção do boss
 
 /* Velocidades */
 #define VELOCIDADE_PATRULHA             0.7f    // Velocidade durante patrulha
-#define VELOCIDADE_PERSEGUICAO          1.3f    // Velocidade ao perseguir animal
+#define VELOCIDADE_PERSEGUICAO          1.1f    // Velocidade ao perseguir animal
 #define VELOCIDADE_PERSEGUICAO_BOSS     1.4f    // Velocidade do boss
 
 /* Margem de Segurança para Fuga do Animal */
@@ -43,10 +43,10 @@
 /* Atributos de Batalha */
 #define VIDA_MAXIMA_CACADOR_NORMAL      100     // Vida dos caçadores normais
 #define VIDA_MAXIMA_CACADOR_BOSS        200     // Vida do boss
-#define ATAQUE_BASE_CACADOR             20      // Ataque base dos caçadores
-#define ATAQUE_BASE_BOSS                25      // Ataque do boss
-#define DEFESA_BASE_CACADOR             10      // Defesa base dos caçadores
-#define DEFESA_BASE_BOSS                15      // Defesa do boss
+#define ATAQUE_BASE_CACADOR             30      // Ataque base dos caçadores
+#define ATAQUE_BASE_BOSS                40      // Ataque do boss
+#define DEFESA_BASE_CACADOR             20      // Defesa base dos caçadores
+#define DEFESA_BASE_BOSS                30      // Defesa do boss
 
 /* Raios Físicos */
 #define RAIO_CACADOR                    13.0f   // Raio físico do caçador
