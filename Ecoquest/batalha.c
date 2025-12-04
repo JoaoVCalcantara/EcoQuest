@@ -17,26 +17,26 @@
 /* ==== Conteúdo reinserido: frases e funções de popup/lookup de frases ==== */
 /* Frases de estudo */
 static const char* frases_lobo_guara[] = {
-    "Pernas Longas e Esguias - Adaptacao Evolutiva: A caracteristica mais marcante do lobo-guara, suas pernas longas e finas, eh uma adaptacao crucial para a locomocao no capim alto do Cerrado e em areas abertas. Essa estrutura permite que ele enxergue acima da vegetacao rasteira e persiga suas presas de forma eficiente nesse tipo de terreno. Essa caracteristica o diferencia dos lobos e raposas de florestas mais densas.",
+    "Pernas Longas e Esguias - Adaptacao Evolutiva: A caracteristica mais marcante do lobo-guara, suas pernas longas e finas, e uma adaptacao crucial para a locomocao no capim alto do Cerrado e em areas abertas. Essa estrutura permite que ele enxergue acima da vegetacao rasteira e persiga suas presas de forma eficiente nesse tipo de terreno. Essa caracteristica o diferencia dos lobos e raposas de florestas mais densas.",
     "Dieta Onivora (Especializacao em Frutos) - Adaptacao Evolutiva: Diferente da maioria dos grandes canideos, que sao predominantemente carnivoros, o lobo-guara desenvolveu uma dieta onivora, com grande consumo de frutos (chegando a 90% da dieta em certas epocas). Essa dieta e uma resposta a disponibilidade sazonal de recursos no Cerrado. Papel Ecologico: Essa evolucao alimentar fez dele um dispersor de sementes vital para o bioma, especialmente da lobeira (Solanum lycocarpum), estabelecendo uma relacao de mutualismo.",
     "Orelhas Grandes - Adaptacao Evolutiva: Suas orelhas grandes e eretas sao essenciais para detectar presas noturnas (como pequenos roedores e insetos) e para a comunicacao em um ambiente de vegetacao aberta, onde o som pode se propagar melhor do que em uma floresta densa.",
-    "Pelagem e Crina - Adaptacao Evolutiva: A pelagem vermelho-dourada ou alaranjada, com a crina de pelos pretos na nuca, ajuda na camuflagem em meio a vegetacao seca do Cerrado. A crina pode ser erizada, o que pode ter evoluido como uma forma de parecer maior para intimidar rivais ou predadores, ja que eh um animal geralmente solitario e timido.",
-    "Comportamento Solitario - Adaptacao Evolutiva: A vida solitaria e territorialista, formando casais apenas na epoca de reproducao, eh uma adaptacao a um ambiente onde os recursos alimentares (frutos e pequenas presas) sao mais dispersos, nao favorecendo a captura em matilhas tipica dos lobos verdadeiros."
+    "Pelagem e Crina - Adaptacao Evolutiva: A pelagem vermelho-dourada ou alaranjada, com a crina de pelos pretos na nuca, ajuda na camuflagem em meio a vegetacao seca do Cerrado. A crina pode ser erizada, o que pode ter evoluido como uma forma de parecer maior para intimidar rivais ou predadores, ja que e um animal geralmente solitario e timido.",
+    "Comportamento Solitario - Adaptacao Evolutiva: A vida solitaria e territorialista, formando casais apenas na epoca de reproducao, e uma adaptacao a um ambiente onde os recursos alimentares (frutos e pequenas presas) sao mais dispersos, nao favorecendo a captura em matilhas tipica dos lobos verdadeiros."
 };
 
 static const char* frases_jacare[] = {
     "Corpo Hidrodinamico: A forma do corpo e a longa cauda musculosa evoluiram para permitir locomocao e manobrabilidade eficientes na agua. Adaptacoes Aquaticas: Diferente de seus ancestrais, que eram terrestres e podiam ate ser bipedes, os jacares desenvolveram membros mais laterais (postura rastejante) e um focinho mais comprido, adaptacoes para a vida em rios, lagos e pantanos.",
     "Olhos e Narinas no Topo da Cabeca: Uma adaptacao crucial para a emboscada. Isso permite que o jacare permaneca quase totalmente submerso, observando e respirando, enquanto espera a presa.",
     "Pele Resistente: A pele espessa e com placas osseas (osteodermes) oferece protecao contra predadores e ajuda na retencao de agua, uma adaptacao a vida em ambientes sazonais.",
-    "Ovo com Casca Rigida (Amniota): Uma das aquisicoes evolutivas mais importantes dos repteis foi o ovo com casca, que protege o embriao da desseccao, permitindo a reproducao em terra firme, longe da dependencia direta da agua para os ovos.",
-    "Eficiencia Termica (Ectotermia): Por serem ectotermicos (dependem do ambiente para regulator a temperatura corporal), eles desenvolveram comportamentos como tomar sol nas margens para aquecer-se, o que e energeticamente eficiente e uma adaptacao a climas quentes.",
+    "Ovo com Casca Rigida (Amniota): Uma das aquisicoes evolutivas mais importantes dos repteis foi o ovo com casca, que protege o embriao da dessecacao, permitindo a reproducao em terra firme, longe da dependencia direta da agua para os ovos.",
+    "Eficiencia Termica (Ectotermia): Por serem ectotermicos (dependem do ambiente para regular a temperatura corporal), eles desenvolveram comportamentos como tomar sol nas margens para aquecer-se, o que e energeticamente eficiente e uma adaptacao a climas quentes.",
     "Comportamento Maternal: Uma caracteristica evolutiva notavel e o cuidado parental. As femeas protegem os ninhos e ate transportam os filhotes recem-nascidos para a agua, defendendo-os de predadores por um longo periodo."
 };
 
 static const char* frases_boto[] = {
     "Boto Coloracao Rosada: Os botos nao nascem cor-de-rosa; eles nascem cinzentos e a coloracao surge com a idade. A tonalidade rosa e influenciada pela idade, sexo e, principalmente, por cicatrizes de arranhoes em troncos ou disputas entre machos. Isso pode ser uma forma de selecao sexual, onde os machos mais rosados (mais marcados por lutas) sao mais desejaveis.",
     "Flexibilidade Corporal e Pescoco Articulado: Ao contrario dos golfinhos marinhos, cujas vertebras cervicais sao fundidas, as do boto nao sao. Adaptacao Evolutiva: Essa flexibilidade permite que ele vire a cabeca em um angulo de ate 90 graus, essencial para manobrar e cacar em areas alagadas, igapos e entre troncos de arvores, algo inviavel em mar aberto.",
-    "Focinho Longo e Dentes Adaptados: O boto possui um focinho mais longo e fino do que a maioria dos golfinhos marinhos, com dentes diferentes na frente (para agarrar) e no fundo da boca (para triturar). Adaptacao Evolutiva: Essa specializacao permite a captura de uma dieta variada, incluindo peixes, tartarugas e caranguejos, adaptando-se aos recursos disponiveis nos rios.",
+    "Focinho Longo e Dentes Adaptados: O boto possui um focinho mais longo e fino do que a maioria dos golfinhos marinhos, com dentes diferentes na frente (para agarrar) e no fundo da boca (para triturar). Adaptacao Evolutiva: Essa especializacao permite a captura de uma dieta variada, incluindo peixes, tartarugas e caranguejos, adaptando-se aos recursos disponiveis nos rios.",
     "Visao Reduzida e Ecolocalizacao Aprimorada: Embora ainda funcional, a visao do boto e menos desenvolvida do que a de golfinhos marinhos, o que faz sentido em aguas turvas e escuras da Amazonia. Adaptacao Evolutiva: Em compensacao, seu sistema de ecolocalizacao e extremamente sofisticado, permitindo-lhe navegar e cacar com precisao em condicoes de pouca ou nenhuma visibilidade.",
     "Ausencia de Nadadeira Dorsal Proeminente: Em vez de uma barbatana dorsal alta e rigida, o boto tem apenas uma pequena crista dorsal. Adaptacao Evolutiva: Isso facilita a natacao em aguas rasas e a passagem por baixo de galhos e vegetacao densa durante as cheias sazonais da Amazonia.",
     "Cerebro Grande e Complexo: O boto-cor-de-rosa tem o maior cerebro entre os golfinhos de agua doce e, proporcionalmente, utiliza mais capacidade cerebral que os humanos."
@@ -45,16 +45,16 @@ static const char* frases_boto[] = {
 static const char* frases_onca[] = {
     "Mandibula e Forca de Mordida Excepcionais: Esta e talvez a sua caracteristica evolutiva mais distintiva. A onca-pintada desenvolveu uma cabeca grande e robusta, com musculos mandibulares e dentes caninos extremamente fortes, permitindo-lhe ter uma das mordidas mais potentes entre todos os felinos. Vantagem Evolutiva: Essa forca permite a onca abater presas grandes e, crucialmente, perfurar cranios de mamiferos ou cascos de repites (como tartarugas e jacares), um metodo de caca raro entre felinos, que geralmente matam por estrangulamento.",
     "Constituicao Fisica Musculosa e Membros Curtos: Em contraste com a estrutura mais esguia de guepardos ou leopardos, a onca-pintada tem um corpo atarracado e musculoso, com membros curtos e macicos. Vantagem Evolutiva: Essa estrutura fisica nao e para velocidade em corridas longas, mas sim para forca, agilidade em curtas distancias e a capacidade de nadar e escalar arvores, permitindo-lhe emboscar presas em ambientes densos e proximos a agua.",
-    "Padrao de Pelagem (Rosetas): Sua pelagem de cor amarelo-dourada a castanho-avermelhada e coberta por rosetas complexas (manchas circulares com pontos pretos dentro). Vantagem Evolutiva: Este padrao fornece uma camuflagem excellente na vegetacao densa e na luz filtrada de florestas e pantanos, facilitando a caca por emboscada.",
-    "Habilidades Aquaticas: Diferente da maioria dos felinos que evitam a agua, a onca-pintada e uma excelente nadadora, uma adaptacao vital para a vida em biomas com muitos corpos d'agua, como a Amazonia e o Pantanal, onde pode cacar presas aquaticas e semi-aquaticas."
+    "Padrao de Pelagem (Rosetas): Sua pelagem de cor amarelo-dourada a castanho-avermelhada e coberta por rosetas complexas (manchas circulares com pontos pretos dentro). Vantagem Evolutiva: Este padrao fornece uma camuflagem excelente na vegetacao densa e na luz filtrada de florestas e pantanos, facilitando a caca por emboscada.",
+    "Habilidades Aquaticas: Diferente da maioria dos felinos que evitam a agua, a onca-pintada e uma excelente nadadora, uma adaptacao vital para a vida em biomas com muitos corpos de agua, como a Amazonia e o Pantanal, onde pode cacar presas aquaticas e semi-aquaticas."
 };
 
 static const char* frases_harpia[] = {
-    "Visao Excepcional - Adaptacao Evolutiva: A harpia possui uma das visoes mais aguçadas do reino animal, com olhos grandes adaptados para enxergar presas a grandes distancias mesmo em florestas densas. Pode detectar um macaco a mais de 200 metros de distancia.",
-    "Garras Poderosas - Adaptacao Evolutiva: Suas garras podem medir ate 12 cm, do tamanho das garras de um urso-pardo, tornando-a capaz de capturar presas grandes como preguiças e macacos. Essa forca permite perfurar o cranio das presas instantaneamente.",
-    "Voo Agil em Floresta Densa - Adaptacao Evolutiva: Apesar do tamanho (envergadura de ate 2 metros), a harpia desenvolveu asas curtas e largas que permitem manobrabilidade excepcional entre arvores, uma adaptacao crucial para caçar no dossel da Amazonia.",
-    "Caçadora de Dossel - Papel Ecologico: Como predadora de topo do dossel amazonico, a harpia controla populacoes de primatas e preguiças, sendo essencial para o equilibrio ecologico da floresta tropical.",
-    "Nidificação e Cuidado Parental - Adaptacao Evolutiva: Constroi ninhos enormes (ate 1.5m de diametro) no topo das arvores mais altas e cuida de apenas um filhote por vez durante ate 2 anos, garantindo alta taxa de sobrevivencia."
+    "Visao Excepcional - Adaptacao Evolutiva: A harpia possui uma das visoes mais agucadas do reino animal, com olhos grandes adaptados para enxergar presas a grandes distancias mesmo em florestas densas. Pode detectar um macaco a mais de 200 metros de distancia.",
+    "Garras Poderosas - Adaptacao Evolutiva: Suas garras podem medir ate 12 cm, do tamanho das garras de um urso-pardo, tornando-a capaz de capturar presas grandes como preguicas e macacos. Essa forca permite perfurar o cranio das presas instantaneamente.",
+    "Voo Agil em Floresta Densa - Adaptacao Evolutiva: Apesar do tamanho (envergadura de ate 2 metros), a harpia desenvolveu asas curtas e largas que permitem manobrabilidade excepcional entre arvores, uma adaptacao crucial para cacar no dossel da Amazonia.",
+    "Cacadora de Dossel - Papel Ecologico: Como predadora de topo do dossel amazonico, a harpia controla populacoes de primatas e preguicas, sendo essencial para o equilibrio ecologico da floresta tropical.",
+    "Nidificacao e Cuidado Parental - Adaptacao Evolutiva: Constroi ninhos enormes (ate 1.5m de diametro) no topo das arvores mais altas e cuida de apenas um filhote por vez durante ate 2 anos, garantindo alta taxa de sobrevivencia."
 };
 
 static const char* frases_mico[] = {
@@ -67,34 +67,34 @@ static const char* frases_mico[] = {
 
 static const char* frases_capivara[] = {
     "Maior Roedor do Mundo - Adaptacao Evolutiva: Com ate 65 kg, a capivara evoluiu um tamanho corporal que a torna menos vulneravel a predadores pequenos, mantendo ainda a flexibilidade de herbivoro semi-aquatico.",
-    "Adaptacoes Aquaticas - Adaptacao Evolutiva: Membranas interdigitais (como patos) facilitam a natacao, olhos e narinas no topo da cabeça permitem ficar submersa observando predadores, e pode prender a respiracao por ate 5 minutos.",
+    "Adaptacoes Aquaticas - Adaptacao Evolutiva: Membranas interdigitais (como patos) facilitam a natacao, olhos e narinas no topo da cabeca permitem ficar submersa observando predadores, e pode prender a respiracao por ate 5 minutos.",
     "Herbivoria Especifica - Adaptacao Evolutiva: Seus dentes crescem continuamente (como todos roedores), adaptacao essencial para sua dieta de gramineas duras que desgastariam dentes normais rapidamente.",
     "Comportamento Social Complexo - Adaptacao Evolutiva: Vivem em grupos hierarquicos de ate 20 individuos, uma estrategia anti-predacao crucial em ambientes abertos como pantanos, onde a vigilancia coletiva aumenta chances de sobrevivencia.",
-    "Engenheira de Ecossistemas - Papel Ecologico: Ao pastar grandes quantidades de vegetacao aquatica e terrestre, a capivara modifica o habitat para outras especies, sendo considerada 'engenheira de ecossistemas' em areas alagadas."
+    "Engenheira de Ecossistemas - Papel Ecologico: Ao pastar grandes quantidades de vegetacao aquatica e terrestre, a capivara modifica o habitat para outras especies, sendo considerada engenheira de ecossistemas em areas alagadas."
 };
 
 static const char* frases_tubarao[] = {
     "Tolerancia a Agua Doce - Adaptacao Evolutiva: Unico tubarao capaz de viver tanto em agua salgada quanto doce, o tubarao-touro desenvolveu rins e glandulas especiais que regulam concentracao de sal no corpo, permitindo navegar rios da Amazonia.",
     "Mandibulas Poderosas - Adaptacao Evolutiva: Possui uma das mordidas mais fortes entre tubaroes, adaptacao para capturar presas grandes e variedades em ambientes diversos (oceano, estuarios, rios), maximizando oportunidades alimentares.",
-    "Agressividade e Territorialidade - Adaptacao Evolutiva: Sua reputacao de agressividade pode ser uma estrategia evolutiva para defender territorios ricos em recursos tanto marinhos quanto fluviais, onde a competicao e intensa.",
-    "Reproducao Vivipara - Adaptacao Evolutiva: As femeas dao a luz filhotes vivos (viviparidade), e frequentemente usam estuarios e rios como 'berçarios' onde filhotes tem menos predadores, aumentando sobrevivencia da prole.",
+    "Agressividade e Territorialidade - Adaptacao Evolutiva: Sua reputacao de agressividade pode ser uma estrategia evolutiva para defender territórios ricos em recursos tanto marinhos quanto fluviais, onde a competicao e intensa.",
+    "Reproducao Vivipara - Adaptacao Evolutiva: As femeas dao a luz filhotes vivos (viviparidade), e frequentemente usam estuarios e rios como bercarios onde filhotes tem menos predadores, aumentando sobrevivencia da prole.",
     "Predador Oportunista de Topo - Papel Ecologico: Como predador generalista que transita entre ambientes marinhos e dulcicolas, o tubarao-touro conecta cadeias alimentares de diferentes ecossistemas, regulando populacoes de presas em multiplos habitats."
 };
 
 static const char* frases_tamandua[] = {
     "Lingua Longa e Pegajosa - Adaptacao Evolutiva: Sua lingua pode se estender ate 60 cm, coberta por saliva pegajosa, adaptacao perfeita para capturar formigas e cupins dentro de tuneis estreitos, sua dieta exclusiva.",
     "Ausencia de Dentes - Adaptacao Evolutiva: Evoluiu sem dentes porque sua dieta de insetos moles nao exige mastigacao; o estomago muscular (como moela de ave) tritura o alimento, uma economia energetica evolutiva significativa.",
-    "Garras Poderosas - Adaptacao Evolutiva: Garras dianteiras enormes servem para escavar cupinzeiros/formigueiros duros e tambem para defesa contra predadores como onças. Essa multifuncionalidade aumentou sua sobrevivencia.",
-    "Baixo Metabolismo - Adaptacao Evolutiva: Tem uma das taxas metabolicas mais baixas entre mamiferos, adaptacao ao Cerrado onde recursos podem ser escassos; economiza energia movendo-se lentamente e dormindo ate 16 horas/dia.",
+    "Garras Poderosas - Adaptacao Evolutiva: Garras dianteiras enormes servem para escavar cupinzeiros e formigueiros duros e tambem para defesa contra predadores como oncas. Essa multifuncionalidade aumentou sua sobrevivencia.",
+    "Baixo Metabolismo - Adaptacao Evolutiva: Tem uma das taxas metabolicas mais baixas entre mamiferos, adaptacao ao Cerrado onde recursos podem ser escassos; economiza energia movendo-se lentamente e dormindo ate 16 horas por dia.",
     "Dispersor de Sementes Involuntario - Papel Ecologico: Ao escavar cupinzeiros, revolve solo e espalha sementes que estavam enterradas, contribuindo indiretamente para regeneracao de vegetacao do Cerrado."
 };
 
 static const char* frases_pirarucu[] = {
     "Maior Peixe de Escamas de Agua Doce - Adaptacao Evolutiva: Pode atingir ate 3 metros e pesar 200 kg, tamanho que evoluiu como vantagem competitiva na Amazonia, permitindo-lhe dominar outros peixes e escapar de predadores menores.",
-    "Respiracao Aerea Obligatoria - Adaptacao Evolutiva: Desenvolveu a capacidade de respirar ar atmosferico diretamente (atraves de uma bexiga natatoria modificada), adaptacao crucial para sobreviver em aguas pobres em oxigenio da varzea amazonica durante a seca.",
+    "Respiracao Aerea Obrigatoria - Adaptacao Evolutiva: Desenvolveu a capacidade de respirar ar atmosferico diretamente (atraves de uma bexiga natatoria modificada), adaptacao crucial para sobreviver em aguas pobres em oxigenio da varzea amazonica durante a seca.",
     "Lingua Ossea (Dentes na Lingua) - Adaptacao Evolutiva: Possui uma placa ossea na lingua com pequenos dentes que, junto com dentes no ceu da boca, tritura presas como peixes e crustaceos, uma especializacao alimentar unica.",
     "Cuidado Parental (Macho) - Adaptacao Evolutiva: Os machos protegem agressivamente ninhos e filhotes durante os primeiros meses, um comportamento raro entre peixes que aumenta dramaticamente a sobrevivencia da prole em ambientes com muitos predadores.",
-    "Escamas Enormes (Armadura Natural) - Adaptacao Evolutiva: Suas escamas podem atingir 6 cm e sao extremamente duras, funcionando como armadura contra predadores como piranhas e jacares jovens, e historicamente usadas por indigenas como lixas e utensílios.",
+    "Escamas Enormes (Armadura Natural) - Adaptacao Evolutiva: Suas escamas podem atingir 6 cm e sao extremamente duras, funcionando como armadura contra predadores como piranhas e jacares jovens, e historicamente usadas por indigenas como lixas e utensilios.",
     "Predador de Topo Aquatico - Papel Ecologico: Como um dos maiores peixes da Amazonia, o pirarucu regula populacoes de peixes menores, sendo essencial para o equilibrio dos ecossistemas aquaticos da regiao."
 };
 
@@ -111,9 +111,16 @@ static const char** obter_frases_animal(const char* nome_animal, int* total_fras
     char nome_normalizado[64];
     int j = 0;
     for (int i = 0; nome_lower[i] && j < (int)sizeof(nome_normalizado) - 1; i++) {
-        nome_normalizado[j++] = (nome_lower[i] == ' ') ? '_' : nome_lower[i];
+        // Substituir espacos E hifens por underscores
+        if (nome_lower[i] == ' ' || nome_lower[i] == '-') {
+            nome_normalizado[j++] = '_';
+        } else {
+            nome_normalizado[j++] = nome_lower[i];
+        }
     }
     nome_normalizado[j] = '\0';
+
+    printf("[DEBUG] Nome original: '%s' | Nome normalizado: '%s'\n", nome_animal, nome_normalizado);
 
     if (strcmp(nome_normalizado, "lobo_guara") == 0 || strcmp(nome_lower, "lobo guara") == 0) {
         *total_frases = (int)(sizeof(frases_lobo_guara) / sizeof(frases_lobo_guara[0]));
@@ -135,7 +142,7 @@ static const char** obter_frases_animal(const char* nome_animal, int* total_fras
         *total_frases = (int)(sizeof(frases_harpia) / sizeof(frases_harpia[0]));
         return frases_harpia;
     }
-    else if (strcmp(nome_lower, "mico-leao dourado") == 0 || strcmp(nome_normalizado, "mico-leao_dourado") == 0) {
+    else if (strcmp(nome_normalizado, "mico_leao_dourado") == 0) {
         *total_frases = (int)(sizeof(frases_mico) / sizeof(frases_mico[0]));
         return frases_mico;
     }
@@ -147,7 +154,7 @@ static const char** obter_frases_animal(const char* nome_animal, int* total_fras
         *total_frases = (int)(sizeof(frases_tubarao) / sizeof(frases_tubarao[0]));
         return frases_tubarao;
     }
-    else if (strcmp(nome_lower, "tamandua-bandeira") == 0 || strcmp(nome_normalizado, "tamandua-bandeira") == 0 || strcmp(nome_normalizado, "tamandua_bandeira") == 0) {
+    else if (strcmp(nome_normalizado, "tamandua_bandeira") == 0) {
         *total_frases = (int)(sizeof(frases_tamandua) / sizeof(frases_tamandua[0]));
         return frases_tamandua;
     }
@@ -156,6 +163,7 @@ static const char** obter_frases_animal(const char* nome_animal, int* total_fras
         return frases_pirarucu;
     }
 
+    printf("[AVISO] Animal '%s' nao possui frases cadastradas!\n", nome_animal);
     *total_frases = 0;
     return NULL;
 }
@@ -419,6 +427,11 @@ static void aplicar_ajustes_animal_especifico(const char* nome_animal,
     if (strstr(nome_lower, "harpia") != NULL) {
         *oponente_escala += HARPIA_ESCALA_EXTRA;
     }
+
+    // Jacaré: abaixar 35px na altura (aumentar Y)
+    if (strstr(nome_lower, "jacare") != NULL) {
+        *oponente_y += JACARE_OFFSET_Y;
+    }
 }
 
 void desenhar_batalha_unificada(ALLEGRO_FONT* fonte, int opcao, ALLEGRO_DISPLAY* display,
@@ -660,12 +673,17 @@ void iniciar_batalha_unificada(ALLEGRO_FONT* fonte, OponenteBatalha* oponente,
     if (oponente->tipo == BATALHA_ANIMAL) {
         snprintf(caminho_sprite_oponente, sizeof(caminho_sprite_oponente), 
                 "assets/img/animais/%s.png", oponente->nome);
+        // Converter para lowercase e substituir espaços, hífens e outros caracteres especiais por underscores
         for (size_t i = 0; caminho_sprite_oponente[i]; i++) {
             if (caminho_sprite_oponente[i] >= 'A' && caminho_sprite_oponente[i] <= 'Z')
                 caminho_sprite_oponente[i] += ('a' - 'A');
-            if (caminho_sprite_oponente[i] == ' ')
+            // Substituir espaços, hífens e outros caracteres especiais por underscore
+            if (caminho_sprite_oponente[i] == ' ' || 
+                caminho_sprite_oponente[i] == '-' ||
+                caminho_sprite_oponente[i] == '\xC3') // Caractere especial UTF-8 (ã, á, etc)
                 caminho_sprite_oponente[i] = '_';
         }
+        printf("[DEBUG] Caminho sprite animal gerado: %s\n", caminho_sprite_oponente);
     } else {
         snprintf(caminho_sprite_oponente, sizeof(caminho_sprite_oponente), 
                 "%s", oponente->cacador->dados_batalha.caminho_sprite);

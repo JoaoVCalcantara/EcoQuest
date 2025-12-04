@@ -44,7 +44,7 @@
 #define VIDA_MAXIMA_CACADOR_NORMAL      100     // Vida dos caçadores normais
 #define VIDA_MAXIMA_CACADOR_BOSS        200     // Vida do boss
 #define ATAQUE_BASE_CACADOR             30      // Ataque base dos caçadores
-#define ATAQUE_BASE_BOSS                40      // Ataque do boss
+#define ATAQUE_BASE_BOSS                35     // Ataque do boss
 #define DEFESA_BASE_CACADOR             20      // Defesa base dos caçadores
 #define DEFESA_BASE_BOSS                30      // Defesa do boss
 

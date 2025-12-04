@@ -221,11 +221,11 @@ void adicionar_especie_bestiario(Bestiario* bestiario, Animal* animal) {
         }
     }
 
-    // Normaliza nome com underscore
+    // Normaliza nome com underscore (substitui espaços E HÍFENS)
     char nome_normalizado[64];
     int j = 0;
     for (int i = 0; nome_lower[i] && j < 63; i++) {
-        if (nome_lower[i] == ' ') {
+        if (nome_lower[i] == ' ' || nome_lower[i] == '-') {
             nome_normalizado[j++] = '_';
         }
         else {
@@ -234,7 +234,9 @@ void adicionar_especie_bestiario(Bestiario* bestiario, Animal* animal) {
     }
     nome_normalizado[j] = '\0';
 
-    if (strcmp(nome_lower, "lobo guara") == 0 || strcmp(nome_normalizado, "lobo_guara") == 0) {
+    printf("[BESTIARIO] Adicionando: '%s' | Normalizado: '%s'\n", animal->nome, nome_normalizado);
+
+    if (strcmp(nome_normalizado, "lobo_guara") == 0) {
         bestiario->entradas[idx].info_ecologica = criar_info_ecologica_lobo_guara();
     }
     else if (strcmp(nome_lower, "jacare") == 0) {
@@ -249,20 +251,23 @@ void adicionar_especie_bestiario(Bestiario* bestiario, Animal* animal) {
     else if (strcmp(nome_lower, "harpia") == 0) {
         bestiario->entradas[idx].info_ecologica = criar_info_ecologica_harpia();
     }
-    else if (strcmp(nome_lower, "mico-leao dourado") == 0 || strcmp(nome_normalizado, "mico-leao_dourado") == 0) {
+    else if (strcmp(nome_normalizado, "mico_leao_dourado") == 0) {
         bestiario->entradas[idx].info_ecologica = criar_info_ecologica_mico();
     }
     else if (strcmp(nome_lower, "capivara") == 0) {
         bestiario->entradas[idx].info_ecologica = criar_info_ecologica_capivara();
     }
-    else if (strcmp(nome_lower, "tubarao touro") == 0 || strcmp(nome_normalizado, "tubarao_touro") == 0) {
+    else if (strcmp(nome_normalizado, "tubarao_touro") == 0) {
         bestiario->entradas[idx].info_ecologica = criar_info_ecologica_tubarao();
     }
-    else if (strcmp(nome_lower, "tamandua-bandeira") == 0 || strcmp(nome_normalizado, "tamandua-bandeira") == 0 || strcmp(nome_normalizado, "tamandua_bandeira") == 0) {
+    else if (strcmp(nome_normalizado, "tamandua_bandeira") == 0) {
         bestiario->entradas[idx].info_ecologica = criar_info_ecologica_tamandua();
     }
     else if (strcmp(nome_lower, "pirarucu") == 0) {
         bestiario->entradas[idx].info_ecologica = criar_info_ecologica_pirarucu();
+    }
+    else {
+        printf("[AVISO] Animal '%s' nao possui info ecologica cadastrada!\n", animal->nome);
     }
 
     bestiario->total_especies++;

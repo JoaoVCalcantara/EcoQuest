@@ -80,17 +80,17 @@ static void atualizar_progresso_cenarios(entidade* jogador, Bot bots[TOTAL_ANIMA
     if (contar_animais_estudados_cenario(bots, CENARIO1) >= 1) {
         jogador->progresso.cenario1_completo = true;
     }
-    
+
     // Cenário 2 completo: pelo menos 1 animal estudado
     if (contar_animais_estudados_cenario(bots, CENARIO2) >= 1) {
         jogador->progresso.cenario2_completo = true;
     }
-    
+
     // Cenário 3 completo: pelo menos 1 animal estudado
     if (contar_animais_estudados_cenario(bots, CENARIO3) >= 1) {
         jogador->progresso.cenario3_completo = true;
     }
-    
+
     // Cenário 4 completo: pelo menos 1 animal estudado
     if (contar_animais_estudados_cenario(bots, CENARIO4) >= 1) {
         jogador->progresso.cenario4_completo = true;
@@ -221,6 +221,17 @@ static void inicializar_jogo(AllegroContext* ctx,
         cacadores[i].velocidade_perseguicao = VELOCIDADE_PERSEGUICAO;
         cacadores[i].tempo_dano_interval = COOLDOWN_DANO_CACADOR;
         cacadores[i].ativo = false;
+
+        // DEBUG: Verificar configuração de alvos
+        if (cacadores[i].alvo) {
+            printf("[INIT] Cacador %d (%s) -> Alvo: %s (Bot %d)\n",
+                i, cacadores[i].nome,
+                cacadores[i].alvo->animal_data.nome,
+                (int)(cacadores[i].alvo - bots));  // Índice do bot
+        }
+        else {
+            printf("[ERRO] Cacador %d (%s) SEM ALVO!\n", i, cacadores[i].nome);
+        }
     }
 
     /* Boss - USANDO CONFIGURAÇÕES */
@@ -511,17 +522,30 @@ int main() {
 
                 // ========== ATUALIZAÇÃO DOS ANIMAIS (continuação do movimento mesmo se o caçador morrer) ==========
                 for (int i = 0; i < TOTAL_ANIMAIS; i++) {
-                    if (bots[i].ativo && bots[i].cenario == cena_logic) {
-                        // Se o caçador correspondente estiver ativo e não derrotado, atualiza com lógica de interação.
-                        // Caso contrário (cacador derrotado ou inativo), o animal continua a atualizar seu comportamento normal.
-                        if (i < TOTAL_CACADORES && cacadores[i].ativo && !cacadores[i].derrotado && cacadores[i].cenario == cena_logic) {
-                            atualizar_bot_com_cacador(&bots[i], &cacadores[i], LARGURA_MAPA, ALTURA_MAPA, delta_time);
+                    if (!bots[i].ativo || bots[i].cenario != cena_logic) continue;
+
+                    // Verificar se ALGUM caçador ativo está perseguindo ESTE animal
+                    bool sendo_perseguido = false;
+                    Cacador* cacador_perseguidor = NULL;
+
+                    for (int j = 0; j < TOTAL_CACADORES; j++) {
+                        if (cacadores[j].ativo &&
+                            !cacadores[j].derrotado &&
+                            cacadores[j].cenario == cena_logic &&
+                            cacadores[j].alvo == &bots[i]) {  // Caçador tem ESTE animal como alvo
+                            sendo_perseguido = true;
+                            cacador_perseguidor = &cacadores[j];
+                            break;  // Encontrou um caçador perseguindo
                         }
-                        else {
-                            // Função que atualiza o comportamento padrão do bot sem depender do caçador.
-                            // Presume-se que exista `atualizar_bot` em inimigo.c/h; mantém movimento/patrulha do animal.
-                            atualizar_bot(&bots[i], LARGURA_MAPA, ALTURA_MAPA, delta_time);
-                        }
+                    }
+
+                    if (sendo_perseguido && cacador_perseguidor) {
+                        // Animal sabe que está sendo perseguido e foge
+                        atualizar_bot_com_cacador(&bots[i], cacador_perseguidor, LARGURA_MAPA, ALTURA_MAPA, delta_time);
+                    }
+                    else {
+                        // Animal patrulha normalmente (sem caçador ativo perseguindo)
+                        atualizar_bot(&bots[i], LARGURA_MAPA, ALTURA_MAPA, delta_time);
                     }
                 }
 
@@ -567,11 +591,11 @@ int main() {
 
                         // NOVA LÓGICA: Verificar se TODOS os caçadores do cenário foram derrotados
                         if (!todos_cacadores_cenario_derrotados(cacadores, bots[i].cenario)) {
-                            printf("[BLOQUEADO] Derrote TODOS os cacadores do %s primeiro!\n", 
-                                   bots[i].cenario == CENARIO1 ? "Cenario 1 (Selva)" :
-                                   bots[i].cenario == CENARIO2 ? "Cenario 2 (Pantano)" :
-                                   bots[i].cenario == CENARIO3 ? "Cenario 3 (Lago)" : "Cenario 4 (Cerrado)");
-                            
+                            printf("[BLOQUEADO] Derrote TODOS os cacadores do %s primeiro!\n",
+                                bots[i].cenario == CENARIO1 ? "Cenario 1 (Selva)" :
+                                bots[i].cenario == CENARIO2 ? "Cenario 2 (Pantano)" :
+                                bots[i].cenario == CENARIO3 ? "Cenario 3 (Lago)" : "Cenario 4 (Cerrado)");
+
                             int derrotados = contar_cacadores_derrotados_cenario(cacadores, bots[i].cenario);
                             int total_cenario = 0;
                             for (int j = 0; j < TOTAL_CACADORES; j++) {
@@ -829,7 +853,7 @@ int main() {
                     snprintf(texto_cacadores, sizeof(texto_cacadores), FMT_CACADORES_DERROTADOS, cacadores_derrotados);
                     al_draw_text(fonte, al_map_rgb(COR_TEXTO_OURO_R, COR_TEXTO_OURO_G, COR_TEXTO_OURO_B),
                         POS_TEXTO_CONTADOR_X, POS_TEXTO_CONTADOR_Y, ALLEGRO_ALIGN_LEFT, texto_cacadores);
-                    
+
                     // NOVA: Mostrar progresso de animais estudados
                     int animais_estudados = 0;
                     for (int i = 0; i < TOTAL_ANIMAIS; i++) {
@@ -839,7 +863,7 @@ int main() {
                     snprintf(texto_animais, sizeof(texto_animais), "Animais Estudados: %d/%d", animais_estudados, TOTAL_ANIMAIS);
                     al_draw_text(fonte, al_map_rgb(COR_TEXTO_VERDE_CLARO_R, COR_TEXTO_VERDE_CLARO_G, COR_TEXTO_VERDE_CLARO_B),
                         POS_TEXTO_CONTADOR_X, POS_TEXTO_CONTADOR_Y + 20, ALLEGRO_ALIGN_LEFT, texto_animais);
-                    
+
                     // NOVA: Mostrar requisitos para o boss se ainda não foi liberado
                     if (!boss.liberado && (cacadores_derrotados >= TOTAL_CACADORES || animais_estudados >= TOTAL_ANIMAIS - 2)) {
                         al_draw_text(fonte, al_map_rgb(COR_TEXTO_MAGENTA_R, COR_TEXTO_MAGENTA_G, COR_TEXTO_MAGENTA_B),
@@ -867,11 +891,11 @@ int main() {
                                     for (int j = 0; j < TOTAL_CACADORES; j++) {
                                         if (cacadores[j].cenario == bots[i].cenario) total_cenario++;
                                     }
-                                    
+
                                     char mensagem_bloqueio[128];
-                                    snprintf(mensagem_bloqueio, sizeof(mensagem_bloqueio), 
-                                            "Derrote todos os cacadores! (%d/%d)", derrotados, total_cenario);
-                                    
+                                    snprintf(mensagem_bloqueio, sizeof(mensagem_bloqueio),
+                                        "Derrote todos os cacadores! (%d/%d)", derrotados, total_cenario);
+
                                     al_draw_text(fonte, al_map_rgb(COR_TEXTO_VERMELHO_R, COR_TEXTO_VERMELHO_G, COR_TEXTO_VERMELHO_B),
                                         POS_TEXTO_CENTRO_X, POS_TEXTO_BLOQUEIO_Y,
                                         ALLEGRO_ALIGN_CENTRE, mensagem_bloqueio);

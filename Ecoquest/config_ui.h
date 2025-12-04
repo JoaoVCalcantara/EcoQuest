@@ -22,46 +22,46 @@
 #define SELVA_ANIMAL_ESCALA        0.25f
 
 #define SELVA_CACADOR_X            885.0f
-#define SELVA_CACADOR_Y            445.0f
+#define SELVA_CACADOR_Y            435.0f
 #define SELVA_CACADOR_ESCALA       0.30f
 
 /* --- CENÁRIO: PANTANO --- */
-#define PANTANO_JOGADOR_X          290.0f
-#define PANTANO_JOGADOR_Y          400.0f
+#define PANTANO_JOGADOR_X          350.0f
+#define PANTANO_JOGADOR_Y          425.0f
 #define PANTANO_JOGADOR_ESCALA     0.45f
 
-#define PANTANO_ANIMAL_X           1010.0f
-#define PANTANO_ANIMAL_Y           350.0f
+#define PANTANO_ANIMAL_X           890.0f
+#define PANTANO_ANIMAL_Y           275.0f
 #define PANTANO_ANIMAL_ESCALA      0.2f
 
 #define PANTANO_CACADOR_X          900.0f
-#define PANTANO_CACADOR_Y          350.0f
-#define PANTANO_CACADOR_ESCALA     0.2f
+#define PANTANO_CACADOR_Y          250.0f
+#define PANTANO_CACADOR_ESCALA     0.3f
 
 /* --- CENÁRIO: LAGO --- */
-#define LAGO_JOGADOR_X             320.0f
-#define LAGO_JOGADOR_Y             500.0f
+#define LAGO_JOGADOR_X             375.0f
+#define LAGO_JOGADOR_Y             425.0f
 #define LAGO_JOGADOR_ESCALA        0.5f
 
-#define LAGO_ANIMAL_X              960.0f
-#define LAGO_ANIMAL_Y              490.0f
+#define LAGO_ANIMAL_X              935.0f
+#define LAGO_ANIMAL_Y              450.0f
 #define LAGO_ANIMAL_ESCALA         0.25f
 
-#define LAGO_CACADOR_X             960.0f
-#define LAGO_CACADOR_Y             490.0f
+#define LAGO_CACADOR_X             935.0f
+#define LAGO_CACADOR_Y             400.0f
 #define LAGO_CACADOR_ESCALA        0.30f
 
 /* --- CENÁRIO: CERRADO --- */
-#define CERRADO_JOGADOR_X          340.0f
-#define CERRADO_JOGADOR_Y          560.0f
+#define CERRADO_JOGADOR_X          450.0f
+#define CERRADO_JOGADOR_Y          450.0f
 #define CERRADO_JOGADOR_ESCALA     0.45f
 
 #define CERRADO_ANIMAL_X           940.0f
-#define CERRADO_ANIMAL_Y           470.0f
+#define CERRADO_ANIMAL_Y           315.0f
 #define CERRADO_ANIMAL_ESCALA      0.25f
 
-#define CERRADO_CACADOR_X          940.0f
-#define CERRADO_CACADOR_Y          470.0f
+#define CERRADO_CACADOR_X          925.0f
+#define CERRADO_CACADOR_Y          315.0f
 #define CERRADO_CACADOR_ESCALA     0.30f
 
 /* === AJUSTES ESPECÍFICOS POR ANIMAL === */
@@ -70,6 +70,9 @@
 
 /* Harpia: aumentar escala */
 #define HARPIA_ESCALA_EXTRA        0.10f  /* Adicional à escala base do cenário */
+
+/* Jacaré: abaixar 35px na altura (aumentar Y) */
+#define JACARE_OFFSET_Y            35.0f
 
 /* --- CENÁRIO: BOSS (Caçador Chefe) --- */
 #define BOSS_JOGADOR_X             200.0f

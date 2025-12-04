@@ -283,6 +283,7 @@ void iniciar_bot(Bot* bot, float x, float y, const char* nome, const char* tipo,
     bot->y = y;
     bot->raio = RAIO_ANIMAL;
     bot->velocidade = VELOCIDADE_ANIMAL;
+    bot->velocidade_base = VELOCIDADE_ANIMAL;  // Salva velocidade original
     
     // Direção inicial aleatória
     float angulo_inicial = ((float)rand() / RAND_MAX) * 6.283185f;
@@ -295,6 +296,10 @@ void iniciar_bot(Bot* bot, float x, float y, const char* nome, const char* tipo,
     bot->ativo = true;
     bot->cenario = cenario;
     bot->cooldown_colisao = 0.0f;
+
+    // Sistema de estado
+    bot->estado_atual = ESTADO_PATRULHA;
+    bot->tempo_no_estado = 0.0f;
 
     bot->fugindo = false;
     bot->fuga_timer = 0.0f;
@@ -326,6 +331,14 @@ void iniciar_bot(Bot* bot, float x, float y, const char* nome, const char* tipo,
     // Inicializa estado de parada ocasional
     bot->parado = false;
     bot->parado_timer = 0.0f;
+    
+    // Inicializa sistema de visão
+    inicializar_sistema_visao(&bot->visao, RAIO_VISAO_PADRAO, ANGULO_VISAO_PADRAO);
+    
+    // Salva posição inicial como segura
+    bot->ultima_pos_segura_x = x;
+    bot->ultima_pos_segura_y = y;
+    bot->tentativas_fuga = 0;
 }
 
 void iniciar_bot_com_sprite(Bot* bot, float x, float y, const char* nome, const char* tipo, int cenario, const char* caminho_sprite) {
@@ -805,4 +818,247 @@ void destruir_bot(Bot* bot) {
     }
 }
 
-// FIM DO ARQUIVO - NÃO ADICIONAR MAIS NADA AQUI
+// ========== SISTEMA DE VISÃO ==========
+
+void inicializar_sistema_visao(SistemaVisao* visao, float raio, float angulo) {
+    if (!visao) return;
+    
+    visao->raio_visao = raio;
+    visao->angulo_visao = angulo;
+    visao->direcao_olhar = 0.0f;  // Inicialmente olhando para direita
+    
+    visao->ameaca_detectada = false;
+    visao->ameaca_x = 0.0f;
+    visao->ameaca_y = 0.0f;
+    visao->tempo_desde_deteccao = 999.0f;  // Muito tempo sem ver ameaça
+    visao->distancia_ameaca = 999.0f;
+    
+    visao->mostrar_debug = false;  // Desligado por padrão
+}
+
+bool ponto_no_campo_visao(const Bot* bot, float px, float py) {
+    if (!bot) return false;
+    
+    // Calcula distância até o ponto
+    float dx = px - bot->x;
+    float dy = py - bot->y;
+    float distancia = sqrtf(dx * dx + dy * dy);
+    
+    // Se está além do raio de visão, não vê
+    if (distancia > bot->visao.raio_visao) return false;
+    
+    // Se o ângulo de visão é >= 2π (360°), vê tudo ao redor
+    if (bot->visao.angulo_visao >= 6.28f) return true;
+    
+    // Calcula ângulo até o ponto
+    float angulo_ponto = atan2f(dy, dx);
+    
+    // Normaliza diferença de ângulo para [-π, π]
+    float diff_angulo = angulo_ponto - bot->visao.direcao_olhar;
+    while (diff_angulo > 3.14159f) diff_angulo -= 6.28318f;
+    while (diff_angulo < -3.14159f) diff_angulo += 6.28318f;
+    
+    // Verifica se está dentro do cone de visão
+    return fabsf(diff_angulo) <= (bot->visao.angulo_visao / 2.0f);
+}
+
+void atualizar_deteccao_ameacas(Bot* bot, float ameaca_x, float ameaca_y, float delta_time) {
+    if (!bot) return;
+    
+    // Atualiza direção do olhar baseado na direção de movimento
+    if (fabsf(bot->direcao_x) > 0.01f || fabsf(bot->direcao_y) > 0.01f) {
+        bot->visao.direcao_olhar = atan2f(bot->direcao_y, bot->direcao_x);
+    }
+    
+    // Verifica se a ameaça está no campo de visão
+    bool pode_ver = ponto_no_campo_visao(bot, ameaca_x, ameaca_y);
+    
+    if (pode_ver) {
+        // Ameaça detectada!
+        bot->visao.ameaca_detectada = true;
+        bot->visao.ameaca_x = ameaca_x;
+        bot->visao.ameaca_y = ameaca_y;
+        bot->visao.tempo_desde_deteccao = 0.0f;
+        
+        float dx = ameaca_x - bot->x;
+        float dy = ameaca_y - bot->y;
+        bot->visao.distancia_ameaca = sqrtf(dx * dx + dy * dy);
+    } else {
+        // Não consegue ver a ameaça
+        bot->visao.tempo_desde_deteccao += delta_time;
+        
+        // Se passou muito tempo, "esquece" a ameaça
+        if (bot->visao.tempo_desde_deteccao > TEMPO_MEMORIA_AMEACA) {
+            bot->visao.ameaca_detectada = false;
+        }
+    }
+}
+
+void desenhar_campo_visao(const Bot* bot, float camera_x, float camera_y) {
+    if (!bot || !bot->visao.mostrar_debug) return;
+    
+    float bot_x_tela = (bot->x - camera_x) * ZOOM_FACTOR;
+    float bot_y_tela = (bot->y - camera_y) * ZOOM_FACTOR;
+    float raio_tela = bot->visao.raio_visao * ZOOM_FACTOR;
+    
+    // Desenha círculo de raio de visão
+    al_draw_circle(bot_x_tela, bot_y_tela, raio_tela, 
+                   al_map_rgba(255, 255, 0, 100), 1.5f);
+    
+    // Se tem cone de visão (não é 360°), desenha o cone
+    if (bot->visao.angulo_visao < 6.28f) {
+        float angulo_inicio = bot->visao.direcao_olhar - bot->visao.angulo_visao / 2.0f;
+        float angulo_fim = bot->visao.direcao_olhar + bot->visao.angulo_visao / 2.0f;
+        
+        // Desenha as linhas do cone
+        float x1 = bot_x_tela + cosf(angulo_inicio) * raio_tela;
+        float y1 = bot_y_tela + sinf(angulo_inicio) * raio_tela;
+        float x2 = bot_x_tela + cosf(angulo_fim) * raio_tela;
+        float y2 = bot_y_tela + sinf(angulo_fim) * raio_tela;
+        
+        al_draw_line(bot_x_tela, bot_y_tela, x1, y1, 
+                     al_map_rgba(255, 255, 0, 150), 2.0f);
+        al_draw_line(bot_x_tela, bot_y_tela, x2, y2, 
+                     al_map_rgba(255, 255, 0, 150), 2.0f);
+        
+        // Desenha arco do cone
+        al_draw_arc(bot_x_tela, bot_y_tela, raio_tela,
+                    angulo_inicio, bot->visao.angulo_visao,
+                    al_map_rgba(255, 255, 0, 150), 2.0f);
+    }
+    
+    // Se detectou ameaça, desenha linha até ela
+    if (bot->visao.ameaca_detectada) {
+        float ameaca_x_tela = (bot->visao.ameaca_x - camera_x) * ZOOM_FACTOR;
+        float ameaca_y_tela = (bot->visao.ameaca_y - camera_y) * ZOOM_FACTOR;
+        
+        al_draw_line(bot_x_tela, bot_y_tela, ameaca_x_tela, ameaca_y_tela,
+                     al_map_rgba(255, 0, 0, 200), 2.0f);
+    }
+}
+
+// ========== MÁQUINA DE ESTADOS DA IA ==========
+
+void mudar_estado_ia(Bot* bot, EstadoIA novo_estado) {
+    if (!bot) return;
+    
+    // Debug log
+    printf("[IA] %s: %s -> %s\n", bot->animal_data.nome,
+           nome_estado_ia(bot->estado_atual), nome_estado_ia(novo_estado));
+    
+    bot->estado_atual = novo_estado;
+    bot->tempo_no_estado = 0.0f;
+    
+    // Ajusta velocidade baseado no novo estado
+    switch (novo_estado) {
+        case ESTADO_PATRULHA:
+            bot->velocidade = bot->velocidade_base * VEL_MULTIPLICADOR_PATRULHA;
+            break;
+        case ESTADO_ALERTA:
+            bot->velocidade = bot->velocidade_base * VEL_MULTIPLICADOR_ALERTA;
+            break;
+        case ESTADO_FUGA:
+            bot->velocidade = bot->velocidade_base * VEL_MULTIPLICADOR_FUGA;
+            bot->fugindo = true;  // Compatibilidade com sistema antigo
+            bot->fuga_timer = TEMPO_FUGA_ANIMAL;
+            break;
+        case ESTADO_ESCONDIDO:
+            bot->velocidade = bot->velocidade_base * VEL_MULTIPLICADOR_ESCONDIDO;
+            bot->parado = true;
+            bot->parado_timer = TEMPO_MIN_ESCONDIDO;
+            break;
+        case ESTADO_RETORNANDO:
+            bot->velocidade = bot->velocidade_base * VEL_MULTIPLICADOR_RETORNANDO;
+            break;
+    }
+}
+
+const char* nome_estado_ia(EstadoIA estado) {
+    switch (estado) {
+        case ESTADO_PATRULHA:   return "PATRULHA";
+        case ESTADO_ALERTA:     return "ALERTA";
+        case ESTADO_FUGA:       return "FUGA";
+        case ESTADO_ESCONDIDO:  return "ESCONDIDO";
+        case ESTADO_RETORNANDO: return "RETORNANDO";
+        default:                return "DESCONHECIDO";
+    }
+}
+
+void atualizar_estado_ia(Bot* bot, float delta_time) {
+    if (!bot) return;
+    
+    bot->tempo_no_estado += delta_time;
+    
+    // Máquina de estados
+    switch (bot->estado_atual) {
+        case ESTADO_PATRULHA:
+            // Se detectou ameaça próxima, entra em ALERTA
+            if (bot->visao.ameaca_detectada && bot->visao.distancia_ameaca < RAIO_FUGA_ANIMAL) {
+                if (bot->visao.distancia_ameaca < DISTANCIA_PERIGO_IMINENTE) {
+                    // Perigo muito próximo: foge direto
+                    mudar_estado_ia(bot, ESTADO_FUGA);
+                } else {
+                    // Perigo detectado: fica alerta
+                    mudar_estado_ia(bot, ESTADO_ALERTA);
+                }
+            }
+            // Chance de parar para "descansar"
+            else if (bot->tempo_no_estado > TEMPO_MIN_PATRULHA) {
+                float chance = ((float)rand() / RAND_MAX);
+                if (chance < CHANCE_PARAR_PATRULHA) {
+                    mudar_estado_ia(bot, ESTADO_ESCONDIDO);
+                }
+            }
+            break;
+            
+        case ESTADO_ALERTA:
+            // Se ameaça ficou muito próxima, foge
+            if (bot->visao.ameaca_detectada && bot->visao.distancia_ameaca < DISTANCIA_PERIGO_IMINENTE) {
+                mudar_estado_ia(bot, ESTADO_FUGA);
+            }
+            // Se ameaça desapareceu ou está longe, volta a patrulhar
+            else if (!bot->visao.ameaca_detectada || bot->visao.distancia_ameaca > DISTANCIA_SEGURA) {
+                if (bot->tempo_no_estado > TEMPO_MIN_ALERTA) {
+                    mudar_estado_ia(bot, ESTADO_PATRULHA);
+                }
+            }
+            break;
+            
+        case ESTADO_FUGA:
+            // Se já fugiu por tempo suficiente e está longe, tenta se esconder
+            if (bot->tempo_no_estado > TEMPO_MIN_FUGA) {
+                if (!bot->visao.ameaca_detectada || bot->visao.distancia_ameaca > DISTANCIA_SEGURA) {
+                    mudar_estado_ia(bot, ESTADO_ESCONDIDO);
+                }
+            }
+            break;
+            
+        case ESTADO_ESCONDIDO:
+            // Se foi descoberto, volta a fugir
+            if (bot->visao.ameaca_detectada && bot->visao.distancia_ameaca < RAIO_FUGA_ANIMAL) {
+                mudar_estado_ia(bot, ESTADO_FUGA);
+            }
+            // Se ficou escondido tempo suficiente, volta a área segura
+            else if (bot->tempo_no_estado > TEMPO_MIN_ESCONDIDO) {
+                mudar_estado_ia(bot, ESTADO_RETORNANDO);
+            }
+            break;
+            
+        case ESTADO_RETORNANDO:
+            // Verifica se chegou perto da posição segura
+            float dx = bot->x - bot->ultima_pos_segura_x;
+            float dy = bot->y - bot->ultima_pos_segura_y;
+            float dist_segura = sqrtf(dx * dx + dy * dy);
+            
+            // Se chegou ou foi ameaçado novamente
+            if (dist_segura < 30.0f || bot->tempo_no_estado > TEMPO_MIN_RETORNANDO) {
+                mudar_estado_ia(bot, ESTADO_PATRULHA);
+            }
+            else if (bot->visao.ameaca_detectada && bot->visao.distancia_ameaca < RAIO_FUGA_ANIMAL) {
+                mudar_estado_ia(bot, ESTADO_FUGA);
+            }
+            break;
+    }
+}
+
+// FIM DO ARQUIVO
