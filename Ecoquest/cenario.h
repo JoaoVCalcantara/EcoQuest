@@ -7,7 +7,6 @@
 #include "entidades.h"
 #include "allegro_init.h"
 
-#define ZOOM_FACTOR 4.0f
 
 typedef enum {
     CENARIO1,

@@ -11,7 +11,7 @@ struct CavernaState;
 struct AllegroContext; /* necessário porque alguns protótipos usam AllegroContext* */
 
 /* Constants */
-#define PLAYER_RADIUS 15.0f
+#define PLAYER_RADIUS 17.0f
 #define PLAYER_SPEED 2.0f
 
 typedef enum {
@@ -21,6 +21,12 @@ typedef enum {
 	DIRECAO_DIR
 } Direcao;
 
+typedef struct {
+    bool cenario1_completo;
+    bool cenario2_completo;
+    bool cenario3_completo;
+    bool cenario4_completo;
+} ProgressoJogo;
 
 /* Estrutura completa das entidades */
 typedef struct {
@@ -31,8 +37,8 @@ typedef struct {
 
 	SpriteAnimadoFrameAFrame* sprite_cima;
     SpriteAnimadoFrameAFrame* sprite_baixo;
-    SpriteAnimadoFrameAFrame* sprite_direita;
     SpriteAnimadoFrameAFrame* sprite_esquerda;
+    SpriteAnimadoFrameAFrame* sprite_direita;
 
     SpriteAnimadoFrameAFrame* sprite_idle_cima;
     SpriteAnimadoFrameAFrame* sprite_idle_baixo;
@@ -42,6 +48,8 @@ typedef struct {
     Direcao Direcao_atual;
     bool movendo;
     bool usar_sprite;
+
+    ProgressoJogo progresso;
 } entidade;
 
 /* Dar tag à struct camera para permitir forward declarations */
@@ -58,5 +66,6 @@ void limitar_jogador(entidade* jogador, float largura_mapa, float altura_mapa);
 void processar_teclado(ALLEGRO_KEYBOARD_STATE* estado, entidade* jogador);
 bool colisao(float cx, float cy, float r, float rx, float ry, float rw, float rh);
 void destruir_entidade(entidade* p);
+void limitar_jogador_com_progresso(entidade* jogador, float largura_mapa, float altura_mapa, ProgressoJogo* progresso);
 
 #endif // ENTIDADES_H

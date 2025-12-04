@@ -1,4 +1,7 @@
 #include "allegro_init.h"
+#include <allegro5/allegro_ttf.h>
+#include <allegro5/allegro_image.h>
+#include <allegro5/allegro_primitives.h>
 #include <stdio.h>
 
 int inicializar_allegro(AllegroContext* ctx) {
@@ -6,13 +9,32 @@ int inicializar_allegro(AllegroContext* ctx) {
         fprintf(stderr, "Erro: falha ao inicializar Allegro\n");
         return 0;
     }
-    
+
     // Inicializa componentes do Allegro
-    al_init_font_addon();
-    al_init_ttf_addon();
-    al_init_image_addon();
-    al_init_primitives_addon();
-    al_install_keyboard();
+    if (!al_init_font_addon()) {
+        fprintf(stderr, "Erro: falha ao inicializar font addon\n");
+        return 0;
+    }
+
+    if (!al_init_ttf_addon()) {
+        fprintf(stderr, "Erro: falha ao inicializar TTF addon\n");
+        return 0;
+    }
+
+    if (!al_init_image_addon()) {
+        fprintf(stderr, "Erro: falha ao inicializar image addon\n");
+        return 0;
+    }
+
+    if (!al_init_primitives_addon()) {
+        fprintf(stderr, "Erro: falha ao inicializar primitives addon\n");
+        return 0;
+    }
+
+    if (!al_install_keyboard()) {
+        fprintf(stderr, "Erro: falha ao instalar teclado\n");
+        return 0;
+    }
 
     al_set_new_bitmap_flags(0);
 
@@ -35,22 +57,25 @@ int inicializar_allegro(AllegroContext* ctx) {
     ctx->mapa = al_load_bitmap("./assets/img/estruturas/mapa.png");
     if (!ctx->mapa) {
         fprintf(stderr, "Aviso: falha ao carregar mapa.png\n");
-        ctx->altura = ctx->largura = 0;
-        ctx->metadealtura = ctx->metadelargura = 0;
-    } else {
+        ctx->altura = 0;
+        ctx->largura = 0;
+        ctx->metadealtura = 0;
+        ctx->metadelargura = 0;
+    }
+    else {
         ctx->altura = al_get_bitmap_height(ctx->mapa);
         ctx->largura = al_get_bitmap_width(ctx->mapa);
         ctx->metadealtura = ctx->altura / 2;
         ctx->metadelargura = ctx->largura / 2;
-        
+
         // Cria sub-bitmaps para cada quadrante do mapa
         ctx->regioes[0] = al_create_sub_bitmap(ctx->mapa, 0, 0, ctx->metadelargura, ctx->metadealtura);
         ctx->regioes[1] = al_create_sub_bitmap(ctx->mapa, ctx->metadelargura, 0, ctx->metadelargura, ctx->metadealtura);
         ctx->regioes[2] = al_create_sub_bitmap(ctx->mapa, 0, ctx->metadealtura, ctx->metadelargura, ctx->metadealtura);
         ctx->regioes[3] = al_create_sub_bitmap(ctx->mapa, ctx->metadelargura, ctx->metadealtura, ctx->metadelargura, ctx->metadealtura);
     }
-    
-    ctx->font = NULL;  // Sem fonte por enquanto
+
+    ctx->font = al_create_builtin_font();  // Sem fonte por enquanto
 
     // Cria a fila de eventos
     ctx->event_queue = al_create_event_queue();
@@ -85,12 +110,12 @@ int inicializar_allegro(AllegroContext* ctx) {
 
 void destruir_allegro(AllegroContext* ctx) {
     if (!ctx) return;
-    
+
     // Destrói recursos na ordem inversa da criação
     for (int i = 0; i < 4; i++) {
         if (ctx->regioes[i]) al_destroy_bitmap(ctx->regioes[i]);
     }
-    
+
     if (ctx->mapa) al_destroy_bitmap(ctx->mapa);
     if (ctx->font) al_destroy_font(ctx->font);
     if (ctx->timer) al_destroy_timer(ctx->timer);

@@ -21,6 +21,8 @@
   <ItemGroup>
     <ClCompile Include="allegro_init.c" />
     <ClCompile Include="batalha.c" />
+    <ClCompile Include="bestiario.c" />
+    <ClCompile Include="cacador.c" />
     <ClCompile Include="cenario.c" />
     <ClCompile Include="entidades.c" />
     <ClCompile Include="inimigo.c" />
@@ -29,12 +31,17 @@
     <ClCompile Include="sprites.c" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="config_cacador.h" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="allegro_init.h" />
     <ClInclude Include="batalha.h" />
+    <ClInclude Include="bestiario.h" />
+    <ClInclude Include="cacador.h" />
     <ClInclude Include="cenario.h" />
+    <ClInclude Include="config_jogo.h" />
+    <ClInclude Include="config_ui.h" />
     <ClInclude Include="entidades.h" />
     <ClInclude Include="inimigo.h" />
     <ClInclude Include="menu.h" />
